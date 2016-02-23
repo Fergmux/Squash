@@ -27,3 +27,42 @@ Issues have been disabled on this repo, if you do find an issue or have a questi
 =======
 # Squash
 >>>>>>> 5d4ebc6056653ff89f1246a128697251ef2faf9a
+
+
+# Cache.js
+
+### Cache.initialize()
+
+Call this when the app loads to make sure the master key object has been stored in HTML5 localStorage.
+
+```
+Cache.initialize()
+```
+
+
+### Cache.request(url, callbackDone, callbackFail)
+
+All external data requests should be made through this function. First the cache will attempt to update it's version of the data through a normal AJAX request to the given `url`. If this is not successful, the cache will attempt to retrieve previously stored data.
+
+If one of these succeed, the method passed as the argument `callbackDone` will be called and the successfully retrieved data passed as its argument, whether from the new request or the cache storage.
+
+If neither of these succeed, the method passed as the argument `callbackFail` will be called.
+
+
+```
+Cache.request(url, callbackDone, callbackFail)
+
+    - (String)    url           :  The AJAX request URL
+    - (Function)  callbackDone  :  Function to call on success
+    - (Function)  callbackFail  :  Function to call on failure
+```
+
+### Cache.clean(time)
+
+This function can be used to prevent old, rarely used data from cluttering up the cache. Any object stored in the cache older than the parameter ```time``` (in milliseconds) will be deleted.
+
+```
+Cache.clean(time)
+
+    - (Long)      time          :  Maximum allowed age in milliseconds
+```

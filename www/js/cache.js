@@ -43,7 +43,7 @@ var Cache = {
     },
 
     /* Clean the cache */
-    clean: function() {
+    clean: function(time) {
         /* Get keylist from master key */
         var objMaster = JSON.parse(localStorage.getItem(this.masterkey));
 
@@ -54,8 +54,8 @@ var Cache = {
             var age = Date.now() - lastUpdated;
 
             /* Delete elements that haven't been updated for a week */
-            if (age > 604800000) {
-                this._delete(objMaster.keys[i].key);
+            if (age > time) {
+                Cache.delete(objMaster.keys[i].key);
             }
         }
     },
