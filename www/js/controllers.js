@@ -121,6 +121,97 @@ function main() {
    
 .controller('teamsCtrl', function($scope) {
 
+function format_date(date) {
+     var monthNames = [
+     "Jan", "Feb", "Mar", "Apr", "May",
+    "Jun", "Jul", "Aug", "Sep", "Oct",
+    "Nov", "Dec"
+    ];
+     var day = date.getDate();
+    var month = date.getMonth();
+     var year = date.getFullYear();
+
+     var formatted_date = String(day) + " " + monthNames[month] + " " + String(year);
+     return formatted_date; 
+
+}
+
+function read_team_match(match){
+    var seconds = match.dateint;
+    var date = new Date(seconds * 1000);
+    var formatted_date = format_date(date);
+
+    //var attendance; 
+    if (match.withdrawn == "false"){
+        var attendance = 'Yes';
+    }
+    else {
+        var attendance = 'No';
+    }
+
+    return[match.other_team.name, formatted_date, attendance];
+}
+
+
+
+function displayteam(teamdata){
+    var data = $.parseJSON(teamdata);
+    if (data.status == "good") {
+        var name = data.data.captain;
+        var contact = data.data.contact;
+        $("#team_name").html("Captain: " + name + "Contact Number: " + contact);
+
+        var team_matches = data.data.matches;
+        var team_matchdata = [];
+        for (var i = 0; i < team_matches.length; i++) {
+            var t = read_team_match(team_matches[i]);
+            team_matchdata.push(t);
+        }
+        $("#dteamtable").DataTable({
+            data: team_matchdata,
+            columns: [
+                {title: "Opponent"},
+                {title: "Date"},
+                {title: "Availible"},
+            ]
+        });
+
+        $("#team").show();
+        $("#form").hide();
+
+    }
+
+}
+
+
+function loadteam() { 
+    $("#team").hide();
+var teamid = $("#teamid").val(); 
+    if (/^[0-9]+$/.test(teamid)) {
+      var teamdata = $.ajax({
+        url: "http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json",
+        }).done(displayteam)
+          .fail(function() {
+            $("#msg").html("Error in AJAC equest.");
+          }); 
+    } else {
+        $("#msg").html("Error - id must be a number");
+    }
+}
+
+
+
+function main() {
+    $("#team").hide(); 
+
+    $("#teamid").button();
+    $("#loadteambutton").button().click(loadteam)
+
+}
+
+/* launch when page ready */
+$(main);
+
 })
    
 .controller('playersCtrl', function($scope) {
