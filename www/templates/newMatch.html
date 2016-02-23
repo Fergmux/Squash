@@ -1,19 +1,4 @@
-<!-- <head>
-<meta charset="UTF-8" />
-<title>Demo page</title>
-<link rel="stylesheet" type="text/css" href="demo.css" />
-
-<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.11.4/themes/humanity/jquery-ui.css" />
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css" />
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
-
-<script type="text/javascript" src="./demo.js"></script>
-</head> -->
-
-<ion-view title="New Match">
+<ion-view title="Search">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
 
     	<div id="msg"></div>
@@ -26,24 +11,29 @@
 	        </p>
 	    </div>
 
+
+	    <div id="foo"><div>
+
 	    <div id="tabs">
-	    <ul>
-	    <li> <a href="#tab-main">Name</a> </li>
-	    <li> <a href="#tab-stats">Stats</a> </li>
-	    <li> <a href="#tab-matches">Matches</a> </li>
-	    </ul>
-	    <div id="tab-main"></div>
-	    <div id="tab-stats">
-	        <p id="p_matches"></p>
-	        <div id="matchesbar"></div>
-	        <p id="p_games"></p>
-	        <div id="gamesbar"></div>
-	        <p id="p_points"></p>
-	        <div id="pointsbar"></div>
-	    </div>
-	    <div id="tab-matches">
-	        <table id="dtable" class="display" width="100%"></table>
-	    </div>
+	    	
+	    		<h2 class="title">Name </h2>
+	    			<div id="tab-main"></div>
+
+	    		<h2 class="title">Stats </h2>
+	    			<div id="tab-stats">
+				        <p id="p_matches"></p>
+				        <div id="matchesbar"></div>
+				        <p id="p_games"></p>
+				        <div id="gamesbar"></div>
+				        <p id="p_points"></p>
+				        <div id="pointsbar"></div>
+				    </div>
+	    
+	    		<h2 class="title"> Matches </h2>
+	    			<div id="tab-matches">
+	        			<table id="dtable" class="display cell-border" width="100%"></table>
+	    			</div>
+	    	
 	    </div>
 
 	</ion-content>
