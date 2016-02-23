@@ -65,7 +65,7 @@ function display(data) {
             var t = readmatch(matches[i]);
             matchdata.push(t);
         }
-        $("#dtable").DataTable({
+        $("#dtable").dataTable({
             data: matchdata,
             columns: [
                 {title: "Type"},
@@ -78,7 +78,7 @@ function display(data) {
 
         // $("#tabs").tabs();
         $("#tabs").show();
-        $("#msg").html("Success, loaded data for player " + id);
+        // $("#msg").html("Success, loaded data for player " + id);
     } else {
         $("#msg").html("Error - " + data.user_message);
     }
