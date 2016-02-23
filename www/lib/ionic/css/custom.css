@@ -1,0 +1,16 @@
+
+.tabheader {
+	color: #ef473a;
+	margin-top: 20px;
+}
+
+.searchbar {
+	width: 78%;
+	float: left;
+	margin-right: 5px;
+}
+ .smallbutt {
+ 	width: 20%;
+ 	padding: 5px;
+ 	line-height: 36px;
+ }
