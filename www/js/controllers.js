@@ -15,6 +15,10 @@ angular.module('app.controllers', [])
 .controller('newMatchCtrl', function($scope) {
 
 $("#tabs").hide();
+
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
 $scope.onTap = function () {
 	console.log("works")
 	$("#msg").empty();
@@ -22,10 +26,12 @@ $scope.onTap = function () {
 	func();
 	main();
 }
+
 function func() {
 	console.log("function");
 }
-	function readmatch(match) {
+
+function readmatch(match) {
     if (match.leaguetypeid) {
         return ["League", match.opponent, match.games_score, match.level_before, match.level_after];
     } else {
@@ -36,6 +42,65 @@ function func() {
             return ["error", "", "", "", ""];
         }
     }
+}
+
+function drawChart(chartdata) {
+    try {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'date');
+        data.addColumn('number', 'level');
+
+        for(var i = 0; i<chartdata.length; i++) {
+            data.addRow([formatDate(chartdata[i][0]), chartdata[i][1]] );
+        }
+        var options = {
+            title: 'Level History',
+            colors: ['red'],
+            hAxis: {
+                format: 'd MMM yy',
+                slantedText: true,
+                slantedTextAngle: 60,
+            //  showTextEver:,
+            //  ticks:, 
+                textStyle: {fontSize: 8}
+            },
+            vAxis: {
+                baseline: 0
+            }
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+        chart.draw(data, options);
+    }
+    catch(err) {
+        console.log("err: Empty chart_data");
+    }
+}
+
+function chartData(match) {
+    if(match.dateint) {
+        return [match.dateint, match.level_after];    
+    } else {
+        return ["error", "", "", "", ""];
+    }
+}
+
+
+/**
+* TODO: remove; change formatting to inside drawChart method
+*/
+function formatDate(dateint) {
+    var date = new Date(dateint * 1000);
+    // var monthNames = [
+    // "Jan", "Feb", "Mar", "Apr", "May",
+    // "Jun", "Jul", "Aug", "Sep", "Oct",
+    // "Nov", "Dec"
+    // ];
+    // var day = date.getDate();
+    // var month = date.getMonth();
+    // var year = date.getFullYear();
+
+    // var formatted_date = new Date(String(day) + " " + monthNames[month] + " " + String(year));
+    return date;
 }
 
 function display(data) {
@@ -62,9 +127,12 @@ function display(data) {
 
         var matches = data.data.matches;
         var matchdata = [];
+        var chartdata = [];
         for (var i = 0; i < matches.length; i++) {
             var t = readmatch(matches[i]);
+            var c = chartData(matches[i]);
             matchdata.push(t);
+            chartdata.push(c);
         }
         $("#dtable").dataTable({
             data: matchdata,
@@ -78,6 +146,7 @@ function display(data) {
         });
 
         // $("#tabs").tabs();
+        $("#tab-main").html(drawChart(chartdata));
         $("#tabs").show();
         // $("#msg").html("Success, loaded data for player " + id);
     } else {
