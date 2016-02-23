@@ -1,3 +1,92 @@
 <ion-view title="Fixtures">
-    <ion-content overflow-scroll="true" padding="true" class="has-header"></ion-content>
+    <ion-content overflow-scroll="true" padding="true" class="has-header">
+
+
+    <div id="tab-rankingCounty">
+	        <form method="post">
+
+	            <button on-tap="onTap()" class="button button-stable" id="loadbutton">Search</button>
+	            <select id="dropdown" name="dropdown">
+	                    <option value="all">All counties</option>
+	                    <option value="-1">None</option>
+	                    <option value="22">Avon</option>
+	                    <option value="52">Beds</option>
+	                    <option value="55">Berks</option>
+	                    <option value="53">Bucks</option>
+	                    <option value="83">Calgary</option>
+	                    <option value="39">Cambs</option>
+	                    <option value="76">Cardiff</option>
+	                    <option value="72">Carmarthenshire</option>
+	                    <option value="28">Cheshire</option>
+	                    <option value="7">Cornwall </option>
+	                    <option value="9">Cumbria </option>
+	                    <option value="63">D and C</option>
+	                    <option value="95">Derbys</option>
+	                    <option value="41">Derbyshire</option>
+	                    <option value="40">Devon</option>
+	                    <option value="36">Dorset</option>
+	                    <option value="61">Dundee</option>
+	                    <option value="33">Essex</option>
+	                    <option value="71">Flintshire</option>
+	                    <option value="38">Glos</option>
+	                    <option value="69">Gwent</option>
+	                    <option value="26">Hants</option>
+	                    <option value="62">Herefords</option>
+	                    <option value="49">Herts</option>
+	                    <option value="47">Ireland</option>
+	                    <option value="67">Isle Of Man</option>
+	                    <option value="50">Kent</option>
+	                    <option value="30">Lancs</option>
+	                    <option value="34">Leics</option>
+	                    <option value="65">Leinster</option>
+	                    <option value="29">Lincs</option>
+	                    <option value="46">Merseyside</option>
+	                    <option value="78">Mid Glamorgan</option>
+	                    <option value="51">Middx</option>
+	                    <option value="73">Monmouth</option>
+	                    <option value="32">Norfolk</option>
+	                    <option value="57">Northants</option>
+	                    <option value="14">Northumbria </option>
+	                    <option value="42">Notts</option>
+	                    <option value="2">NW Counties</option>
+	                    <option value="45">Oxon</option>
+	                    <option value="75">Pembrokeshire</option>
+	                    <option value="43">Scotland</option>
+	                    <option value="89">Se Wales</option>
+	                    <option value="18">Shropshire </option>
+	                    <option value="59">Somerset</option>
+	                    <option value="68">South Glamorgan</option>
+	                    <option value="54">Staffs</option>
+	                    <option value="56">Suffolk</option>
+	                    <option value="24">Surrey</option>
+	                    <option value="48">Sussex</option>
+	                    <option value="77">Tyne And Wear</option>
+	                    <option value="93">Ulster</option>
+	                    <option value="74">Vale Of Glamorgan</option>
+	                    <option value="31">Wales</option>
+	                    <option value="35">Warwicks</option>
+	                    <option value="70">West Glamorgan</option>
+	                    <option value="66">West Mids</option>
+	                    <option value="64">West Scotland</option>
+	                    <option value="44">Wilts</option>
+	                    <option value="58">Worcs</option>
+	                    <option value="91">Worcsestershire</option>
+	                    <option value="27">Yorks</option>
+	            </select>
+	        <input type="hidden" name="hiddenInput" id="hiddenInput" value="" />
+	        </form>
+	        <div id="result"></div>    
+	    </div>
+
+
+
+	    <div id="tabs">
+			<h2 class="title tabheader"> Ranking </h2>
+	    			<div id="tab-ranking">
+	    				<div id="table_div" style="width: 500px; height: 200px"></div>
+	    			</div>
+
+	 	</div>
+
+	</ion-content>
 </ion-view>

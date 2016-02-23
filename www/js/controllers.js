@@ -20,16 +20,11 @@ $("#tabs").hide();
     google.charts.setOnLoadCallback(drawChart);
 
 $scope.onTap = function () {
-	console.log("works")
 	$("#msg").empty();
-	// $("#foo").append("bar");
-	func();
-	main();
+    $("#tabs").hide();
+	load();
 }
 
-function func() {
-	console.log("function");
-}
 
 function readmatch(match) {
     if (match.leaguetypeid) {
@@ -170,21 +165,94 @@ function load() {
     }
 }
 
-function main() {
-    $("#tabs").hide();
-
-    // $("#playerid").button();
-    load();
-    // $("#loadbutton").button().click(load);
-
-}
-
-/* launch when page ready */
-// $(main);
-
 })
    
 .controller('pastMatchesCtrl', function($scope) {
+
+	google.charts.load('current', {
+		packages: ['table']
+	});
+	google.charts.setOnLoadCallback(loadteam);
+
+	$scope.onTap = function () {
+		console.log("works")
+		$("#msg").empty();
+		// $("#foo").append("bar");
+		changeHiddenInput();
+	}
+
+	function displayR(rank) {
+		console.log("test");
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Position');
+		data.addColumn('string', 'Player');
+		data.addColumn('string', 'Club');
+		data.addColumn('string', 'Last match');
+		data.addColumn('string', 'Level');
+
+		var rank = $.parseJSON(rank);
+
+		if (rank.status == "good") {
+
+			var rankData = rank.data;
+			var rows = [];
+			for (var i = 0; i < rankData.length; i++) {
+				console.log(rankData[i]);
+				var row = readRank(rankData[i]);
+				console.log(row);
+				rows.push(row);
+			}
+			data.addRows(rows);
+
+			var table = new google.visualization.Table(document.getElementById('table_div'));
+
+			table.draw(data, {
+				showRowNumber: true,
+				width: '100%',
+				height: '100%'
+			});
+
+		} else {
+			$("#msg").html("Error - displayR");
+		}
+	}
+	var select;
+	$scope.onload = function() {
+		select = document.getElementById('dropdown');
+		console.log(select);
+	}
+
+	var county = "";
+
+	function changeHiddenInput() {
+		county = $("#dropdown").val();
+		console.log("county = " + county);
+		loadteam();
+		//county.setValue(a);
+		//result.innerHTML = a || "";
+	}
+	
+	function loadteam() {
+		var rank = $.ajax({
+				url: "http://squashlevels.com/players.php?check=1&limit_confidence=1&club=all&county=" + county + "&country=all&show=last12m&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&format=json"
+
+			}).done(displayR)
+			.fail(function() {
+				$("#msg").html("Error in AJAX request for rank");
+			});
+	}
+
+	function readRank(rank) {
+
+	if (rank.position) {
+		date = new Date(rank.lastmatch_date * 1000).toLocaleDateString();
+		return ["" + rank.position, rank.player, rank.club, date, "" + rank.level];
+	} else {
+		// something went wrong
+		return ["error", "", "", "", ""];
+	}
+}
+
 
 })
    
@@ -297,14 +365,16 @@ $(main);
 	}
 
 	function display(data) {
+		console.log("it fuckin works")
 	    var data = $.parseJSON(data);
 	    console.log(data);
-	    currentStart = 0;
-	    $scope.items = []
-	    for (var i = 0; i < data.data.length; i++) {
-	    	$scope.items[i] = data.data[i].level + " - " + data.data[i].player
-	    }
+	  	$scope.items = []
+	  	for (var i = 0; i < data.data.length; i++) {
+	      	$scope.items.push(data.data[i].level + " - " + data.data[i].player)
+	  	}
 	}
+
+	 
 
 })
    
