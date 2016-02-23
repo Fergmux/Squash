@@ -1,4 +1,4 @@
-<ion-view title="Players">
+<ion-view title="Rankings">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
         <form class="list">
             <label class="item item-select">
@@ -12,21 +12,13 @@
                 </select>
             </label>
         </form>
-        <ion-list id="players"></ion-list>
-        <ion-list id="poo">
-  <ion-item>Hello!</ion-item>
-  <ion-item href="#/detail">
-    Link to detail page
-  </ion-item>
-  <ion-item>Hello!</ion-item>
-  <ion-item href="#/detail">
-    Link to detail page
-  </ion-item>
-  <ion-item>Hello!</ion-item>
-  <ion-item href="#/detail">
-    Link to detail page
-  </ion-item>
-</ion-list>
+        <ion-list>
+        <ion-item ng-repeat="item in items track by $index">
+          <p>{{item}}</p>
+        </ion-item>
+       </ion-list>
+
+       <button on-tap="onTap()" class="button button-assertive" id="loadbutton">More</button>
 
         
         <div id="levels"></div>
