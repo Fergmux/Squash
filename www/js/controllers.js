@@ -17,7 +17,7 @@ angular.module('app.controllers', [])
 $("#tabs").hide();
 $scope.onTap = function () {
 	console.log("works")
-	$("#foo").append("bar");
+	// $("#foo").append("bar");
 	func();
 	main();
 }

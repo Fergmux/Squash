@@ -1,13 +1,16 @@
-<ion-view title="Search">
+<ion-view title="Players">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
 
     	<div id="msg"></div>
 
 	    <div id="form">
 	        <p>
-	            ID (try 591):
-	            <input id="playerid" />
-	            <button on-tap="onTap()" class="button button-stable" id="loadbutton">Test</button>
+	            <!-- <input id="playerid"/> -->
+	            <label class="searchbar item item-input">
+				  <i class="icon ion-search placeholder-icon"></i>
+				  <input type="search" id="playerid" placeholder="Search">
+				</label>
+	            <button on-tap="onTap()" class="button button-stable smallbutt" id="loadbutton">Search</button>
 	        </p>
 	    </div>
 
@@ -16,10 +19,10 @@
 
 	    <div id="tabs">
 	    	
-	    		<h2 class="title">Name </h2>
+	    		<h2 class="title tabheader">Name </h2>
 	    			<div id="tab-main"></div>
 
-	    		<h2 class="title">Stats </h2>
+	    		<h2 class="title tabheader">Stats </h2>
 	    			<div id="tab-stats">
 				        <p id="p_matches"></p>
 				        <div id="matchesbar"></div>
@@ -29,7 +32,7 @@
 				        <div id="pointsbar"></div>
 				    </div>
 	    
-	    		<h2 class="title"> Matches </h2>
+	    		<h2 class="title tabheader"> Matches </h2>
 	    			<div id="tab-matches">
 	        			<table id="dtable" class="display cell-border" width="100%"></table>
 	    			</div>

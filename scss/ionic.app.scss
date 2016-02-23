@@ -19,9 +19,4 @@ $dark:                            #444 !default;
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
-@import "www/lib/ionic/scss/ionic";
-
-.tabheader {
-	font-size: 20px;
-	margin-top: 20px;
-}
+@import "../www/lib/ionic/scss/ionic";
