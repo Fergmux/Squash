@@ -132,7 +132,20 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
-			
+			$("#dtable").dataTable({
+				data: matchdata,
+				columns: [{
+					title: "Type"
+				}, {
+					title: "Opponent"
+				}, {
+					title: "Score"
+				}, {
+					title: "Level before"
+				}, {
+					title: "Level after"
+				}]
+			});
 
 			// $("#tabs").tabs();
 			$("#tab-main").html(drawChart(chartdata));
@@ -217,20 +230,6 @@ angular.module('app.controllers', [])
 	$scope.onload = function() {
 		select = document.getElementById('dropdown');
 		console.log(select);
-		$("#dtable").dataTable({
-			data: matchdata,
-			columns: [{
-				title: "Type"
-			}, {
-				title: "Opponent"
-			}, {
-				title: "Score"
-			}, {
-				title: "Level before"
-			}, {
-				title: "Level after"
-			}]
-		});
 	}
 
 	var county = "";
