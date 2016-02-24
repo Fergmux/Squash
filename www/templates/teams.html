@@ -7,11 +7,15 @@
             <div id="form">
 
                 <p> 
-                    Team ID (try ):
-                    <input id= "teamid" />
-                    <button id= "loadteambutton">Load</button>
+
+                    <label class="searchbar item item-input barmargin">
+                      <i class="icon ion-search placeholder-icon"></i>
+                      <input type="search" id="teamid" placeholder="Search">
+                    </label>
+                    <button on-tap="onTap()" class="button button-stable smallbutt" id="loadteambutton">Search</button>
                 </p>
             </div>
+
 
             <div id ="team">
                 <p> 

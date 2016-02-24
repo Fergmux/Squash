@@ -132,20 +132,7 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
-			$("#dtable").dataTable({
-				data: matchdata,
-				columns: [{
-					title: "Type"
-				}, {
-					title: "Opponent"
-				}, {
-					title: "Score"
-				}, {
-					title: "Level before"
-				}, {
-					title: "Level after"
-				}]
-			});
+			
 
 			// $("#tabs").tabs();
 			$("#tab-main").html(drawChart(chartdata));
@@ -230,6 +217,20 @@ angular.module('app.controllers', [])
 	$scope.onload = function() {
 		select = document.getElementById('dropdown');
 		console.log(select);
+		$("#dtable").dataTable({
+			data: matchdata,
+			columns: [{
+				title: "Type"
+			}, {
+				title: "Opponent"
+			}, {
+				title: "Score"
+			}, {
+				title: "Level before"
+			}, {
+				title: "Level after"
+			}]
+		});
 	}
 
 	var county = "";
@@ -341,7 +342,7 @@ angular.module('app.controllers', [])
 		if (data.status == "good") {
 			var name = data.data.captain;
 			var contact = data.data.contact;
-			$("#team_name").html("Captain: " + name + "Contact Number: " + contact);
+			$("#team_name").html("Captain: " + name + "<br>Contact Number: " + contact);
 
 			var team_matches = data.data.matches;
 			var team_matchdata = [];
@@ -361,7 +362,7 @@ angular.module('app.controllers', [])
 			});
 
 			$("#team").show();
-			$("#form").hide();
+			// $("#form").hide();
 
 		}
 
@@ -376,7 +377,7 @@ angular.module('app.controllers', [])
 					url: "http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json",
 				}).done(displayteam)
 				.fail(function() {
-					$("#msg").html("Error in AJAC equest.");
+					$("#msg").html("Error in AJAX equest.");
 				});
 		} else {
 			$("#msg").html("Error - id must be a number");
@@ -384,12 +385,16 @@ angular.module('app.controllers', [])
 	}
 
 
+	$scope.onTap = function() {
+		console.log("works")
+		loadteam();
+		console.log("poop")
+	}
+
 
 	function main() {
 		$("#team").hide();
 
-		$("#teamid").button();
-		$("#loadteambutton").button().click(loadteam)
 
 	}
 
