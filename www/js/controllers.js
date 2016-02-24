@@ -419,8 +419,11 @@ angular.module('app.controllers', [])
 		for (var i = 0; i < data.data.length; i++) {
 			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
 		}
+		$scope.$apply()
 	}
 
+
+			// $('#ranklist').html("<li> " + data.data[i].level + " <p> " + data.data[i].player + "</p></li>");
 
 
 })

@@ -11,12 +11,14 @@
                     <option>Level</option>
                 </select>
             </label>
-        </form>
+        </form><!-- 
+        <ul id="ranklist">
+        </ul> -->
         <ion-list>
-            <ion-item ng-repeat="item in items track by $index">
-                <p>{{item}}</p>
-            </ion-item>
-       </ion-list>
+          <ion-item ng-repeat="item in items">
+            {{item}}
+          </ion-item>
+        </ion-list>
 
        <!-- <button on-tap="onTap()" class="button button-assertive" id="loadbutton">More</button> -->
 
