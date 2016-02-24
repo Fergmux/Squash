@@ -102,6 +102,7 @@ angular.module('app.controllers', [])
 	}
 
 	function display(data) {
+		// $("#dtable").dataTable().fnDestroy();
 		var data = $.parseJSON(data);
 		if (data.status == "good") {
 			var id = data.data.summary.playerid;
@@ -134,6 +135,7 @@ angular.module('app.controllers', [])
 			}
 			$("#dtable").dataTable({
 				data: matchdata,
+				"bDestroy": true,
 				columns: [{
 					title: "Type"
 				}, {
