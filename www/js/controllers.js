@@ -216,6 +216,8 @@ angular.module('app.controllers', [])
 		}
 	}
 
+
+
 	function load() {
 		// $("#tabs").hide();
 		var name = $("#playerid").val();
@@ -258,21 +260,64 @@ angular.module('app.controllers', [])
 		var rank = $.parseJSON(rank);
 
 		if (rank.status == "good") {
+
 			var rankData = rank.data;
-			for (var i = 0; i < rankData.length; i++) {
+			console.log(rankData);
+			
+			console.log(info);
+
+			$scope.groups = [];
+			for (var i = 0; i < rankData.length; i++) { {
 				var info = rankData[i];
-				// date = new Date(rank.lastmatch_date * 1000).toLocaleDateString();
-				if (typeof info.club == 'undefined' || info.club == '') {
-					$("#ranklist").append("<li>"+info.level+" - " + info.player + "</li>");
-				} else {
-					$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
-				}
+				$scope.groups[i] = {
+				    name: info.position + " - " + info.player,
+				    items: []
+				};
+				var date = new Date(info.lastmatch_date * 1000).toLocaleDateString();
+				$scope.groups[i].items.push("Level: " + info.level);
+				if (typeof info.club != 'undefined' && info.club != '') {
+			    	$scope.groups[i].items.push("Club: " + info.club);
+			    }
+			    $scope.groups[i].items.push("Last Match: " + date);
+			}
+
+
+			// for (var i = 0; i < rankData.length; i++) {
+			// 	var info = rankData[i];
+				
+			// 	if (typeof info.club == 'undefined' || info.club == '') {
+			// 		$("#ranklist").append("<li>"+info.level+" - " + info.player + "</li>");
+			// 	} else {
+			// 		$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
+			// 	}
 			}
 			$("#tabs").show();
 		} else {
 			$("#msg").html("Error - No results for your query");
 		}
 	}
+
+
+
+	
+	  
+	  /*
+	   * if given group is the selected group, deselect it
+	   * else, select the given group
+	   */
+	  $scope.toggleGroup = function(group) {
+	    if ($scope.isGroupShown(group)) {
+	      $scope.shownGroup = null;
+	    } else {
+	      $scope.shownGroup = group;
+	    }
+	  };
+	  $scope.isGroupShown = function(group) {
+	    return $scope.shownGroup === group;
+	  };
+
+
+
 	//Reads input from the drop-down list
 	var select;
 	$scope.onload = function() {
@@ -469,5 +514,9 @@ angular.module('app.controllers', [])
 })
 
 .controller('settingsCtrl', function($scope) {
+
+})
+
+.controller('filtersCtrl', function($scope) {
 
 })

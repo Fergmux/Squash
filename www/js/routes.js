@@ -121,6 +121,18 @@ angular.module('app.routes', [])
         }
       }
     })
+
+
+
+    .state('badSquash.filters', {
+      url: '/page13',
+      views: {
+        'side-menu21': {
+          templateUrl: 'templates/filters.html',
+          controller: 'filtersCtrl'
+        }
+      }
+    })
         
       
     ;
