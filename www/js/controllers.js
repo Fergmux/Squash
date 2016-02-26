@@ -188,6 +188,7 @@ angular.module('app.controllers', [])
 
 			// $("#tabs").tabs();
 			$("#tab-main").html(drawChart(chartdata));
+			$("#playerlist").hide();
 			$("#tabs").show();
 			// $("#msg").html("Success, loaded data for player " + id);
 		} else {
@@ -217,7 +218,6 @@ angular.module('app.controllers', [])
 
 	function load() {
 		// $("#tabs").hide();
-		$("#playerlist").hide();
 		var name = $("#playerid").val();
 		console.log(name)
 		// let's make sure it's a number
