@@ -205,9 +205,9 @@ angular.module('app.controllers', [])
 
 .controller('pastMatchesCtrl', function($scope) {
 
-	google.charts.load('current', {
-		packages: ['table']
-	});
+	// google.charts.load('current', {
+	// 	packages: ['table']
+	// });
 	google.charts.setOnLoadCallback(loadRanking);
 
 	//Load button
