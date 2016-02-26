@@ -24,15 +24,17 @@ angular.module('app.controllers', [])
 	$scope.onTap = function() {
 		$("#msg").empty();
 		$("#tabs").hide();
-		$("#playerlist").hide();
 		if($("#playerid").val()=="") {
 			loadplayers();
 		} else {
-			load();	
+			load();
 		}
 	}
 
 	loadplayers();
+	loadlookup();
+
+	var idtable = new Object();
 
 	function loadplayers() {
 		var data = $.ajax({
@@ -52,6 +54,14 @@ angular.module('app.controllers', [])
 		}
 		$scope.$apply()
 		$("#playerlist").show();
+	}
+
+	$scope.search = function(item) {
+		console.log("searched");
+		var player = item.split("-")[1].trim()
+		console.log(player);
+		$("#playerid").val(player)
+		load();
 	}
 
 
@@ -185,20 +195,44 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	function load() {
-		// $("#tabs").hide();
-		var id = $("#playerid").val();
-		// let's make sure it's a number
-		if (/^[0-9]+$/.test(id)) {
+	function loadlookup(){
+		if (1) {
 			var data = $.ajax({
-					url: "http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json",
-				}).done(display)
+					url: "http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json",
+				}).done(function() {
+					data = $.parseJSON(data.responseText);
+					for (x in data.data) {
+						var playerid = data.data[x].playerid;
+						var player = data.data[x].player.toLowerCase();
+						idtable[player] = playerid;
+					}
+				})
 				.fail(function() {
 					$("#msg").html("Error in AJAX request.");
 				});
 		} else {
 			$("#msg").html("Error - id must be a number");
 		}
+	}
+
+	function load() {
+		// $("#tabs").hide();
+		$("#playerlist").hide();
+		var name = $("#playerid").val();
+		console.log(name)
+		// let's make sure it's a number
+		// if (/^[0-9]+$/.test(id)) {
+			var id = idtable[name.toLowerCase()]
+			console.log(id)
+			var data = $.ajax({
+					url: "http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json",
+				}).done(display)
+				.fail(function() {
+					$("#msg").html("Error in AJAX request.");
+				});
+		// } else {
+		// 	$("#msg").html("Error - id must be a number");
+		// }
 	}
 
 })
