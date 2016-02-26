@@ -241,9 +241,10 @@ angular.module('app.controllers', [])
 
 	// google.charts.load('current', {
 	// 	packages: ['table']
+	$("#tabs").hide();
 	// });
-	google.charts.setOnLoadCallback(loadRanking);
-
+	// google.charts.setOnLoadCallback(loadRanking);
+	
 	//Load button
 	$scope.onTap = function() {
 		console.log("works")
@@ -251,16 +252,20 @@ angular.module('app.controllers', [])
 		// $("#foo").append("bar");
 		changeHiddenInput();
 	}
+	
+	changeHiddenInput();
 
 	//Displays the ranking as a table 
 	function displayR(rank) {
-		console.log("test");
-		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Position');
-		data.addColumn('string', 'Player');
-		data.addColumn('string', 'Club');
-		data.addColumn('string', 'Last match');
-		data.addColumn('string', 'Level');
+		$("#tabs").hide();
+		$("#ranklist").empty();
+
+		// var data = new google.visualization.DataTable();
+		// data.addColumn('string', 'Position');
+		// data.addColumn('string', 'Player');
+		// data.addColumn('string', 'Club');
+		// data.addColumn('string', 'Last match');
+		// data.addColumn('string', 'Level');
 
 		var rank = $.parseJSON(rank);
 
@@ -268,24 +273,27 @@ angular.module('app.controllers', [])
 
 			var rankData = rank.data;
 			var rows = [];
+			console.log(rankData)
 			for (var i = 0; i < rankData.length; i++) {
-				console.log(rankData[i]);
-				var row = readRank(rankData[i]);
-				console.log(row);
-				rows.push(row);
+				var info = rankData[i];
+				// console.log(info.player)
+				// console.log(info.level)
+				// console.log(info.club)
+				console.log(info.club)
+				
+				if (typeof info.club == 'undefined' || info.club == '') {
+					$("#ranklist").append("<li>"+info.level+" - " + info.player + "</li>");
+				} else {
+					$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
+				}
+				// var row = readRank(rankData[i]);
+				
+				// console.log(row + "this is a row");
+				// rows.push(row);
 			}
-			data.addRows(rows);
-
-			var table = new google.visualization.Table(document.getElementById('table_div'));
-
-			table.draw(data, {
-				showRowNumber: true,
-				width: '100%',
-				height: '100%'
-			});
-
+			$("#tabs").show();
 		} else {
-			$("#msg").html("Error - displayR");
+			$("#msg").html("Error - No results for your query");
 		}
 	}
 	//Reads input from the drop-down list

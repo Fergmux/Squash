@@ -13,6 +13,7 @@
 	width: 20%;
 	padding: 5px;
 	line-height: 36px;
+	font-size: 15px;
 }
 
 #ranklist {
@@ -28,10 +29,18 @@
 	padding: 0px 25px 0px 20px;
 	border-bottom: solid #777 1px;
 	color: #444;
+	width: 100%;
+	float: none;
 }
 #ranklist > li > p {
-	float: right;
+	float: none;
 	margin-bottom: 0px;
+	line-height: 15px;
+	color: #555;
+}
+
+#ranklist > li.full {
+	line-height: 35px;
 }
 
 .list .item {
