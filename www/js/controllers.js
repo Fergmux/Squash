@@ -239,17 +239,12 @@ angular.module('app.controllers', [])
 
 .controller('pastMatchesCtrl', function($scope) {
 
-	// google.charts.load('current', {
-	// 	packages: ['table']
 	$("#tabs").hide();
-	// });
-	// google.charts.setOnLoadCallback(loadRanking);
 	
 	//Load button
 	$scope.onTap = function() {
 		console.log("works")
 		$("#msg").empty();
-		// $("#foo").append("bar");
 		changeHiddenInput();
 	}
 	
@@ -260,36 +255,18 @@ angular.module('app.controllers', [])
 		$("#tabs").hide();
 		$("#ranklist").empty();
 
-		// var data = new google.visualization.DataTable();
-		// data.addColumn('string', 'Position');
-		// data.addColumn('string', 'Player');
-		// data.addColumn('string', 'Club');
-		// data.addColumn('string', 'Last match');
-		// data.addColumn('string', 'Level');
-
 		var rank = $.parseJSON(rank);
 
 		if (rank.status == "good") {
-
 			var rankData = rank.data;
-			var rows = [];
-			console.log(rankData)
 			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
-				// console.log(info.player)
-				// console.log(info.level)
-				// console.log(info.club)
-				console.log(info.club)
-				
+				// date = new Date(rank.lastmatch_date * 1000).toLocaleDateString();
 				if (typeof info.club == 'undefined' || info.club == '') {
 					$("#ranklist").append("<li>"+info.level+" - " + info.player + "</li>");
 				} else {
 					$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
 				}
-				// var row = readRank(rankData[i]);
-				
-				// console.log(row + "this is a row");
-				// rows.push(row);
 			}
 			$("#tabs").show();
 		} else {
@@ -356,18 +333,6 @@ angular.module('app.controllers', [])
 			.fail(function() {
 				$("#msg").html("Error in AJAX request for rank");
 			});
-	}
-
-	//Reads the rank of the current player 
-	function readRank(rank) {
-
-		if (rank.position) {
-			date = new Date(rank.lastmatch_date * 1000).toLocaleDateString();
-			return ["" + rank.position, rank.player, rank.club, date, "" + rank.level];
-		} else {
-			// something went wrong
-			return ["error", "", "", "", ""];
-		}
 	}
 
 
