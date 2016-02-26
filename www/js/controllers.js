@@ -24,7 +24,34 @@ angular.module('app.controllers', [])
 	$scope.onTap = function() {
 		$("#msg").empty();
 		$("#tabs").hide();
-		load();
+		$("#playerlist").hide();
+		if($("#playerid").val()=="") {
+			loadplayers();
+		} else {
+			load();	
+		}
+	}
+
+	loadplayers();
+
+	function loadplayers() {
+		var data = $.ajax({
+				url: "http://www.badsquash.co.uk/players.php?leaguetype=1&format=json",
+			}).done(displayplayers)
+			.fail(function() {
+				$("#msg").html("Error in AJAX request.");
+			});
+	}
+
+	function displayplayers(data) {
+		var data = $.parseJSON(data);
+		console.log(data);
+		$scope.items = []
+		for (var i = 0; i < data.data.length; i++) {
+			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
+		}
+		$scope.$apply()
+		$("#playerlist").show();
 	}
 
 

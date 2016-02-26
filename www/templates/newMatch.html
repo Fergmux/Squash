@@ -1,4 +1,4 @@
-<ion-view title="Players">
+<ion-view title="Rankings">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
 
     	
@@ -15,6 +15,14 @@
 	    </div>
 
 	    <div id="msg"></div>
+
+	    <div id="playerlist">
+		    <ion-list>
+	          <ion-item ng-repeat="item in items">
+	            {{item}}
+	          </ion-item>
+	        </ion-list>
+	    </div>
 
 
 	    <div id="tabs">
