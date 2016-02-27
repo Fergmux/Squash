@@ -9,7 +9,7 @@ angular.module('app.controllers', [])
 })
 
 .controller('myProfileCtrl', function($scope) {
-
+    console.log('@@@');
 })
 
 .controller('newMatchCtrl', function($scope) {
@@ -85,7 +85,8 @@ angular.module('app.controllers', [])
 			data.addColumn('number', 'level');
 
 			for (var i = 0; i < chartdata.length; i++) {
-				data.addRow([formatDate(chartdata[i][0]), chartdata[i][1]]);
+				date = new Date(chartdata[i][0]*1000)
+                data.addRow([date, chartdata[i][1]]);
 			}
 			var options = {
 				title: 'Level History',
@@ -94,8 +95,6 @@ angular.module('app.controllers', [])
 					format: 'd MMM yy',
 					slantedText: true,
 					slantedTextAngle: 60,
-					//  showTextEver:,
-					//  ticks:, 
 					textStyle: {
 						fontSize: 8
 					}
@@ -117,25 +116,6 @@ angular.module('app.controllers', [])
 		} else {
 			return ["error", "", "", "", ""];
 		}
-	}
-
-
-	/**
-	 * TODO: remove; change formatting to inside drawChart method
-	 */
-	function formatDate(dateint) {
-		var date = new Date(dateint * 1000);
-		// var monthNames = [
-		// "Jan", "Feb", "Mar", "Apr", "May",
-		// "Jun", "Jul", "Aug", "Sep", "Oct",
-		// "Nov", "Dec"
-		// ];
-		// var day = date.getDate();
-		// var month = date.getMonth();
-		// var year = date.getFullYear();
-
-		// var formatted_date = new Date(String(day) + " " + monthNames[month] + " " + String(year));
-		return date;
 	}
 
 	function display(data) {
@@ -239,6 +219,9 @@ angular.module('app.controllers', [])
 
 })
 
+
+
+// SquashLevels tab: displays player rankings with filters
 .controller('pastMatchesCtrl', function($scope) {
 
 	$("#tabs").hide();
@@ -297,10 +280,6 @@ angular.module('app.controllers', [])
 		}
 	}
 
-
-
-	
-	  
 	  /*
 	   * if given group is the selected group, deselect it
 	   * else, select the given group
