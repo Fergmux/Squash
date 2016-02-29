@@ -77,7 +77,12 @@ angular.module('app.routes', [])
           templateUrl: 'templates/pastMatches.html',
           controller: 'pastMatchesCtrl'
         }
-      }
+      },
+      // resolve: {
+      //   filts: function(FiltService) {
+      //     return FiltService.getFilts()
+      //   }
+      // }
     })
         
       
@@ -131,7 +136,12 @@ angular.module('app.routes', [])
           templateUrl: 'templates/filters.html',
           controller: 'filtersCtrl'
         }
-      }
+      },
+      // resolve: {
+      //   filts: function(FiltService, filters) {
+      //     FiltService.setFilts(filters)
+      //   }
+      // }
     })
         
       

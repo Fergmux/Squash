@@ -242,6 +242,9 @@ angular.module('app.controllers', [])
 .controller('pastMatchesCtrl', function($scope) {
 
 	$("#tabs").hide();
+	// var filts = $scope.filts;
+	// console.log(filts)
+
 	
 	//Load button
 	$scope.onTap = function() {
@@ -518,5 +521,7 @@ angular.module('app.controllers', [])
 })
 
 .controller('filtersCtrl', function($scope) {
+	// var filters = {club: "None"}
+	// filts(filters)
 
 })
