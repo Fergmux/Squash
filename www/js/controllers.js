@@ -9,7 +9,7 @@ angular.module('app.controllers', [])
 })
 
 .controller('myProfileCtrl', function($scope) {
-    console.log('@@@');
+
 })
 
 .controller('newMatchCtrl', function($scope) {
@@ -91,16 +91,17 @@ angular.module('app.controllers', [])
 			var options = {
 				title: 'Level History',
 				colors: ['red'],
+                legend: {position: 'none'},
+                width: 400,
+                pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
-					slantedText: true,
-					slantedTextAngle: 60,
 					textStyle: {
 						fontSize: 8
 					}
 				},
-				vAxis: {
-					baseline: 0
+    			vAxis: {
+					baseline: 0,
 				}
 			};
 			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
@@ -125,7 +126,7 @@ angular.module('app.controllers', [])
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 
-			$("#tab-main").html("Player: " + name);
+			$("#tab-main").html(name);
 
 			var s = data.data.statistics;
 			$("#p_matches").html("Matches: " + s.matches +

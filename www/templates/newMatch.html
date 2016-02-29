@@ -1,7 +1,6 @@
 <ion-view title="Rankings">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
 
-    	
 
 	    <div id="form">
 	        <p>
@@ -28,25 +27,31 @@
 
 
 	    <div id="tabs">
-	    	
 	    		<h2 class="title tabheader">Name </h2>
-	    			<div id="tab-main"></div>
+	    			<!-- <div id="tab-main"></div> -->
+	    			<div class="card">
+						<div class="item item-text-wrap">
+						    <div id="tab-main"></div>
+					  	</div>
+					</div>
 
 	    		<h2 class="title tabheader">Stats </h2>
-	    			<div id="tab-stats">
-				        <p id="p_matches"></p>
-				        <p id="p_games"></p>
-				        <p id="p_points"></p>
-				       	<p id="level_hist">
-        					<div id="line_chart" style="width: 500px; height: 200px"></div>
-        				</p>
-				    </div>
+	    			<div class="card">
+				        <div class="item item-text-wrap">
+	    					<div id="tab-stats">
+				        		<p id="p_matches"></p>
+						        <p id="p_games"></p>
+						        <p id="p_points"></p>
+						        <p id="level_hist"></p>
+				    		</div>
+				    	</div>
+					</div>
+				<div id="line_chart" style="width: 300px; height: 200px"></div>
 	    
-	    		<h2 class="title tabheader"> Matches </h2>
+	       		<h2 class="title tabheader"> Matches </h2>
 	    			<div id="tab-matches">
 	        			<table id="dtable" class="display cell-border" width="100%"></table>
 	    			</div>
-	    	
 	    </div>
 
 	</ion-content>
