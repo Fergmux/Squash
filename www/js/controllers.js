@@ -234,6 +234,7 @@ angular.module('app.controllers', [])
 
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
+		$("#loader").show();
 		$("#filters").hide();
 	})
 	// var filts = $scope.filts;
@@ -242,7 +243,7 @@ angular.module('app.controllers', [])
 	
 	//Load button
 	$scope.onTap = function() {
-		console.log("fuck");
+		$("#tabs").hide();
 		$("#loader").show();
 		$("#msg").empty();
 		changeHiddenInput();
@@ -299,6 +300,7 @@ angular.module('app.controllers', [])
 			$("#loader").hide();
 			$("#tabs").show();
 		} else {
+			$("#loader").hide();
 			$("#msg").html("Error - No results for your query");
 		}
 	}
