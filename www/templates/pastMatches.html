@@ -1,6 +1,7 @@
 <ion-view title="Squash Levels">
 <ion-nav-buttons side="right">
-  <button ui-sref="badSquash.filters" class="button" ng-click="doSomething()">
+  <button class="button" ng-click="toggleFilters()">
+  	<!-- ui-sref="badSquash.filters"  -->
     Filters
   </button>
 </ion-nav-buttons>
@@ -8,17 +9,15 @@
 
 
     <div id="tab-rankingCounty">
-	        <form method="post">
 
-	            
-	            
-<!--         	Not working yet
-				<input type="checkbox" name="check0" id="check0">First checkbox</input>
-        		<input type="checkbox" name="check1" id="check1">Second checkbox</input>
-        		<input type="checkbox" name="check2" id="check2">Third checkbox</input>
-        		<input type="checkbox" name="check3" id="check3">Fourth checkbox</input> -->
+    	<div class="list" id="filters" style="oveflow: hidden">
 
-	            <select id="clubs" name="clubs">
+
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Club
+		    </div>
+		    <select id="clubs" name="clubs">
 					    <option value="all">All Clubs</option>
 					    <option value="-1">None</option>
 					    <option value="1196">1ne Project Solutions Ltd, Leics</option>
@@ -1227,9 +1226,13 @@
 					    <option value="369">York, Yorks</option>
 					    <option value="405">York not in, Yorks</option>
 					    <option value="1300">Zimmer Boys, Cambs</option>
-				</select>	
-
-	            <select id="county" name="county">
+				</select>
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      County
+		    </div>
+		    <select id="county" name="county">
 	                    <option value="all">All counties</option>
 	                    <option value="-1">None</option>
 	                    <option value="22">Avon</option>
@@ -1296,8 +1299,12 @@
 	                    <option value="91">Worcsestershire</option>
 	                    <option value="27">Yorks</option>
 	            </select>
-	            
-	            <select id="country" name="country">
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Country
+		    </div>
+		    <select id="country" name="country">
 					    <option value="all">All countries</option>
 					    <option value="157">-</option>
 					    <option value="147">AND</option>
@@ -1429,8 +1436,12 @@
 					    <option value="44">ZAM</option>
 					    <option value="67">ZIM</option>
 				</select>
-
-	            <select id="show" name="show">
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Time
+		    </div>
+		    <select id="show" name="show">
 	            		<option value="last6m">Last 6 months</option>
 	                    <option value="last12m">Last 12 months</option>
 	                    <option value="last24m">Last 2 years</option>
@@ -1438,21 +1449,29 @@
 	                    <option value="year">This year</option>
 	                    <option value="all">All matches</option>
 	            </select>	
-
-	        	<select id="events" name="events">
-						<option value="1">Min events: 1</option>
-						<option value="2">Min events: 2</option>
-						<option value="3">Min events: 3</option>
-						<option value="4">Min events: 4</option>
-						<option value="5">Min events: 5</option>
-						<option value="6">Min events: 6</option>
-						<option value="7">Min events: 7</option>
-						<option value="8">Min events: 8</option>
-						<option value="9">Min events: 9</option>
-						<option value="10">Min events: 10</option>
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Min events
+		    </div>
+		    <select id="events" name="events">
+						<option value="1"> 1</option>
+						<option value="2"> 2</option>
+						<option value="3"> 3</option>
+						<option value="4"> 4</option>
+						<option value="5"> 5</option>
+						<option value="6"> 6</option>
+						<option value="7"> 7</option>
+						<option value="8"> 8</option>
+						<option value="9"> 9</option>
+						<option value="10"> 10</option>
 				</select>
-
-	            <select id="matchtype" name="matchtype">
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      League/Event
+		    </div>
+		    <select id="matchtype" name="matchtype">
 						<option value="all">All Avon leagues/events</option>
 						<option value="Avon BLTSC Closed">Avon BLTSC Closed</option>
 						<option value="Avon BLTSC Ladies Closed">Avon BLTSC Ladies Closed</option>
@@ -1491,8 +1510,12 @@
 						<option value="Vivo Sports Boxes">Vivo Sports Boxes</option>
 						<option value="Vivo Sports lunch time Boxes">Vivo Sports lunch time Boxes</option>
 				</select>
-
-	        	<select id="agegroup" name="agegroup">
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Age
+		    </div>
+		    <select id="agegroup" name="agegroup">
 	        			<option value="all">All ages</option>
 	        			<option value="juniors">All juniors</option>
 	        			<option value="masters">All masters</option>
@@ -1520,14 +1543,40 @@
 	        			<option value="8">U21</option>
 	        			<option value="18">U23</option>
 				</select>
-				<select id="gender" name="gender">
+		  </label>
+		  <label class="item item-input item-select">
+		    <div class="input-label">
+		      Gender
+		    </div>
+		    <select id="gender" name="gender">
 						<option value="all">Male and female</option>
 						<option value="1">Male</option>
 						<option value="2">Female</option>
 				</select>
+		  </label>
 
-				<button on-tap="onTap()" class="button button-stable" id="loadbutton">Search</button>
+		  <div style="text-align: center">
+		  	<button ng-click="onTap()" class="button button-assertive searchbutton" id="loadbutton">Search</button>
+		  </div>
 
+
+		</div>
+	        
+	        	
+			<!-- <form method="post"> -->
+
+		  
+	            
+	            
+<!--         	Not working yet
+				<input type="checkbox" name="check0" id="check0">First checkbox</input>
+        		<input type="checkbox" name="check1" id="check1">Second checkbox</input>
+        		<input type="checkbox" name="check2" id="check2">Third checkbox</input>
+        		<input type="checkbox" name="check3" id="check3">Fourth checkbox</input> -->
+
+				
+
+			</div>
 	        <input type="hidden" name="hiddenInput" id="hiddenInput" value="" />
 	        </form>
 	        <div id="result"></div>    
@@ -1535,13 +1584,16 @@
 
 	    <div id="msg"></div>
 
+	    
+
 	    <div id="tabs">
 			<h2 class="title tabheader"> Rank </h2>
 	    			<!-- <div id="tab-ranking">
 	    				<div id="table_div" style="width: 500px; height: 200px"></div>
 	    			</div> -->
 
-	 	
+	 		
+
 
 	 		<ion-list>
 			    <div ng-repeat="group in groups">

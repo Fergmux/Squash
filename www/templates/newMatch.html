@@ -10,11 +10,12 @@
 				  <i class="icon ion-search placeholder-icon"></i>
 				  <input type="search" id="playerid" placeholder="Search">
 				</label>
-	            <button on-tap="onTap()" class="button button-stable smallbutt" id="loadbutton">Search</button>
+	            <button ng-click="onTap()" class="button button-stable smallbutt" id="loadbutton">Search</button>
 	        </p>
 	    </div>
 
 	    <div id="msg"></div>
+	    <div id="loader" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
 
 	    <div id="playerlist">
 		    <ion-list>

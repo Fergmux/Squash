@@ -14,7 +14,10 @@ angular.module('app.controllers', [])
 
 .controller('newMatchCtrl', function($scope) {
 
-	$("#tabs").hide();
+	$scope.$on('$ionicView.loaded', function () {
+		$("#tabs").hide();
+		$("#loader").show();
+	})
 
 	google.charts.load('current', {
 		packages: ['corechart']
@@ -24,6 +27,7 @@ angular.module('app.controllers', [])
 	$scope.onTap = function() {
 		$("#msg").empty();
 		$("#tabs").hide();
+		$("#loader").show();
 		if($("#playerid").val()=="") {
 			loadplayers();
 		} else {
@@ -53,6 +57,7 @@ angular.module('app.controllers', [])
 			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
 		}
 		$scope.$apply()
+		$("#loader").hide();
 		$("#playerlist").show();
 	}
 
@@ -169,9 +174,11 @@ angular.module('app.controllers', [])
 			// $("#tabs").tabs();
 			$("#tab-main").html(drawChart(chartdata));
 			$("#playerlist").hide();
+			$("#loader").hide();
 			$("#tabs").show();
 			// $("#msg").html("Success, loaded data for player " + id);
 		} else {
+			$("#loader").hide();
 			$("#msg").html("Error - " + data.user_message);
 		}
 	}
@@ -203,18 +210,18 @@ angular.module('app.controllers', [])
 		var name = $("#playerid").val();
 		console.log(name)
 		// let's make sure it's a number
-		// if (/^[0-9]+$/.test(id)) {
+		if (!/^[0-9]+$/.test(name)) {
 			var id = idtable[name.toLowerCase()]
-			console.log(id)
-			var data = $.ajax({
-					url: "http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json",
-				}).done(display)
-				.fail(function() {
-					$("#msg").html("Error in AJAX request.");
-				});
-		// } else {
-		// 	$("#msg").html("Error - id must be a number");
-		// }
+		} else {
+			var id = name;
+		}
+		console.log(id)
+		var data = $.ajax({
+				url: "http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json",
+			}).done(display)
+			.fail(function() {
+				$("#msg").html("Error in AJAX request.");
+			});
 	}
 
 })
@@ -224,18 +231,28 @@ angular.module('app.controllers', [])
 // SquashLevels tab: displays player rankings with filters
 .controller('pastMatchesCtrl', function($scope) {
 
-	$("#tabs").hide();
+	$scope.$on('$ionicView.loaded', function () {
+		$("#tabs").hide();
+		$("#filters").hide();
+	})
 	// var filts = $scope.filts;
 	// console.log(filts)
 
 	
 	//Load button
 	$scope.onTap = function() {
-		console.log("works")
+		console.log("fuck");
+		$("#loader").show();
 		$("#msg").empty();
 		changeHiddenInput();
+		$("#filters").slideToggle('slow');
+
 	}
-	
+
+	$scope.toggleFilters = function() {
+		$("#filters").slideToggle('slow');
+	}
+
 	changeHiddenInput();
 
 	//Displays the ranking as a table 
@@ -277,6 +294,8 @@ angular.module('app.controllers', [])
 			// 		$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
 			// 	}
 			}
+			$scope.$apply();
+			$("#loader").hide();
 			$("#tabs").show();
 		} else {
 			$("#msg").html("Error - No results for your query");
