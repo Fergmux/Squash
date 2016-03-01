@@ -15,7 +15,10 @@ angular.module('app.controllers', [])
 })
 
 .controller('rankingsCtrl', function($scope) {
+	//hide results before data has been loaded
 	$("#tabs").hide();
+
+	//only fires when page ist first entered
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
 		$("#loader").hide();
@@ -23,16 +26,26 @@ angular.module('app.controllers', [])
 		loadlookup();
 	})
 
+	//load in google charts
 	google.charts.load('current', {
 		packages: ['corechart']
 	});
 	google.charts.setOnLoadCallback(drawChart);
 
+	//when search button is pressed
 	$scope.onTap = function() {
+		//empty error message
 		$("#msg").empty();
+
+		//hide results
 		$("#tabs").hide();
+
 		// $("#loader").show();
+		
+		//get value from search box
 		var searchVal = $("#playerid").val()
+
+		//if there is no value in search box, bring back rank list, otherwise load individual player
 		if(searchVal=="") {
 			loadplayers();
 		} else {
@@ -40,14 +53,17 @@ angular.module('app.controllers', [])
 		}
 	}
 
+	//initialse lookup table for player name - ID
 	var idtable = new Object();
 
+	//get the player data using the cache
 	function loadplayers() {
 		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", displayplayers, function() {
 				$("#msg").html("Error in AJAX request.");
 			})
 		}
 
+	// push the rankings data to the list
 	function displayplayers(data) {
 		var data = $.parseJSON(data);
 		$scope.items = []
@@ -59,12 +75,17 @@ angular.module('app.controllers', [])
 		$("#playerlist").show();
 	}
 
+	//when a rank list item is clicked, earch for that person
 	$scope.search = function(item) {
+		//take the name from the list item
 		var player = item.split("-")[1].trim()
+
+		//put the name in the search box (it looks nice)
 		$("#playerid").val(player)
+
+		//load player page
 		load(player);
 	}
-
 
 	function readmatch(match) {
 		if (match.leaguetypeid) {
@@ -120,6 +141,7 @@ angular.module('app.controllers', [])
 		}
 	}
 
+	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
 		if (data.status == "good") {
@@ -151,6 +173,8 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
+
+			//define the table columns
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
@@ -176,12 +200,14 @@ angular.module('app.controllers', [])
 		}
 	}
 
+	//load the lookup table data for all players - ID
 	function loadlookup(){
 		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerTable, function() {
 			$("#msg").html("Error - id must be a number")
 		})
 	}
 
+	//populate the payer -ID lookup table
 	function makePlayerTable(data) {
 		data = $.parseJSON(data);
 		for (x in data.data) {
@@ -191,13 +217,11 @@ angular.module('app.controllers', [])
 		}
 	}
 
-
-
+	//load the data for the player page with the cache
 	function load(name) {
-		// $("#tabs").hide();
-		// var name = $("#playerid").val();
-		// let's make sure it's a number
+		//test if they are searching for ID or player name
 		if (!/^[0-9]+$/.test(name)) {
+			//make lower case to remove errors on incorrect capitalization
 			var id = idtable[name.toLowerCase()]
 		} else {
 			var id = name;
@@ -213,6 +237,7 @@ angular.module('app.controllers', [])
 // SquashLevels tab: displays player rankings with filters
 .controller('squashLevelsCtrl', function($scope) {
 
+	//fires when page is loaded for the first time
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
 		$("#loader").hide();
@@ -220,7 +245,7 @@ angular.module('app.controllers', [])
 		changeHiddenInput();
 	})
 	
-	//Load button
+	//When search buttton is pressed, hide results, reload data, hide filters
 	$scope.onTap = function() {
 		$("#tabs").hide();
 		$("#loader").show();
@@ -229,34 +254,43 @@ angular.module('app.controllers', [])
 		$("#filters").slideToggle('slow');
 	}
 
+	//when filters button is pressed toggle filters
 	$scope.toggleFilters = function() {
 		$("#filters").slideToggle('slow');
 	}
 
-	//Displays the ranking as a table 
+	//Displays the rankings as a list
 	function displayRank(rank) {
 		$("#tabs").hide();
 		$("#ranklist").empty();
 
 		var rank = $.parseJSON(rank);
-		console.log(rank)
 
+		//if data has been returned succesfully
 		if (rank.status == "good") {
 
 			var rankData = rank.data;
 
 			$scope.groups = [];
+			//populate rank list with data (Position - Name)
 			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
 				$scope.groups[i] = {
 				    name: info.position + " - " + info.player,
 				    items: []
 				};
+				//make date human readable
 				var date = new Date(info.lastmatch_date * 1000).toLocaleDateString();
+				
+				//push player level, to dropdown
 				$scope.groups[i].items.push("Level: " + info.level);
+				
+				//if the player has a club, push that to dropdown
 				if (typeof info.club != 'undefined' && info.club != '') {
 			    	$scope.groups[i].items.push("Club: " + info.club);
 			    }
+			    
+			    //push the player's last match datae to dropdown
 			    $scope.groups[i].items.push("Last Match: " + date);
 			}
 			$scope.$apply();
@@ -268,35 +302,23 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	  /*
-	   * if given group is the selected group, deselect it
-	   * else, select the given group
-	   */
-	  $scope.toggleGroup = function(group) {
-	    if ($scope.isGroupShown(group)) {
-	      $scope.shownGroup = null;
-	    } else {
-	      $scope.shownGroup = group;
-	    }
-	  };
-	  $scope.isGroupShown = function(group) {
-	    return $scope.shownGroup === group;
-	  };
+	/*
+	* if given group is the selected group, deselect it
+	* else, select the given group
+	*/
+	//this is all code for the accordian dropdown style, ripped straight from internet, don't break
+	$scope.toggleGroup = function(group) {
+		if ($scope.isGroupShown(group)) {
+	  		$scope.shownGroup = null;
+		} else {
+	  		$scope.shownGroup = group;
+		}
+	};
+	$scope.isGroupShown = function(group) {
+		return $scope.shownGroup === group;
+	};
 
-
-
-	//Reads input from the drop-down list
-	var select;
-	$scope.onload = function() {
-		select = document.getElementById('dropdown');
-		console.log(select);
-	}
-
-	var county = "";
-	var show = "";
-	var agegroup = "";
-	var gender = "";
-
+	//get the dropdown inpiuts
 	function changeHiddenInput() {
 		county = $("#county").val();
 		show = $('#show').val();
@@ -310,7 +332,7 @@ angular.module('app.controllers', [])
 		loadRanking();
 	}
 
-	//This loads the data for desplaying rankings (renames it to loadRanking from loadteam-- there's another function called that)
+	//This loads the data for desplaying rankings, calls displayRank on success
 	function loadRanking() {
 		Cache.request("http://squashlevels.com/players.php?check=1&limit_confidence=1&club=" + clubs + "&county=" + county + "&country=" + country + "&show=" + show + "&events=" + events + "&matchtype=" + matchtype + "&playercat=" + agegroup + "&playertype=" + gender + "&search=Search+name&format=json", displayRank, function() {
 				$("#msg").html("Error in AJAX request for rank");
@@ -320,6 +342,7 @@ angular.module('app.controllers', [])
 
 .controller('teamsCtrl', function($scope) {
 
+	// return date in readable format
 	function format_date(date) {
 		var monthNames = [
 			"Jan", "Feb", "Mar", "Apr", "May",
@@ -340,7 +363,6 @@ angular.module('app.controllers', [])
 		var date = new Date(seconds * 1000);
 		var formatted_date = format_date(date);
 
-		//var attendance; 
 		if (match.withdrawn == "false") {
 			var attendance = 'Yes';
 		} else {
@@ -350,13 +372,9 @@ angular.module('app.controllers', [])
 		return [match.other_team.name, formatted_date, attendance];
 	}
 
-
-
+	//display the team data in the table
 	function displayteam(teamdata) {
-		console.log(teamdata)
 		var data = $.parseJSON(teamdata);
-
-		// var data = $.parseJSON(data.responseText);
 		
 		if (data.status == "good") {
 			var name = data.data.captain;
@@ -369,6 +387,7 @@ angular.module('app.controllers', [])
 				var t = read_team_match(team_matches[i]);
 				team_matchdata.push(t);
 			}
+			//set columns for the datatable
 			$("#dteamtable").DataTable({
 				data: team_matchdata,
 				columns: [{
@@ -386,8 +405,9 @@ angular.module('app.controllers', [])
 
 
 	function loadteam() {
-		$("#team").hide();
+		//get team id from the search box
 		var teamid = $("#teamid").val();
+		//make sure it's a number (TODO: search on club name)
 		if (/^[0-9]+$/.test(teamid)) {
 			Cache.request("http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
 					$("#msg").html("Error in AJAX equest.");
@@ -397,19 +417,10 @@ angular.module('app.controllers', [])
 		}
 	}
 
-
+	//wehn search button is pressed
 	$scope.onTap = function() {
-		console.log("works")
 		loadteam();
-		console.log("poop")
 	}
-
-	function main() {
-		$("#team").hide();
-	}
-
-	/* launch when page ready */
-	$(main);
 
 })
 

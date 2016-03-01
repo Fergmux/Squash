@@ -4,10 +4,9 @@
 
 	    <div id="form">
 	        <p>
-	            <!-- <input id="playerid"/> -->
 	            <label class="searchbar item item-input">
-				  <i class="icon ion-search placeholder-icon"></i>
-				  <input type="search" id="playerid" placeholder="Search">
+					<i class="icon ion-search placeholder-icon"></i>
+				  	<input type="search" id="playerid" placeholder="Search">
 				</label>
 	            <button ng-click="onTap()" class="button button-stable smallbutt" id="loadbutton">Search</button>
 	        </p>
@@ -23,36 +22,31 @@
 	          </ion-item>
 	        </ion-list>
 	    </div>
-
-	    
-
-
 	    <div id="tabs">
-	    		<h2 class="title tabheader">Name </h2>
-	    			<!-- <div id="tab-main"></div> -->
-	    			<div class="card">
-						<div class="item item-text-wrap">
-						    <div id="tab-main"></div>
-					  	</div>
-					</div>
+    		<h2 class="title tabheader">Name </h2>
+    			<div class="card">
+					<div class="item item-text-wrap">
+					    <div id="tab-main"></div>
+				  	</div>
+				</div>
 
-	    		<h2 class="title tabheader">Stats </h2>
-	    			<div class="card">
-				        <div class="item item-text-wrap">
-	    					<div id="tab-stats">
-				        		<p id="p_matches"></p>
-						        <p id="p_games"></p>
-						        <p id="p_points"></p>
-						        <p id="level_hist"></p>
-				    		</div>
-				    	</div>
-					</div>
-				<div id="line_chart" style="width: 300px; height: 200px"></div>
-	    
-	       		<h2 class="title tabheader"> Matches </h2>
-	    			<div id="tab-matches">
-	        			<table id="dtable" class="display cell-border" width="100%"></table>
-	    			</div>
+    		<h2 class="title tabheader">Stats </h2>
+    			<div class="card">
+			        <div class="item item-text-wrap">
+    					<div id="tab-stats">
+			        		<p id="p_matches"></p>
+					        <p id="p_games"></p>
+					        <p id="p_points"></p>
+					        <p id="level_hist"></p>
+			    		</div>
+			    	</div>
+				</div>
+			<div id="line_chart" style="width: 300px; height: 200px"></div>
+    
+       		<h2 class="title tabheader"> Matches </h2>
+			<div id="tab-matches">
+    			<table id="dtable" class="display cell-border" width="100%"></table>
+			</div>
 	    </div>
 
 	</ion-content>
