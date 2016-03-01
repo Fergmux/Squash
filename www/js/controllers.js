@@ -89,7 +89,7 @@ angular.module('app.controllers', [])
 
 	function readmatch(match) {
 		if (match.leaguetypeid) {
-			return ["League", match.opponent, match.games_score, match.level_before, match.level_after];
+			return [match.opponent, match.games_score, match.level_before, match.level_after];
 		} else {
 			if (match.matchtypeid) {
 				return ["Match", match.opponent, match.games_score, match.level_before, match.level_after];
@@ -179,8 +179,6 @@ angular.module('app.controllers', [])
 				data: matchdata,
 				"bDestroy": true,
 				columns: [{
-					title: "Type"
-				}, {
 					title: "Opponent"
 				}, {
 					title: "Score"
