@@ -15,16 +15,34 @@ angular.module('app.controllers', [])
 })
 
 .controller('rankingsCtrl', function($scope) {
-	//hide results before data has been loaded
-	$("#tabs").hide();
-
 	//only fires when page ist first entered
 	$scope.$on('$ionicView.loaded', function () {
-		$("#tabs").hide();
-		$("#loader").hide();
+		$("#results").hide();
+		$("#loader").show();
 		loadplayers();
 		loadlookup();
 	})
+
+	var players = []
+	loadnames();
+
+	$(function() {
+    	$( "#playerid" ).autocomplete({
+      		source: players
+    	});
+  	});
+	function loadnames(){
+		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
+			$("#msg").html("Error - AJAX failed")
+		})
+	}
+	function makePlayerArray(data){
+		data = $.parseJSON(data);
+		for (var x = 0; x < data.data.length; x++) {
+			players[x] = data.data[x].player;
+		}
+		console.log(players)
+	}
 
 	//load in google charts
 	google.charts.load('current', {
@@ -38,9 +56,10 @@ angular.module('app.controllers', [])
 		$("#msg").empty();
 
 		//hide results
-		$("#tabs").hide();
+		$("#results").hide();
+		$("#playerlist").hide();
 
-		// $("#loader").show();
+		$("#loader").show();
 		
 		//get value from search box
 		var searchVal = $("#playerid").val()
@@ -77,6 +96,8 @@ angular.module('app.controllers', [])
 
 	//when a rank list item is clicked, earch for that person
 	$scope.search = function(item) {
+		$("#playerlist").hide();
+		$("#loader").show();
 		//take the name from the list item
 		var player = item.split("-")[1].trim()
 
@@ -188,10 +209,9 @@ angular.module('app.controllers', [])
 					title: "Level after"
 				}]
 			});
-			$("#tab-main").html(drawChart(chartdata));
-			$("#playerlist").hide();
 			$("#loader").hide();
-			$("#tabs").show();
+			$("#results").show();
+			$("#tab-main").html(drawChart(chartdata));
 		} else {
 			$("#loader").hide();
 			$("#msg").html("Error - " + data.user_message);
@@ -237,17 +257,16 @@ angular.module('app.controllers', [])
 
 	//fires when page is loaded for the first time
 	$scope.$on('$ionicView.loaded', function () {
-		$("#tabs").hide();
-		$("#loader").hide();
 		$("#filters").hide();
+		$("#tabs").hide();
+		$("#loading").show();
 		changeHiddenInput();
 	})
 	
 	//When search buttton is pressed, hide results, reload data, hide filters
 	$scope.onTap = function() {
-		$("#tabs").hide();
-		$("#loader").show();
 		$("#msg").empty();
+		$("#loading").show();
 		changeHiddenInput();
 		$("#filters").slideToggle('slow');
 	}
@@ -259,7 +278,6 @@ angular.module('app.controllers', [])
 
 	//Displays the rankings as a list
 	function displayRank(rank) {
-		$("#tabs").hide();
 		$("#ranklist").empty();
 
 		var rank = $.parseJSON(rank);
@@ -292,10 +310,9 @@ angular.module('app.controllers', [])
 			    $scope.groups[i].items.push("Last Match: " + date);
 			}
 			$scope.$apply();
-			$("#loader").hide();
+			$("#loading").hide();
 			$("#tabs").show();
 		} else {
-			$("#loader").hide();
 			$("#msg").html("Error - No results for your query");
 		}
 	}
@@ -396,11 +413,8 @@ angular.module('app.controllers', [])
 					title: "Availible"
 				}, ]
 			});
-
-			$("#team").show();
 		}
 	}
-
 
 	function loadteam() {
 		//get team id from the search box
@@ -415,32 +429,250 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	//wehn search button is pressed
+	//when search button is pressed
 	$scope.onTap = function() {
 		loadteam();
 	}
 
 })
 
-.controller('playersCtrl', function($scope) {
+.controller('playersCtrl', function($scope, $ionicPopup) {
+	var players = [];
+	var rounds = 3;
+	loadplayers();
+	setDateInput();
 
-	load();
-
-	function load() {
-		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", display, function() {
-				$("#msg").html("Error in AJAX request.");
-			});
+	function setDateInput(){
+		var currentTime = new Date();
+		currentTime = currentTime.toISOString()
+		currentTime = currentTime.substring(0,16)
+		$("#dateInput").val(currentTime)
 	}
 
-	function display(data) {
-		var data = $.parseJSON(data);
-		$scope.items = []
-		for (var i = 0; i < data.data.length; i++) {
-			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
+	$(function() {
+    	$( ".nameInput" ).autocomplete({
+      		source: players
+    	});
+  	});
+	function loadplayers(){
+		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
+			$("#msg").html("Error - AJAX failed")
+		})
+	}
+	function makePlayerArray(data){
+		data = $.parseJSON(data);
+		for (var x = 0; x < data.data.length; x++) {
+			players[x] = data.data[x].player;
 		}
-		$scope.$apply()
+		console.log(players)
 	}
-
+	$scope.threeRounds = function(){
+		rounds = 3;
+		$(".moreRounds").hide();
+		$scope.scores.score41 = undefined;
+		$scope.scores.score42 = undefined;
+		$scope.scores.score51 = undefined;
+		$scope.scores.score52 = undefined;
+		score1[3] = 0;
+		score2[3] = 0;
+		score1[4] = 0;
+		score2[4] = 0;
+		updateRounds();
+	}
+	$scope.fiveRounds = function(){
+		$(".moreRounds").show();
+		rounds = 5;
+	}
+	$scope.toggleDoubles = function() {
+		$(".doubles").toggle();	
+	}
+	$scope.scores = {}
+	var score1 = [0, 0, 0, 0, 0]
+	var score2 = [0, 0, 0, 0, 0]
+	$scope.score1Change = function(){
+		if($scope.scores.score11 > $scope.scores.score12) {
+			score1[0] = 1
+			score2[0] = 0
+		} else {
+			score1[0] = 0
+			score2[0] = 1
+		}
+		if($scope.scores.score11 == undefined) {
+			score1[0] = 0
+			score2[0] = 1
+		}
+		if($scope.scores.score12 == undefined) {
+			score1[0] = 1
+			score2[0] = 0
+		}
+		updateRounds();
+	}
+	$scope.score2Change = function(){
+		if($scope.scores.score21 > $scope.scores.score22) {
+			score1[1] = 1
+			score2[1] = 0
+		} else {
+			score1[1] = 0
+			score2[1] = 1
+		}
+		if($scope.scores.score21 == undefined) {
+			score1[1] = 0
+			score2[1] = 1
+		}
+		if($scope.scores.score22 == undefined) {
+			score1[1] = 1
+			score2[1] = 0
+		}
+		updateRounds();
+	}
+	$scope.score3Change = function(){
+		if($scope.scores.score31 > $scope.scores.score32) {
+			score1[2] = 1
+			score2[2] = 0
+		} else {
+			score1[2] = 0
+			score2[2] = 1
+		}
+		if($scope.scores.score31 == undefined) {
+			score1[2] = 0
+			score2[2] = 1
+		}
+		if($scope.scores.score32 == undefined) {
+			score1[2] = 1
+			score2[2] = 0
+		}
+		updateRounds();
+	}
+	$scope.score4Change = function(){
+		if($scope.scores.score41 > $scope.scores.score42) {
+			score1[3] = 1
+			score2[3] = 0
+		} else {
+			score1[3] = 0
+			score2[3] = 1
+		}
+		if($scope.scores.score41 == undefined) {
+			score1[3] = 0
+			score2[3] = 1
+		}
+		if($scope.scores.score42 == undefined) {
+			score1[3] = 1
+			score2[3] = 0
+		}
+		updateRounds();
+	}
+	$scope.score5Change = function(){
+		if($scope.scores.score51 > $scope.scores.score52) {
+			score1[4] = 1
+			score2[4] = 0
+		} else {
+			score1[4] = 0
+			score2[4] = 1
+		}
+		if($scope.scores.score51 == undefined) {
+			score1[4] = 0
+			score2[4] = 1
+		}
+		if($scope.scores.score52 == undefined) {
+			score1[4] = 1
+			score2[4] = 0
+		}
+		updateRounds();
+	}
+	function updateRounds() {
+		console.log($scope.scores);
+		console.log(score1);
+		console.log(score2);
+		var total1 = score1.reduce(function(previousValue, currentValue, currentIndex, array) {
+		  return previousValue + currentValue;
+		});
+		var total2 = score2.reduce(function(previousValue, currentValue, currentIndex, array) {
+		  return previousValue + currentValue;
+		});
+		console.log(total2)
+		$("#rounds1").html(total1)
+		$("#rounds2").html(total2)
+	}
+	$scope.submitScores = function() {
+		checkScores();		
+	}
+	function checkScores(){
+		var first = 0
+		var count = 0
+		var check = 0
+		var valid = 1
+		var val = 0
+		var output = []
+		var alerted = 0
+		// $("#dateInput").val()
+		if (Object.keys($scope.scores).length < rounds*2) {
+			alerted = 1
+			popAlert("Please enter all scores")
+		} else {
+			for (x in $scope.scores) {
+				if (count < rounds) {
+					val = $scope.scores[x]
+					if (first == 0) {
+						check = $scope.scores[x];
+						first = 1
+					} else {
+						var isValid = checkValid(val, check);
+						if (isValid == 1) {
+							// output.append(first, check)
+							output.push[first, check]
+							first = 0
+						} else {
+							//alert error
+							alerted = 1
+							popAlert(isValid)
+							break
+						}
+					}
+				}
+			}
+		}
+		if (alerted == 0) {
+			console.log($("#dateInput").val())
+			clearPage();
+		}
+	}
+	function popAlert(text){
+		$ionicPopup.alert({
+            title: 'Sorry',
+            type: 'button-assertive',
+            content: text
+        })
+	}
+	//val 11
+	//cehck 1
+	function checkValid(val, check) {
+		if (check == undefined || val == undefined) {
+			return "Please enter all scores"
+		}
+		if (check == val) {
+			return "Scores cannot be equal"
+		}
+		if (check < 11 && val < 11) {
+			return "One player must score at least 11"
+		}
+		if (!((val == 11 && check < 10) || (val < 10 && check == 11))) {
+			var diff = Math.abs(val-check)
+			if (diff<2) {
+				return "One player must win by two clear points"
+			} else if (diff > 2) {
+				return "Players cannot win by more than two points"
+			}
+		}
+		return 1
+	}
+	function clearPage() {
+		$scope.scores = {}
+		score1 = [0, 0, 0, 0, 0]
+		score2 = [0, 0, 0, 0, 0]
+		$("#dateInput").val("");
+		$(".nameInput").val("");
+		updateRounds();
+	}
 })
 
 .controller('settingsCtrl', function($scope) {

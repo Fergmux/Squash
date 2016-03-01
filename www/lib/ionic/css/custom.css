@@ -20,35 +20,75 @@
 .searchbutton {
 	margin: 15px 10px;
 }
-
-
-
-/*#ranklist {
-	border-top: solid #777 1px;
-	margin-left: -10px;
-	margin-right: -10px;
+#submitbutton {
+	margin: 5px 0px 30px 0px;
 }
-#ranklist > li {
-	font-family: 'Helvetica Neue';
-	font-size: 16px;
-	height: 60px;
-	line-height: 60px;
-	padding: 0px 25px 0px 20px;
-	border-bottom: solid #777 1px;
-	color: #444;
+
+table.customMatch {
 	width: 100%;
-	float: none;
-}
-#ranklist > li > p {
-	float: none;
-	margin-bottom: 0px;
-	line-height: 15px;
-	color: #555;
+	font-size: 26px;
+	color: #ef473a;
+	padding: 7px;
+	font-weight: bold;
+	margin-bottom: 20px;
 }
 
-#ranklist > li.full {
-	line-height: 35px;
-}*/
+table.customMatch > tbody > tr > td {
+	width: 100%;
+	padding: 7px;
+	text-align: center;
+}
+table.customMatch > tbody > tr > td > input {
+	width: 100%;
+	height: 40px;
+	font-size: 20px;
+	color: #ef473a;
+	font-weight: 900;
+	padding-left: 10px;
+	border: solid #888 1px;
+	text-align: center;
+	line-height: 20px;
+}
+
+table.roundScores {
+    border-collapse: separate;
+    border-spacing: 10px 10px;
+}
+table.roundScores > tbody > tr{
+	height: 50px;
+	line-height: 50px;
+	margin: 10px 0px;
+}
+
+table.roundScores > tbody > tr > td {
+	width: 20%;
+	font-size: 20px;
+	color: #ef473a;
+	font-weight: 900;
+	text-align: center;
+	padding: auto;
+}
+
+table.roundScores > tbody > tr > td.middle {
+	width:40%;
+	font-weight: 500px;
+}
+
+table.roundScores > tbody > tr > td > input {
+	text-align: center;
+	font-size: 20px;
+	color: #ef473a;
+	font-weight: 900;
+	width: 100%;
+	height: 50px;
+	border: solid #888 1px;
+	line-height: 21px;
+	padding-left: 13px;
+}
+
+input#dateInput{
+	padding: 0px;
+}
 
 .list .item {
 /* Styles go here */
