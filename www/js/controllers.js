@@ -12,7 +12,7 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('newMatchCtrl', function($scope) {
+.controller('rankingsCtrl', function($scope) {
 
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
@@ -230,7 +230,7 @@ angular.module('app.controllers', [])
 
 
 // SquashLevels tab: displays player rankings with filters
-.controller('pastMatchesCtrl', function($scope) {
+.controller('squashLevelsCtrl', function($scope) {
 
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
