@@ -62,15 +62,13 @@ var Cache = {
 
     /* Request data from cache */
     request: function(k, callbackDone, callbackFail) {
-        /* $.ajax(url).done().fail(); */
-
         /* Make AJAX request */
         var data = $.ajax({
             url: k
         }).done(function(){
             /* If request succeeds, insert data into cache and execute cache */
-            Cache.insert(k, JSON.stringify(data));
-            callbackDone(JSON.stringify(data));
+            Cache.insert(k, data.responseText);
+            callbackDone(data.responseText);
         }).fail(function(){
             /* If the request fails, try to get data from the cache */
             var data = localStorage.getItem(k);

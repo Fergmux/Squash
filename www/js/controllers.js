@@ -1,7 +1,9 @@
 angular.module('app.controllers', [])
 
 .controller('loginCtrl', function($scope) {
-
+	Cache.initialize();
+	//604800000 milliseconds in a week
+	Cache.clean(604800000);
 })
 
 .controller('signupCtrl', function($scope) {
@@ -13,10 +15,12 @@ angular.module('app.controllers', [])
 })
 
 .controller('rankingsCtrl', function($scope) {
-
+	$("#tabs").hide();
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
-		$("#loader").show();
+		$("#loader").hide();
+		loadplayers();
+		loadlookup();
 	})
 
 	google.charts.load('current', {
@@ -27,31 +31,25 @@ angular.module('app.controllers', [])
 	$scope.onTap = function() {
 		$("#msg").empty();
 		$("#tabs").hide();
-		$("#loader").show();
-		if($("#playerid").val()=="") {
+		// $("#loader").show();
+		var searchVal = $("#playerid").val()
+		if(searchVal=="") {
 			loadplayers();
 		} else {
-			load();
+			load(searchVal);
 		}
 	}
-
-	loadplayers();
-	loadlookup();
 
 	var idtable = new Object();
 
 	function loadplayers() {
-		var data = $.ajax({
-				url: "http://www.badsquash.co.uk/players.php?leaguetype=1&format=json",
-			}).done(displayplayers)
-			.fail(function() {
+		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", displayplayers, function() {
 				$("#msg").html("Error in AJAX request.");
-			});
-	}
+			})
+		}
 
 	function displayplayers(data) {
 		var data = $.parseJSON(data);
-		console.log(data);
 		$scope.items = []
 		for (var i = 0; i < data.data.length; i++) {
 			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
@@ -62,11 +60,9 @@ angular.module('app.controllers', [])
 	}
 
 	$scope.search = function(item) {
-		console.log("searched");
 		var player = item.split("-")[1].trim()
-		console.log(player);
 		$("#playerid").val(player)
-		load();
+		load(player);
 	}
 
 
@@ -125,7 +121,6 @@ angular.module('app.controllers', [])
 	}
 
 	function display(data) {
-		// $("#dtable").dataTable().fnDestroy();
 		var data = $.parseJSON(data);
 		if (data.status == "good") {
 			var id = data.data.summary.playerid;
@@ -171,13 +166,10 @@ angular.module('app.controllers', [])
 					title: "Level after"
 				}]
 			});
-
-			// $("#tabs").tabs();
 			$("#tab-main").html(drawChart(chartdata));
 			$("#playerlist").hide();
 			$("#loader").hide();
 			$("#tabs").show();
-			// $("#msg").html("Success, loaded data for player " + id);
 		} else {
 			$("#loader").hide();
 			$("#msg").html("Error - " + data.user_message);
@@ -185,46 +177,35 @@ angular.module('app.controllers', [])
 	}
 
 	function loadlookup(){
-		if (1) {
-			var data = $.ajax({
-					url: "http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json",
-				}).done(function() {
-					data = $.parseJSON(data.responseText);
-					for (x in data.data) {
-						var playerid = data.data[x].playerid;
-						var player = data.data[x].player.toLowerCase();
-						idtable[player] = playerid;
-					}
-				})
-				.fail(function() {
-					$("#msg").html("Error in AJAX request.");
-				});
-		} else {
-			$("#msg").html("Error - id must be a number");
+		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerTable, function() {
+			$("#msg").html("Error - id must be a number")
+		})
+	}
+
+	function makePlayerTable(data) {
+		data = $.parseJSON(data);
+		for (x in data.data) {
+			var playerid = data.data[x].playerid;
+			var player = data.data[x].player.toLowerCase();
+			idtable[player] = playerid;
 		}
 	}
 
 
 
-	function load() {
+	function load(name) {
 		// $("#tabs").hide();
-		var name = $("#playerid").val();
-		console.log(name)
+		// var name = $("#playerid").val();
 		// let's make sure it's a number
 		if (!/^[0-9]+$/.test(name)) {
 			var id = idtable[name.toLowerCase()]
 		} else {
 			var id = name;
 		}
-		console.log(id)
-		var data = $.ajax({
-				url: "http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json",
-			}).done(display)
-			.fail(function() {
+		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json", display, function() {
 				$("#msg").html("Error in AJAX request.");
-			});
+			})
 	}
-
 })
 
 
@@ -234,12 +215,10 @@ angular.module('app.controllers', [])
 
 	$scope.$on('$ionicView.loaded', function () {
 		$("#tabs").hide();
-		$("#loader").show();
+		$("#loader").hide();
 		$("#filters").hide();
+		changeHiddenInput();
 	})
-	// var filts = $scope.filts;
-	// console.log(filts)
-
 	
 	//Load button
 	$scope.onTap = function() {
@@ -248,31 +227,26 @@ angular.module('app.controllers', [])
 		$("#msg").empty();
 		changeHiddenInput();
 		$("#filters").slideToggle('slow');
-
 	}
 
 	$scope.toggleFilters = function() {
 		$("#filters").slideToggle('slow');
 	}
 
-	changeHiddenInput();
-
 	//Displays the ranking as a table 
-	function displayR(rank) {
+	function displayRank(rank) {
 		$("#tabs").hide();
 		$("#ranklist").empty();
 
 		var rank = $.parseJSON(rank);
+		console.log(rank)
 
 		if (rank.status == "good") {
 
 			var rankData = rank.data;
-			console.log(rankData);
-			
-			console.log(info);
 
 			$scope.groups = [];
-			for (var i = 0; i < rankData.length; i++) { {
+			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
 				$scope.groups[i] = {
 				    name: info.position + " - " + info.player,
@@ -284,17 +258,6 @@ angular.module('app.controllers', [])
 			    	$scope.groups[i].items.push("Club: " + info.club);
 			    }
 			    $scope.groups[i].items.push("Last Match: " + date);
-			}
-
-
-			// for (var i = 0; i < rankData.length; i++) {
-			// 	var info = rankData[i];
-				
-			// 	if (typeof info.club == 'undefined' || info.club == '') {
-			// 		$("#ranklist").append("<li>"+info.level+" - " + info.player + "</li>");
-			// 	} else {
-			// 		$("#ranklist").append("<li class='full'>"+info.level+" - " + info.player + "<p>" + info.club + "</p></li>");
-			// 	}
 			}
 			$scope.$apply();
 			$("#loader").hide();
@@ -344,47 +307,15 @@ angular.module('app.controllers', [])
 		clubs = $('#clubs').val();
 		country = $("#country").val();
 
-
-		console.log("county = " + county);
-		console.log("since when= " + show);
-		console.log("agegroup= " + agegroup);
-		console.log("matchtype= " + matchtype);
-		console.log("events= " + events);
-		console.log("clubs= " + clubs);
-		console.log("country = " + country);
 		loadRanking();
-		//county.setValue(a);
-		//result.innerHTML = a || "";
 	}
-	//Checkbox -- Not working yet
-	/*	$('#check').change(function() {
 
-		var $check = $(this),
-			$div = $check.parent();
-
-		if ($check.prop('checked')) {
-
-			$div.addClass('test');
-
-		} else {
-
-			$div.removeClass('test');
-
-		}
-
-	});*/
 	//This loads the data for desplaying rankings (renames it to loadRanking from loadteam-- there's another function called that)
 	function loadRanking() {
-		var rank = $.ajax({
-				url: "http://squashlevels.com/players.php?check=1&limit_confidence=1&club=" + clubs + "&county=" + county + "&country=" + country + "&show=" + show + "&events=" + events + "&matchtype=" + matchtype + "&playercat=" + agegroup + "&playertype=" + gender + "&search=Search+name&format=json"
-
-			}).done(displayR)
-			.fail(function() {
+		Cache.request("http://squashlevels.com/players.php?check=1&limit_confidence=1&club=" + clubs + "&county=" + county + "&country=" + country + "&show=" + show + "&events=" + events + "&matchtype=" + matchtype + "&playercat=" + agegroup + "&playertype=" + gender + "&search=Search+name&format=json", displayRank, function() {
 				$("#msg").html("Error in AJAX request for rank");
-			});
+			})
 	}
-
-
 })
 
 .controller('teamsCtrl', function($scope) {
@@ -422,7 +353,11 @@ angular.module('app.controllers', [])
 
 
 	function displayteam(teamdata) {
+		console.log(teamdata)
 		var data = $.parseJSON(teamdata);
+
+		// var data = $.parseJSON(data.responseText);
+		
 		if (data.status == "good") {
 			var name = data.data.captain;
 			var contact = data.data.contact;
@@ -446,10 +381,7 @@ angular.module('app.controllers', [])
 			});
 
 			$("#team").show();
-			// $("#form").hide();
-
 		}
-
 	}
 
 
@@ -457,12 +389,9 @@ angular.module('app.controllers', [])
 		$("#team").hide();
 		var teamid = $("#teamid").val();
 		if (/^[0-9]+$/.test(teamid)) {
-			var teamdata = $.ajax({
-					url: "http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json",
-				}).done(displayteam)
-				.fail(function() {
+			Cache.request("http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
 					$("#msg").html("Error in AJAX equest.");
-				});
+				})
 		} else {
 			$("#msg").html("Error - id must be a number");
 		}
@@ -475,11 +404,8 @@ angular.module('app.controllers', [])
 		console.log("poop")
 	}
 
-
 	function main() {
 		$("#team").hide();
-
-
 	}
 
 	/* launch when page ready */
@@ -492,28 +418,19 @@ angular.module('app.controllers', [])
 	load();
 
 	function load() {
-		var data = $.ajax({
-				url: "http://www.badsquash.co.uk/players.php?leaguetype=1&format=json",
-			}).done(display)
-			.fail(function() {
+		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", display, function() {
 				$("#msg").html("Error in AJAX request.");
 			});
 	}
 
 	function display(data) {
-		console.log("it fuckin works")
 		var data = $.parseJSON(data);
-		console.log(data);
 		$scope.items = []
 		for (var i = 0; i < data.data.length; i++) {
 			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
 		}
 		$scope.$apply()
 	}
-
-
-			// $('#ranklist').html("<li> " + data.data[i].level + " <p> " + data.data[i].player + "</p></li>");
-
 
 })
 
@@ -522,7 +439,5 @@ angular.module('app.controllers', [])
 })
 
 .controller('filtersCtrl', function($scope) {
-	// var filters = {club: "None"}
-	// filts(filters)
 
 })
