@@ -41,7 +41,6 @@ angular.module('app.controllers', [])
 		for (var x = 0; x < data.data.length; x++) {
 			players[x] = data.data[x].player;
 		}
-		console.log(players)
 	}
 
 	//load in google charts
@@ -437,35 +436,47 @@ angular.module('app.controllers', [])
 })
 
 .controller('playersCtrl', function($scope, $ionicPopup) {
+	// list of players for autofill
 	var players = [];
+	//no. of rounds
 	var rounds = 3;
+	//if the submission is for a doubles game
+	var doubles = false
+	//get player data for autocomplete
 	loadplayers();
 	setDateInput();
-
+	//set date input to current date/time
 	function setDateInput(){
+		//get current date
 		var currentTime = new Date();
+		//convert date to ISO
 		currentTime = currentTime.toISOString()
+		//convert date string to dattime input format
 		currentTime = currentTime.substring(0,16)
 		$("#dateInput").val(currentTime)
 	}
 
+	//autocomplet function
 	$(function() {
     	$( ".nameInput" ).autocomplete({
       		source: players
     	});
   	});
+
+  	//get list of players data
 	function loadplayers(){
 		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
+	//populate player array with data
 	function makePlayerArray(data){
 		data = $.parseJSON(data);
 		for (var x = 0; x < data.data.length; x++) {
 			players[x] = data.data[x].player;
 		}
-		console.log(players)
 	}
+	//when three rounds is selected, delete 4th and 5th round inputs and update round counter
 	$scope.threeRounds = function(){
 		rounds = 3;
 		$(".moreRounds").hide();
@@ -479,16 +490,25 @@ angular.module('app.controllers', [])
 		score2[4] = 0;
 		updateRounds();
 	}
+	// show extra round score inputs
 	$scope.fiveRounds = function(){
-		$(".moreRounds").show();
 		rounds = 5;
+		$(".moreRounds").show();
 	}
+	//toggle items which are dependent on a double input
 	$scope.toggleDoubles = function() {
-		$(".doubles").toggle();	
+		$(".doubles").toggle();
+		doubles = !doubles;
 	}
+
+	//object of score inputs
 	$scope.scores = {}
+
+	//array of wether the player has one the round
 	var score1 = [0, 0, 0, 0, 0]
 	var score2 = [0, 0, 0, 0, 0]
+
+	//functions that update the round arrays when each roud score is changed
 	$scope.score1Change = function(){
 		if($scope.scores.score11 > $scope.scores.score12) {
 			score1[0] = 1
@@ -579,63 +599,84 @@ angular.module('app.controllers', [])
 		}
 		updateRounds();
 	}
+	//update the round counters
 	function updateRounds() {
-		console.log($scope.scores);
-		console.log(score1);
-		console.log(score2);
+		//work out the total of tyhe round arrays
 		var total1 = score1.reduce(function(previousValue, currentValue, currentIndex, array) {
 		  return previousValue + currentValue;
 		});
 		var total2 = score2.reduce(function(previousValue, currentValue, currentIndex, array) {
 		  return previousValue + currentValue;
 		});
-		console.log(total2)
+		//set round conters to array total
 		$("#rounds1").html(total1)
 		$("#rounds2").html(total2)
 	}
+	//when submit button is pressed
 	$scope.submitScores = function() {
-		checkScores();		
+		checkInputs();
 	}
-	function checkScores(){
-		var first = 0
-		var count = 0
-		var check = 0
-		var valid = 1
-		var val = 0
-		var output = []
-		var alerted = 0
-		// $("#dateInput").val()
+	function checkInputs(){
+		var first = 0   // wether the score being calculated is the first value or the one it's being compared to
+		var check       //value to calculate against val
+		var val         //value to calculate against check
+		var output = [] //the output array
+		var alerted = 0 //wether or not the userr has been alerted (wether there is an error with the submission)
+		// arrays to loop through to check values from scores object
+		var threeArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32']
+		var fiveArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32', 'score41', 'score42', 'score51', 'score52']
+
+		//if there are not enough scores
 		if (Object.keys($scope.scores).length < rounds*2) {
 			alerted = 1
 			popAlert("Please enter all scores")
 		} else {
-			for (x in $scope.scores) {
-				if (count < rounds) {
-					val = $scope.scores[x]
-					if (first == 0) {
-						check = $scope.scores[x];
-						first = 1
+			var loopArray;
+			if (rounds = 3) {
+				loopArray = threeArray
+			} else {
+				loopArray = fiveArray
+			}
+			for (x in loopArray) {
+				var score = $scope.scores[loopArray[x]]
+				if (first == 0) {
+					check = score;
+					first = 1
+				} else {
+					var isValid = checkValid(score, check);
+					if (isValid == 1) {
+						output.push[score, check]
+						first = 0
 					} else {
-						var isValid = checkValid(val, check);
-						if (isValid == 1) {
-							// output.append(first, check)
-							output.push[first, check]
-							first = 0
-						} else {
-							//alert error
-							alerted = 1
-							popAlert(isValid)
-							break
-						}
+						alerted = 1
+						popAlert(isValid)
+						break
 					}
 				}
 			}
 		}
+		//if no date, throw error
+		if ($("#dateInput").val() == undefined) {
+			alerted = 1
+			popAlert("Please set a date and time")
+		}
+		// if names not entered throw an error
+		if ($("#name1").val() == "" || $("#name1").val() == "") {
+			alerted = 1
+			popAlert("Please enter both players' names")
+		} else if (doubles) {
+			if ($("#name3").val() == "" || $("#name4").val() == "") {
+				alerted = 1
+				popAlert("Please enter all players' names")
+			}
+		}
+		//if no alerts thrown then submit data
 		if (alerted == 0) {
-			console.log($("#dateInput").val())
+			//submit data
 			clearPage();
 		}
 	}
+	//throws an alert taking in the text to be displayed as parameter
 	function popAlert(text){
 		$ionicPopup.alert({
             title: 'Sorry',
@@ -643,18 +684,21 @@ angular.module('app.controllers', [])
             content: text
         })
 	}
-	//val 11
-	//cehck 1
+	//check wether the scores inputted are valid
 	function checkValid(val, check) {
+		//if some scores have not been entered
 		if (check == undefined || val == undefined) {
 			return "Please enter all scores"
 		}
+		// if any scores are equal
 		if (check == val) {
 			return "Scores cannot be equal"
 		}
+		//if either player has not reached 11
 		if (check < 11 && val < 11) {
 			return "One player must score at least 11"
 		}
+		//if one player is on 11 and the other is less than 10, don't check for <2 difference (note the exclamation point)
 		if (!((val == 11 && check < 10) || (val < 10 && check == 11))) {
 			var diff = Math.abs(val-check)
 			if (diff<2) {
@@ -665,6 +709,7 @@ angular.module('app.controllers', [])
 		}
 		return 1
 	}
+	//clear the inputs on the page
 	function clearPage() {
 		$scope.scores = {}
 		score1 = [0, 0, 0, 0, 0]
@@ -672,6 +717,7 @@ angular.module('app.controllers', [])
 		$("#dateInput").val("");
 		$(".nameInput").val("");
 		updateRounds();
+		setDateInput();
 	}
 })
 

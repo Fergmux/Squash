@@ -10,15 +10,15 @@
                 <td style="text-align: center; width: 10%">VS</td>
                 <td style="text-align: right; width: 45%">Torftyests Ssdsivill</td>
             </tr> -->
-            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 1"></td></tr>
-            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 3"></td></tr>
+            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 1" id="name1"></td></tr>
+            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 3" id="name3"></td></tr>
             <tr style="height: 50px; line-height: 50px">
                 <td style="width: 40%; font-size: 52px; text-align: right" id="rounds1">0</td>
-                <td style="width: 20%; font-size: 52px;">-</td>
+                <td style="width: 20%; font-size: 52px; line-height: 45px; vertical-align: top">-</td>
                 <td style="width: 40%; font-size: 52px; text-align: left" id="rounds2">0</td>
             </tr>
-            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 2"></td></tr>
-            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 4"></td></tr>
+            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 2" id="name2"></td></tr>
+            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 4" id="name4"></td></tr>
         </table>
         <div class="button-bar" style="margin-bottom: 20px">
             <a class="button button-assertive" ng-click="threeRounds()">3 Rounds</a>
@@ -53,7 +53,7 @@
         </table>
 
         <label class="item item-input" style="margin: 20px 0px">
-            <span class="input-label">Date/Time</span>
+            <span class="input-label">Date</span>
             <input type="datetime-local" id="dateInput">
         </label>
         <div style="text-align: center">
