@@ -4,6 +4,15 @@ angular.module('app.controllers', [])
 	Cache.initialize();
 	//604800000 milliseconds in a week
 	Cache.clean(604800000);
+
+	/*
+	var hash = CryptoJS.MD5("password").toString();
+	console.log(hash);
+	*/
+
+
+
+
 })
 
 .controller('signupCtrl', function($scope) {
