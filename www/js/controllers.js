@@ -5,13 +5,29 @@ angular.module('app.controllers', [])
 	//604800000 milliseconds in a week
 	Cache.clean(604800000);
 
-	/*
-	var hash = CryptoJS.MD5("password").toString();
-	console.log(hash);
-	*/
+	function login() {
+		//gets email and password on login tap
+		var user = $("#emailId").val();
+		var pass = $("#passId").val()
+		//converts pass to md5
+		var passHash = CryptoJS.MD5(pass).toString();
 
+		/*
+		* info.php
+		* email stored under Session: [un]
+		* password stored under Session: [uns]
+		* url: http://www.badsquash.co.uk/info.php?action=login&email=<email address>&password=<MD5 of the password>&stay_logged_in=1&format=json 
+		*/
 
-
+		//make post request to server with details
+		$.post('http://www.badsquash.co.uk/info.php'
+		
+			);
+	}
+	$scope.loginTap = function() {
+		login();
+		console.log("tap");
+	}
 
 })
 
@@ -24,7 +40,7 @@ angular.module('app.controllers', [])
 })
 
 .controller('rankingsCtrl', function($scope) {
-	//only fires when page ist first entered
+	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
 		$("#results").hide();
 		$("#loader").show();
