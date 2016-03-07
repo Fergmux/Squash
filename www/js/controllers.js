@@ -20,8 +20,10 @@ angular.module('app.controllers', [])
 		*/
 
 		//make post request to server with details
-		$.post('http://www.badsquash.co.uk/info.php'
-		
+		$.post('http://www.badsquash.co.uk/info.php', {action: 'login', email: user, password: passHash},
+				function(data){
+					console.log(data);
+				}
 			);
 	}
 	$scope.loginTap = function() {
