@@ -87,6 +87,10 @@ table.roundScores > tbody > tr > td > input {
 	padding-left: 13px;
 }
 
+.profileItem {
+	height: 20px;
+}
+
 input#dateInput{
 	padding: 0px;
 }

@@ -13,6 +13,10 @@ angular.module('app.controllers', [])
 		//gets email and password on login tap
 		var user = $("#emailId").val();
 		var pass = $("#passId").val()
+		
+		pass = "uniapp"
+		user = "app.developer@bristol.ac.uk"
+
 		//converts pass to md5
 		var passHash = CryptoJS.MD5(pass).toString();
 
@@ -69,15 +73,37 @@ angular.module('app.controllers', [])
 			});
 			$state.go('badSquash.login');
 		} else {
-			displayProfile();
+			getPlayerInfo($rootScope.userData.data.playerid)
 		}
 	});
 
+	function getPlayerInfo(playerid) {
+		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
+				$("#msg").html("Error in AJAX request.");
+			})
+	}
 	
-	function displayProfile() {
+	function displayProfile(data) {
 		var playerData = $rootScope.userData
+		data = $.parseJSON(data);
+		//player name
 		$("#playerName").val(playerData.data.tempname)
+		//player email
 		$("#playerEmail").val(playerData.data.email)
+		//player's current level
+		$("#playerLevel").val(playerData.data.lastlevel)
+		//player's inital level
+		$("#playerInitial").val(playerData.data.initiallevel)
+		//player's average level
+		$("#playerAverage").val(playerData.data.lastdampedlevel)
+		//player's lowest level
+		$("#playerLow").val(playerData.data.level6mago)
+		//player's highest level
+		$("#playerHigh").val(playerData.data.level12mago)
+		//player's position
+		$("#playerPosition").val(playerData.data.lastposition)
+		console.log(data)
+
 	}
 
 	// });
