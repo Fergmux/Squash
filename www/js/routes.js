@@ -128,20 +128,14 @@ angular.module('app.routes', [])
     })
 
 
-
-    .state('badSquash.filters', {
+    .state('badSquash.matchData', {
       url: '/page13',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/filters.html',
-          controller: 'filtersCtrl'
+          templateUrl: 'templates/matchData.html',
+          controller: 'matchDataCtrl'
         }
       },
-      // resolve: {
-      //   filts: function(FiltService, filters) {
-      //     FiltService.setFilts(filters)
-      //   }
-      // }
     })
         
       

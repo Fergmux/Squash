@@ -89,7 +89,29 @@ table.roundScores > tbody > tr > td > input {
 
 .profileItem {
 	height: 20px;
+	background-color: transparent!important;
 }
+
+div.row > div.col {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background-color: #fafafa;
+	margin: 1px;
+	text-align: center;
+}
+
+div.row > div.col > p {
+	font-weight: bold;
+	color: #ef473a;
+	font-size: 16px;
+	margin-top: 5px;
+}
+div.header {
+	margin-top: 10px!important;
+}
+div.header > div.col {
+	font-weight: bold;
+} 
 
 input#dateInput{
 	padding: 0px;

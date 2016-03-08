@@ -14,38 +14,69 @@
             <label class="item item-input">
                 <span class="input-label">Position</span><textarea readonly id="playerPosition" class="profileItem" placeholder=""></textarea>
             </label>
-            <label class="item item-input">
-                <span class="input-label">Current Level</span><textarea readonly id="playerLevel" class="profileItem" placeholder=""></textarea>
-            </label>
-            <label class="item item-input">
-                <span class="input-label">Initial Level</span><textarea readonly id="playerInitial" class="profileItem" placeholder=""></textarea>
-            </label>
-            <label class="item item-input">
-                <span class="input-label">Average Level</span><textarea readonly id="playerAverage" class="profileItem" placeholder=""></textarea>
-            </label>
-            <label class="item item-input">
-                <span class="input-label">Lowest Level</span><textarea readonly id="playerLow" class="profileItem" placeholder=""></textarea>
-            </label>
-            <label class="item item-input">
-                <span class="input-label">High Level</span><textarea readonly id="playerHigh" class="profileItem" placeholder=""></textarea>
-            </label>
-            <label class="item item-select">
-                <span class="input-label">Past</span>
-                <select>
-                    <option>Past Fixture 1</option>
-                    <option>Past Fixture 2</option>
-                </select>
-            </label>
-            <label class="item item-select">
-                <span class="input-label">Upcoming</span>
-                <select>
-                    <option>Fixture 3</option>
-                    <option>Fixture 4</option>
-                </select>
-            </label>
-            <label class="item item-input">
-                <span class="input-label">Level Progress</span><textarea placeholder=""> </textarea>
-            </label>
+            <h2 class="title tabheader">Matches</h2>
+            <div class="row">
+                <div class="col">Played<br><p id="matchesplayed"></p></div>
+                <div class="col">Won<br><p id="matcheswon"></p></div>
+                <div class="col">Lost<br><p id="matcheslost"></p></div>
+                <div class="col">Ratio<br><p id="matchesratio"></p></div>
+            </div>
+
+            <h2 class="title tabheader">Games</h2>
+            <div class="row">
+                <div class="col">Played<br><p id="gamesplayed"></p></div>
+                <div class="col">Won<br><p id="gameswon"></p></div>
+                <div class="col">Lost<br><p id="gameslost"></p></div>
+                <div class="col">Ratio<br><p id="gamesratio"></p></div>
+            </div>
+
+            <h2 class="title tabheader">Points</h2>
+            <div class="row">
+                <div class="col">Played<br><p id="pointsplayed"></p></div>
+                <div class="col">Won<br><p id="pointswon"></p></div>
+                <div class="col">Lost<br><p id="pointslost"></p></div>
+                <div class="col">Ratio<br><p id="pointsratio"></p></div>
+            </div>
+
+            <h2 class="title tabheader">Levels</h2>
+            <div class="row">
+                <div class="col">Initial<br><p id="levelsinitial"></p></div>
+                <div class="col">12 Months<br><p id="levels12"></p></div>
+                <div class="col">Season<br><p id="levelsseason"></p></div>
+                <div class="col">Now<br><p id="levelsnow"></p></div>
+            </div>
+            <div class="row">
+                <div class="col">Average (last 4)<br><p id="levelsaverage"></p></div>
+                <div class="col">Average at (last 4)<br><p id="levelsaverageat"></p></div>
+            </div>
+            <div class="row header">
+                <div class="col">Highest<br></div>
+                <div class="col">Lowest<br></div>
+            </div>
+            <div class="row">
+                <div class="col col-20">Level<br><p id="levelsmax"></p></div>
+                <div class="col col-30">Date<br><p id="levelsmaxdate"></p></div>
+                <div class="col col-20">Level<br><p id="levelsmin"></p></div>
+                <div class="col col-30">Date<br><p id="levelsmindate"></p></div>
+            </div>
+
+            <h2 class="title tabheader">Level Change</h2>
+            <div class="row">
+                <div class="col">Overall<br><p id="levelchangeoverall"></p></div>
+                <div class="col">12 Months<br><p id="levelchange12"></p></div>
+                <div class="col">Season<br><p id="levelchangeseason"></p></div>
+                <div class="col">Last<br><p id="levelchangelast"></p></div>
+            </div>
+
+            <h2 class="title tabheader">Past Fixtures</h2>
+            <div id="matchList">
+                <ion-list>
+                  <ion-item ng-repeat="match in matches" ng-click="load(match)">
+                    {{match}}
+                  </ion-item>
+                </ion-list>
+            </div>
+
         </form>
     </ion-content>
 </ion-view>

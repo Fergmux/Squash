@@ -1,6 +1,6 @@
 angular.module('app.controllers', [])
 
-.controller('loginCtrl', function($scope, $rootScope, $state, $ionicHistory) {
+.controller('loginCtrl', function($scope, $rootScope, $state, $ionicHistory, $window) {
 	Cache.initialize();
 	//604800000 milliseconds in a week
 	Cache.clean(604800000);
@@ -9,60 +9,63 @@ angular.module('app.controllers', [])
 	    disableBack: true
 	});
 
-	function login() {
-		//gets email and password on login tap
-		var user = $("#emailId").val();
-		var pass = $("#passId").val()
-		
-		pass = "uniapp"
-		user = "app.developer@bristol.ac.uk"
 
+	var storedemail = localStorage.getItem("email")
+	var storedpass = localStorage.getItem("password")
+
+	$scope.$on('$ionicView.loaded', function () {
+		if (storedemail != null && storedpass != null) {
+			login(storedemail, storedpass)
+			console.log(storedemail,storedpass)
+		}
+	})
+	
+
+	function login(email, pass) {
+		// pass = "uniapp"
+		// email = "app.developer@bristol.ac.uk"
+
+		//store password and email in local storage (like cookies)
+		console.log(email,pass)
+		console.log(email,pass)
+		$("#emailId").val(email);
+		if (storedemail == null) {
+			localStorage["email"] = JSON.stringify(email);
+		}
+		if (storedpass == null) {
+			localStorage.setItem["password"] = JSON.stringify(pass);
+		}	
+		console.log(storedpass, localStorage["email"])
+		Cache.request("http://www.badsquash.co.uk/info.php?action=login&email="+email+"&password="+pass+"&stay_logged_in=1&format=json", loadUserData, function() {
+			$("#msg").html("Error - AJAX failed")
+		})
+	}
+
+	function loadUserData(data) {
+		data = $.parseJSON(data);
+		console.log(data)
+		if (data.status == "good"){
+			$rootScope.userData = data;
+			$state.go('badSquash.myProfile')
+		} else {
+			$("#msg").html("Sorry, incorrect email or password")
+		}
+	}
+
+	$scope.loginTap = function() {
+		var email = $("#emailId").val();
+		var pass = $("#passId").val();
 		//converts pass to md5
 		var passHash = CryptoJS.MD5(pass).toString();
-
-
-		/*
-		* info.php
-		* email stored under Session: [un]
-		* password stored under Session: [uns]
-		* url: http://www.badsquash.co.uk/info.php?action=login&email=<email address>&password=<MD5 of the password>&stay_logged_in=1&format=json 
-		*/
-
-		// "http://www.badsquash.co.uk/info.php?action=login&email="+email+"&password="+passHash+"&stay_logged_in=1&format=json"
-		$.post("http://www.badsquash.co.uk/info.php?action=login&email="+user+"&password="+passHash+"&stay_logged_in=1&format=json",
-				function(data){
-					console.log(data)
-					data = $.parseJSON(data);
-					console.log(data);
-					if (data.status == "good"){
-						$rootScope.userData = data;
-						$state.go('badSquash.myProfile')
-					} else {
-						$("#msg").html("Sorry, incorrect email or password")
-					}
-				}
-			);
-
-
-		// make post request to server with details
-		// $.post('http://www.badsquash.co.uk/info.php', {action: 'login', email: user, password: passHash},
-		// 		function(data){
-		// 			console.log(data);
-		// 		}
-		// 	);
+		delete $window.localStorage.email;
+		delete $window.localStorage.password;
+		login(email, passHash);
 	}
-	$scope.loginTap = function() {
-		login();
-		console.log("tap");
-	}
-
 })
 
 .controller('signupCtrl', function($scope) {
 
 })
-// app.developer@bristol.ac.uk
-// uniapp
 
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 
@@ -86,27 +89,116 @@ angular.module('app.controllers', [])
 	function displayProfile(data) {
 		var playerData = $rootScope.userData
 		data = $.parseJSON(data);
+		console.log(data)
+		var highDate = new Date(data.data.statistics.max_level_dateint*1000)
+		var month = highDate.getMonth()+1
+		highDate = highDate.getDate()+"/"+month+"/"+highDate.getFullYear()
+		var lowDate = new Date(data.data.statistics.min_level_dateint*1000)
+		month = lowDate.getMonth()+1
+		lowDate = lowDate.getDate()+"/"+month+"/"+lowDate.getFullYear()
 		//player name
-		$("#playerName").val(playerData.data.tempname)
+		$("#playerName").val(data.data.summary.player)
 		//player email
 		$("#playerEmail").val(playerData.data.email)
 		//player's current level
-		$("#playerLevel").val(playerData.data.lastlevel)
+		$("#levelsnow").html(data.data.statistics.end_level)
 		//player's inital level
-		$("#playerInitial").val(playerData.data.initiallevel)
+		$("#levelsinitial").html(data.data.statistics.initial_level)
 		//player's average level
-		$("#playerAverage").val(playerData.data.lastdampedlevel)
+		$("#levelsaverage").html(data.data.statistics.average_level_last4)
+		$("#levelsaverageat").html(data.data.statistics.average_level_played_at_last4);
 		//player's lowest level
-		$("#playerLow").val(playerData.data.level6mago)
+		$("#levelsmin").html(data.data.statistics.min_level)
 		//player's highest level
-		$("#playerHigh").val(playerData.data.level12mago)
+		$("#levelsmax").html(data.data.statistics.max_level)
+		//player's lowest level date
+		$("#levelsmindate").html(lowDate)
+		//player's highest level date
+		$("#levelsmaxdate").html(highDate)
 		//player's position
 		$("#playerPosition").val(playerData.data.lastposition)
-		console.log(data)
+		//level at start of season
+		$("#levelsseason").html(data.data.statistics.season_level);
+		//player's level 12 months ago
+		$("#levels12").html(data.data.statistics.level_12m_ago);
+
+		$("#pointsplayed").html(data.data.statistics.points_won + data.data.statistics.points_lost);
+		$("#pointswon").html(data.data.statistics.points_won);
+		$("#pointslost").html(data.data.statistics.points_lost);
+		if (data.data.statistics.points_win_ratio > 0.5) {
+			$("#pointsratio").css("color", "green")	
+		} else {
+			$("#pointsratio").css("color", "red")	
+		}
+		$("#pointsratio").html(data.data.statistics.points_win_ratio);
+
+		$("#gamesplayed").html(data.data.statistics.games_won + data.data.statistics.games_lost);
+		$("#gameswon").html(data.data.statistics.games_won);
+		$("#gameslost").html(data.data.statistics.games_lost);
+		if (data.data.statistics.games_win_ratio > 0.5) {
+			$("#pointsratio").css("color", "green")	
+		} else {
+			$("#pointsratio").css("color", "red")	
+		}
+		$("#gamesratio").html(data.data.statistics.games_win_ratio);
+
+		$("#matchesplayed").html(data.data.statistics.matches_won + data.data.statistics.matches_lost);
+		$("#matcheswon").html(data.data.statistics.matches_won);
+		$("#matcheslost").html(data.data.statistics.matches_lost);
+		if (data.data.statistics.matches_win_ratio > 0.5) {
+			$("#pointsratio").css("color", "green")	
+		} else {
+			$("#pointsratio").css("color", "red")	
+		}
+		$("#matchesratio").html(data.data.statistics.matches_win_ratio);
+
+		var overallchange = (((data.data.statistics.end_level/data.data.statistics.initial_level).toFixed(2) * 100) - 100)
+		var last12 = ((data.data.statistics.level_change_last_12m.toFixed(2)*100) - 100)
+		var lastmatch = ((data.data.statistics.level_change_last_match.toFixed(2)*100) - 100)
+		var thisseason = ((data.data.statistics.level_change_this_season.toFixed(2)*100) - 100)
+
+		if (overallchange > 0) {
+			$("#levelchangeoverall").css("color", "green");
+			$("#levelchangeoverall").html("+"+overallchange+"%");
+		} else {
+			$("#levelchangeoverall").css("color", "red");
+			$("#levelchangeoverall").html(overallchange+"%");
+		}
+		if (last12 > 0) {
+			$("#levelchange12").css("color", "green");
+			$("#levelchange12").html("+"+last12+"%");
+		} else {
+			$("#levelchange12").css("color", "red");
+			$("#levelchange12").html(last12+"%");
+		}
+		if (lastmatch > 0) {
+			$("#levelchangelast").css("color", "green");
+			$("#levelchangelast").html("+"+lastmatch+"%");
+		} else {
+			$("#levelchangelast").css("color", "red");
+			$("#levelchangelast").html(lastmatch+"%");
+		}
+		if (thisseason > 0) {
+			$("#levelchangeseason").css("color", "green");
+			$("#levelchangeseason").html("+"+thisseason+"%");
+		} else {
+			$("#levelchangeseason").css("color", "red");
+			$("#levelchangeseason").html(thisseason+"%");
+		}
+
+		$scope.matches = []
+		for (var i = 0; i < data.data.matches.length; i++) {
+			$scope.matches.push( i+1 + " - " + data.data.matches[i].opponent)
+		}
+		$scope.$apply()
 
 	}
 
-	// });
+	$scope.load = function(match) {
+		$rootScope.matchindex = match.split(" ")[0]
+		$state.go('badSquash.matchData')
+	}
+
 
 })
 
@@ -173,9 +265,9 @@ angular.module('app.controllers', [])
 	//get the player data using the cache
 	function loadplayers() {
 		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", displayplayers, function() {
-				$("#msg").html("Error in AJAX request.");
-			})
-		}
+			$("#msg").html("Error in AJAX request.");
+		})
+	}
 
 	// push the rankings data to the list
 	function displayplayers(data) {
@@ -753,23 +845,28 @@ angular.module('app.controllers', [])
 			}
 		}
 		//if no date, throw error
-		if ($("#dateInput").val() == undefined) {
-			alerted = 1
-			popAlert("Please set a date and time")
+		if (alerted == 0) {
+			if ($("#dateInput").val() == undefined) {
+				alerted = 1
+				popAlert("Please set a date and time")
+			}
 		}
 		// if names not entered throw an error
-		if ($("#name1").val() == "" || $("#name1").val() == "") {
-			alerted = 1
-			popAlert("Please enter both players' names")
-		} else if (doubles) {
-			if ($("#name3").val() == "" || $("#name4").val() == "") {
+		if (alerted == 0) {
+			if ($("#name1").val() == "" || $("#name1").val() == "") {
 				alerted = 1
-				popAlert("Please enter all players' names")
+				popAlert("Please enter both players' names")
+			} else if (doubles) {
+				if ($("#name3").val() == "" || $("#name4").val() == "") {
+					alerted = 1
+					popAlert("Please enter all players' names")
+				}
 			}
 		}
 		//if no alerts thrown then submit data
 		if (alerted == 0) {
-			//submit data
+			//submit data (output array)
+			popAlert("Scores submitted!")
 			clearPage();
 		}
 	}
@@ -790,6 +887,10 @@ angular.module('app.controllers', [])
 		// if any scores are equal
 		if (check == val) {
 			return "Scores cannot be equal"
+		}
+		// if any scores are equal
+		if (check < 0 || val < 0) {
+			return "Scores cannot be negative"
 		}
 		//if either player has not reached 11
 		if (check < 11 && val < 11) {
@@ -822,6 +923,96 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('filtersCtrl', function($scope) {
+.controller('matchDataCtrl', function($scope, $rootScope) {
+
+	$scope.$on('$ionicView.enter', function () {
+		var playerid = $rootScope.userData.data.playerid
+		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
+			$("#msg").html("Error in AJAX request.");
+		})
+	});
+
+	function displayMatch(data) {
+		data = $.parseJSON(data);
+		var index = $rootScope.matchindex
+		var thisMatch = data.data.matches[index]
+
+		var matchDate = new Date(thisMatch.dateint*1000)
+		var month = matchDate.getMonth()+1
+		matchDate = matchDate.getDate()+"/"+month+"/"+matchDate.getFullYear()
+
+		if(thisMatch.matchtype == undefined) {
+			$("#league").html(thisMatch.leaguetype)	
+		} else {
+			$("#league").html(thisMatch.matchtype)	
+		}
+		$("#date").html(matchDate)
+
+
+
+		$("#yourname").html($rootScope.userData.data.tempname)
+		if(thisMatch.club == undefined) {
+			$("#yourclub").html(thisMatch.team)
+		} else {
+			$("#yourclub").html(thisMatch.club)
+		}
+		if(thisMatch.position_before == -1 || thisMatch.position_after == -1) {
+			$("#positionbefore").parent().hide();
+			$("#positionafter").parent().hide();
+			$("#pos").hide();
+		} else {
+			$("#positionbefore").html(thisMatch.position_before)
+			$("#positionafter").html(thisMatch.position_after)
+		}
+		$("#levelbefore").html(thisMatch.level_before)
+		$("#levelafter").html(thisMatch.level_after)
+		
+
+
+		$("#oppname").html(thisMatch.opponent)
+		if(thisMatch.opponent_club == undefined) {
+			$("#oppclub").html(thisMatch.opponent_team)
+		} else {
+			$("#oppclub").html(thisMatch.opponent_club)
+		}
+		if(thisMatch.opponent_position_after == -1 || thisMatch.opponent_position_after == -1) {
+			$("#opppositionbefore").parent().hide();
+			$("#opppositionafter").parent().hide();
+			$("#opppos").hide();
+		} else {
+			$("#opppositionbefore").html(thisMatch.opponent_position_before)
+			$("#opppositionafter").html(thisMatch.opponent_position_after)
+		}
+		$("#opplevelbefore").html(thisMatch.opponent_level_before)
+		$("#opplevelafter").html(thisMatch.opponent_level_after)
+
+		var points = thisMatch.points_scores.split(",");
+		$("#scores").empty();
+		for (var n = 0; n < points.length; n++) {
+			var scores = points[n].split("-")
+			console.log(scores)
+			if (scores[0] > scores[1]) {
+				$("#scores").append("<div class='col' style='font-weight: bold; color:green'>" + points[n] + "</div>")
+			} else {
+				$("#scores").append("<div class='col' style='font-weight: bold; color:red'>" + points[n] + "</div>")
+			}
+		}
+
+		var games = thisMatch.games_score.split("-")
+		$("#gamepoints").html("<h1 style='color: green; margin-bottom:0px'>" + games[0] + " - " + games[1] + "</h1>")
+	}
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
