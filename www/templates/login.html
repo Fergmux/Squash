@@ -1,17 +1,18 @@
-<ion-view title="Login">
+<ion-view title="{{loginPage}}">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
-        <form class="list">
+        <form class="list" id="login">
             <ion-list>
                 <label class="item item-input">
-                    <span class="input-label">Username</span>
-                    <input type="text" id="emailId" placeholder="">
+                    <span class="input-label">Email</span>
+                    <input type="text" id="emailId" placeholder="" ng-model="input.firstName">
                 </label>
                 <label class="item item-input">
                     <span class="input-label">Password</span>
-                    <input type="password" id="passId" placeholder="">
+                    <input type="password" id="passId" placeholder="" ng-model="input.lastName">
                 </label>
             </ion-list>
-            <div class="spacer" style="height: 40px;"></div>
+            <!-- <div id="msg" style="text-align: center"></div> -->
+            <div class="spacer" id="msg" style="height: 40px; line-height: 48px; text-align: center"></div>
             <button on-tap="loginTap()" class="button button-stable button-block ">Log in</button>
             <a ui-sref="" class="button button-positive button-clear button-block ">Or create an account</a>
         </form>

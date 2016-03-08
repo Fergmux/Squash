@@ -1,9 +1,13 @@
 angular.module('app.controllers', [])
 
-.controller('loginCtrl', function($scope) {
+.controller('loginCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 	Cache.initialize();
 	//604800000 milliseconds in a week
 	Cache.clean(604800000);
+	$scope.loginPage = "Login"
+	$ionicHistory.nextViewOptions({
+	    disableBack: true
+	});
 
 	function login() {
 		//gets email and password on login tap
@@ -12,6 +16,7 @@ angular.module('app.controllers', [])
 		//converts pass to md5
 		var passHash = CryptoJS.MD5(pass).toString();
 
+
 		/*
 		* info.php
 		* email stored under Session: [un]
@@ -19,12 +24,28 @@ angular.module('app.controllers', [])
 		* url: http://www.badsquash.co.uk/info.php?action=login&email=<email address>&password=<MD5 of the password>&stay_logged_in=1&format=json 
 		*/
 
-		//make post request to server with details
-		$.post('http://www.badsquash.co.uk/info.php', {action: 'login', email: user, password: passHash},
+		// "http://www.badsquash.co.uk/info.php?action=login&email="+email+"&password="+passHash+"&stay_logged_in=1&format=json"
+		$.post("http://www.badsquash.co.uk/info.php?action=login&email="+user+"&password="+passHash+"&stay_logged_in=1&format=json",
 				function(data){
+					console.log(data)
+					data = $.parseJSON(data);
 					console.log(data);
+					if (data.status == "good"){
+						$rootScope.userData = data;
+						$state.go('badSquash.myProfile')
+					} else {
+						$("#msg").html("Sorry, incorrect email or password")
+					}
 				}
 			);
+
+
+		// make post request to server with details
+		// $.post('http://www.badsquash.co.uk/info.php', {action: 'login', email: user, password: passHash},
+		// 		function(data){
+		// 			console.log(data);
+		// 		}
+		// 	);
 	}
 	$scope.loginTap = function() {
 		login();
@@ -36,12 +57,34 @@ angular.module('app.controllers', [])
 .controller('signupCtrl', function($scope) {
 
 })
+// app.developer@bristol.ac.uk
+// uniapp
 
-.controller('myProfileCtrl', function($scope) {
+.controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
+
+	$scope.$on('$ionicView.enter', function () {
+		if ($rootScope.userData == undefined) {
+			$ionicHistory.nextViewOptions({
+			    disableBack: true
+			});
+			$state.go('badSquash.login');
+		} else {
+			displayProfile();
+		}
+	});
+
+	
+	function displayProfile() {
+		var playerData = $rootScope.userData
+		$("#playerName").val(playerData.data.tempname)
+		$("#playerEmail").val(playerData.data.email)
+	}
+
+	// });
 
 })
 
-.controller('rankingsCtrl', function($scope) {
+.controller('rankingsCtrl', function($scope, $rootScope) {
 	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
 		$("#results").hide();
@@ -259,6 +302,7 @@ angular.module('app.controllers', [])
 			var player = data.data[x].player.toLowerCase();
 			idtable[player] = playerid;
 		}
+		$rootScope.playerTable = idtable;
 	}
 
 	//load the data for the player page with the cache
