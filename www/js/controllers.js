@@ -295,12 +295,22 @@ angular.module('app.controllers', [])
 		load(player);
 	}
 
+	//calculates percentage change between levels
+	function percChange(lev_before, lev_after) {
+		var change = ((lev_before - lev_after) / lev_before) * 100;
+		if(change >= 0) {
+			return "+"+Number(change).toFixed(2)+"%";
+		} else {
+			return Number(change).toFixed(2)+"%";
+		}
+	}
+
 	function readmatch(match) {
 		if (match.leaguetypeid) {
-			return [match.opponent, match.games_score, match.level_before, match.level_after];
+			return [match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
 			if (match.matchtypeid) {
-				return ["Match", match.opponent, match.games_score, match.level_before, match.level_after];
+				return [match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 			} else {
 				// something went wrong
 				return ["error", "", "", "", ""];
@@ -322,7 +332,7 @@ angular.module('app.controllers', [])
 				title: 'Level History',
 				colors: ['red'],
                 legend: {position: 'none'},
-                width: 400,
+                width: 380,
                 pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
@@ -349,6 +359,7 @@ angular.module('app.controllers', [])
 		}
 	}
 
+
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
@@ -356,21 +367,42 @@ angular.module('app.controllers', [])
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 
-			$("#tab-main").html(name);
+//TODO: find better way
 
+			$("#tab-main").html(name);
 			var s = data.data.statistics;
+			//displays club ranking
+			$("#club_rank").html("Club: " + s.club_pos);
+			//displays league ranking and which league
+			//hacky as fuck
+			for(var i = 0; i<3; i++) {
+				if(s.league_pos[i] == null) {
+					// console.log('wan')
+				} else {
+					var league = ''
+					if(i == 0) {
+						league = 'Singles league: '
+					}
+					else if(i == 1) {
+						league = 'Mixed league: '
+					}
+					else if(i == 2) {
+						league = 'Ladies league: '
+					}
+					$("#league_rank"+i).html(league + s.league_pos[i]);
+				}
+			}
+
 			$("#p_matches").html("Matches: " + s.matches +
 				" won " + s.matches_won +
 				" lost " + s.matches_lost);
-			// $("#matchesbar").progressbar({value: 100 * s.matches_win_ratio});
 			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
 				" won " + s.games_won +
 				" lost " + s.games_lost);
-			// $("#gamesbar").progressbar({value: 100 * s.games_win_ratio});
 			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
 				" won " + s.points_won +
 				" lost " + s.points_lost);
-			// $("#pointsbar").progressbar({value: 100 * s.points_win_ratio});
+
 
 			var matches = data.data.matches;
 			var matchdata = [];
@@ -381,11 +413,11 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
-
 			//define the table columns
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
+// add title for date
 				columns: [{
 					title: "Opponent"
 				}, {
@@ -393,8 +425,9 @@ angular.module('app.controllers', [])
 				}, {
 					title: "Level before"
 				}, {
-					title: "Level after"
-				}]
+					title: "Level Change"
+				}
+				]
 			});
 			$("#loader").hide();
 			$("#results").show();
@@ -412,7 +445,7 @@ angular.module('app.controllers', [])
 		})
 	}
 
-	//populate the payer -ID lookup table
+	//populate the player -ID lookup table
 	function makePlayerTable(data) {
 		data = $.parseJSON(data);
 		for (x in data.data) {
