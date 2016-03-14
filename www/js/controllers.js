@@ -307,15 +307,24 @@ angular.module('app.controllers', [])
 
 	function readmatch(match) {
 		if (match.leaguetypeid) {
-			return [match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
 			if (match.matchtypeid) {
-				return [match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 			} else {
 				// something went wrong
 				return ["error", "", "", "", ""];
 			}
 		}
+	}
+
+	function format_date(date_int) {
+		var date = new Date(date_int*1000);
+
+		var day = date.getDate();
+		var month = date.getMonth();
+		var year = date.getFullYear();
+		return day+'/'+month+'/'+year;
 	}
 
 	function drawChart(chartdata) {
@@ -418,7 +427,9 @@ angular.module('app.controllers', [])
 				data: matchdata,
 				"bDestroy": true,
 // add title for date
-				columns: [{
+				columns: [{ 
+					title: "Date"
+				}, {
 					title: "Opponent"
 				}, {
 					title: "Score"
