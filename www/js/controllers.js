@@ -306,6 +306,7 @@ angular.module('app.controllers', [])
 	}
 
 	function readmatch(match) {
+		
 		if (match.leaguetypeid) {
 			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
