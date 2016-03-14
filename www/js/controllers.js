@@ -306,7 +306,7 @@ angular.module('app.controllers', [])
 	}
 
 	function readmatch(match) {
-		
+
 		if (match.leaguetypeid) {
 			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
@@ -376,10 +376,13 @@ angular.module('app.controllers', [])
 		if (data.status == "good") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
-
-//TODO: find better way
+			var level = data.data.statistics.end_level;
 
 			$("#tab-main").html(name);
+			$("#level").html("Level: "+level);
+
+
+//TODO: find better way			
 			var s = data.data.statistics;
 			//displays club ranking
 			$("#club_rank").html("Club: " + s.club_pos);
@@ -403,9 +406,10 @@ angular.module('app.controllers', [])
 				}
 			}
 
-			$("#p_matches").html("Matches: " + s.matches +
-				" won " + s.matches_won +
-				" lost " + s.matches_lost);
+
+			//displays player statistics
+			$("#team_name").html(data.data.matches.team);
+			$("#p_matches").html("Matches: " + "W " + s.matches_won + "		L " + s.matches_lost);
 			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
 				" won " + s.games_won +
 				" lost " + s.games_lost);
