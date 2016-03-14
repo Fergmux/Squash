@@ -295,17 +295,37 @@ angular.module('app.controllers', [])
 		load(player);
 	}
 
+	//calculates percentage change between levels
+	function percChange(lev_before, lev_after) {
+		var change = ((lev_before - lev_after) / lev_before) * 100;
+		if(change >= 0) {
+			return "+"+Number(change).toFixed(2)+"%";
+		} else {
+			return Number(change).toFixed(2)+"%";
+		}
+	}
+
 	function readmatch(match) {
+
 		if (match.leaguetypeid) {
-			return [match.opponent, match.games_score, match.level_before, match.level_after];
+			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
 			if (match.matchtypeid) {
-				return ["Match", match.opponent, match.games_score, match.level_before, match.level_after];
+				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 			} else {
 				// something went wrong
 				return ["error", "", "", "", ""];
 			}
 		}
+	}
+
+	function format_date(date_int) {
+		var date = new Date(date_int*1000);
+
+		var day = date.getDate();
+		var month = date.getMonth();
+		var year = date.getFullYear();
+		return day+'/'+month+'/'+year;
 	}
 
 	function drawChart(chartdata) {
@@ -322,7 +342,7 @@ angular.module('app.controllers', [])
 				title: 'Level History',
 				colors: ['red'],
                 legend: {position: 'none'},
-                width: 400,
+                width: 380,
                 pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
@@ -349,28 +369,54 @@ angular.module('app.controllers', [])
 		}
 	}
 
+
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
 		if (data.status == "good") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
+			var level = data.data.statistics.end_level;
 
 			$("#tab-main").html(name);
+			$("#level").html("Level: "+level);
 
+
+//TODO: find better way			
 			var s = data.data.statistics;
-			$("#p_matches").html("Matches: " + s.matches +
-				" won " + s.matches_won +
-				" lost " + s.matches_lost);
-			// $("#matchesbar").progressbar({value: 100 * s.matches_win_ratio});
+			//displays club ranking
+			$("#club_rank").html("Club: " + s.club_pos);
+			//displays league ranking and which league
+			//hacky as fuck
+			for(var i = 0; i<3; i++) {
+				if(s.league_pos[i] == null) {
+					// console.log('wan')
+				} else {
+					var league = ''
+					if(i == 0) {
+						league = 'Singles league: '
+					}
+					else if(i == 1) {
+						league = 'Mixed league: '
+					}
+					else if(i == 2) {
+						league = 'Ladies league: '
+					}
+					$("#league_rank"+i).html(league + s.league_pos[i]);
+				}
+			}
+
+
+			//displays player statistics
+			$("#team_name").html(data.data.matches.team);
+			$("#p_matches").html("Matches: " + "W " + s.matches_won + "		L " + s.matches_lost);
 			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
 				" won " + s.games_won +
 				" lost " + s.games_lost);
-			// $("#gamesbar").progressbar({value: 100 * s.games_win_ratio});
 			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
 				" won " + s.points_won +
 				" lost " + s.points_lost);
-			// $("#pointsbar").progressbar({value: 100 * s.points_win_ratio});
+
 
 			var matches = data.data.matches;
 			var matchdata = [];
@@ -381,20 +427,23 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
-
 			//define the table columns
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
-				columns: [{
+// add title for date
+				columns: [{ 
+					title: "Date"
+				}, {
 					title: "Opponent"
 				}, {
 					title: "Score"
 				}, {
 					title: "Level before"
 				}, {
-					title: "Level after"
-				}]
+					title: "Level Change"
+				}
+				]
 			});
 			$("#loader").hide();
 			$("#results").show();
@@ -412,7 +461,7 @@ angular.module('app.controllers', [])
 		})
 	}
 
-	//populate the payer -ID lookup table
+	//populate the player -ID lookup table
 	function makePlayerTable(data) {
 		data = $.parseJSON(data);
 		for (x in data.data) {
