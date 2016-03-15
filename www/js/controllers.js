@@ -393,9 +393,11 @@ angular.module('app.controllers', [])
 //TODO: find better way			
 			var s = data.data.statistics;
 			//displays club ranking
-			$("#club_rank").html("Club: " + s.club_pos);
+			$("#club_pos").html("Club Position: " + s.club_pos);
+			$("#county_pos").html("County Position: " + s.county_pos);
+			$("#country_pos").html("Country Position: " + s.country_pos);
 			//displays league ranking and which league
-			//hacky as fuck
+			
 			// for(var i = 0; i<3; i++) {
 			// 	if(s.league_pos[i] == null) {
 			// 		// console.log('wan')
@@ -417,13 +419,13 @@ angular.module('app.controllers', [])
 
 			//displays player statistics
 			$("#team_name").html(data.data.matches.team);
-			$("#p_matches").html("Matches: " + "W " + s.matches_won + "		L " + s.matches_lost);
+			$("#p_matches").html("Matches: " + "Won " + s.matches_won + "		Lost " + s.matches_lost);
 			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
-				" won " + s.games_won +
-				" lost " + s.games_lost);
+				" Won " + s.games_won +
+				" Lost " + s.games_lost);
 			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
-				" won " + s.points_won +
-				" lost " + s.points_lost);
+				" Won " + s.points_won +
+				" Lost " + s.points_lost);
 
 
 			var matches = data.data.matches;
