@@ -1,0 +1,46 @@
+<ion-view title="Match">
+    <ion-content overflow-scroll="true" padding="true" class="has-header">
+        <div id="results">
+            <h2 class="title tabheader">Name </h2>
+                <div class="card">
+                    <div class="item item-text-wrap">
+                        <div id="tab-main"></div>
+                        <div id ="level"></div>
+                    </div>
+                </div>
+
+            <h2 class="title tabheader">Rankings </h2>
+                <div class="card">
+                    <div class="item item-text-wrap">
+                        <div id = "tab-ranking">
+                            <p id="club_pos"></p>   
+                            <p id="county_pos"></p>
+                            <p id="country_pos"></p>
+                            <p id="overall_pos"></p>
+                        </div>
+                    </div>
+                </div>
+            <h2 class="title tabheader">Statistics </h2>
+                <div class="card">
+                    <div id="tab-stats">
+                        <p id="team_name"></p>
+                        <p id="p_matches"></p>
+                        <p id="p_games"></p>
+                        <p id="p_points"></p>
+                        <p id="level_hist"></p>
+                    </div>
+                </div>
+                <div class="card">  
+                    <div id="line_chart" style="width: 300px; height: 200px"></div>
+                </div>
+    
+            <h2 class="title tabheader"> Matches </h2>
+            <div id="tab-matches">
+            <ion-scroll direction="xy" style="height: 500px">
+                <table id="dtable" class="display cell-border" width="100%"></table>
+            </ion-scroll>
+            </div>
+        </div>
+        <div style="height:30px"></div>
+    </ion-content>
+</ion-view>

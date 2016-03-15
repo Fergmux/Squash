@@ -113,7 +113,15 @@ angular.module('app.routes', [])
       }
     })
         
-      
+    .state('badSquash.playerProfiles', {
+      url: '/page11',
+      views: {
+        'side-menu21': {
+          templateUrl: 'templates/playerProfiles.html',
+          controller: 'playerProfilesCtrl'
+        }
+      }
+    })
     
       
         

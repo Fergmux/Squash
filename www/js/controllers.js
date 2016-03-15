@@ -1007,6 +1007,174 @@ angular.module('app.controllers', [])
 	}
 })
 
+
+
+.controller('playerProfilesCtrl', function($scope, $rootScope) {
+
+	$scope.$on('$ionicView.enter', function() {
+		var playerid = $rootScope.userData.data.playerid
+		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
+			$("#msg").html("Error in AJAX request.");
+		})
+	});
+
+	//calculates percentage change between levels
+	function percChange(lev_before, lev_after) {
+		var change = ((lev_before - lev_after) / lev_before) * 100;
+		if(change >= 0) {
+			return "+"+Number(change).toFixed(2)+"%";
+		} else {
+			return Number(change).toFixed(2)+"%";
+		}
+	}
+
+	function readmatch(match) {
+
+		if (match.leaguetypeid) {
+			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+		} else {
+			if (match.matchtypeid) {
+				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+			} else {
+				// something went wrong
+				return ["error", "", "", "", ""];
+			}
+		}
+	}
+
+	function format_date(date_int) {
+		var date = new Date(date_int*1000);
+
+		var day = date.getDate();
+		var month = date.getMonth();
+		var year = date.getFullYear();
+		return day+'/'+month+'/'+year;
+	}
+
+	function drawChart(chartdata) {
+		try {
+			var data = new google.visualization.DataTable();
+			data.addColumn('date', 'date');
+			data.addColumn('number', 'level');
+
+			for (var i = 0; i < chartdata.length; i++) {
+				date = new Date(chartdata[i][0]*1000)
+                data.addRow([date, chartdata[i][1]]);
+			}
+			var options = {
+				title: 'Level History',
+				colors: ['blue'],
+                legend: {position: 'none'},
+                width: 380,
+                pointSize: 3,
+				hAxis: {
+					format: 'd MMM yy',
+					textStyle: {
+						fontSize: 8
+					}
+				},
+    			vAxis: {
+					baseline: 0,
+				}
+			};
+			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+			chart.draw(data, options);
+		} catch (err) {
+			console.log("err: Empty chart_data");
+		}
+	}
+
+	function chartData(match) {
+		if (match.dateint) {
+			return [match.dateint, match.level_after];
+		} else {
+			return ["error", "", "", "", ""];
+		}
+	}
+
+
+	//display the player profile
+	function display(data) {
+		var data = $.parseJSON(data);
+		if (data.status == "good") {
+			var id = data.data.summary.playerid;
+			var name = data.data.summary.player;
+			var level = data.data.statistics.end_level;
+
+			$("#tab-main").html(name);
+			$("#level").html("Level: "+level);
+		
+			var s = data.data.statistics;
+
+			$("#club_pos").html("Club: " + s.club_pos);
+			$("#county_pos").html("County: " + s.county_pos);
+			$("#country_pos").html("Country: " + s.country_pos);
+			$("#overall_pos").html("Overall: " + s.overall_pos);
+
+			//displays player statistics
+			$("#team_name").html(data.data.matches.team);
+			$("#p_matches").html("Matches: " + "W " + s.matches_won + "		L " + s.matches_lost);
+			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
+				" won " + s.games_won +
+				" lost " + s.games_lost);
+			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
+				" won " + s.points_won +
+				" lost " + s.points_lost);
+
+
+			var matches = data.data.matches;
+			var matchdata = [];
+			var chartdata = [];
+			for (var i = 0; i < matches.length; i++) {
+				var t = readmatch(matches[i]);
+				var c = chartData(matches[i]);
+				matchdata.push(t);
+				chartdata.push(c);
+			}
+			//define the table columns
+			$("#dtable").dataTable({
+				data: matchdata,
+				"bDestroy": true,
+				columns: [{ 
+					title: "Date"
+				}, {
+					title: "Opponent"
+				}, {
+					title: "Score"
+				}, {
+					title: "Level before"
+				}, {
+					title: "Level Change"
+				}
+				]
+			});
+			$("#loader").hide();
+			$("#results").show();
+			$("#tab-main").html(drawChart(chartdata));
+		} else {
+			$("#loader").hide();
+			$("#msg").html("Error - " + data.user_message);
+		}
+	}
+
+
+	//load the data for the player page with the cache
+	function load(name) {
+		//test if they are searching for ID or player name
+		if (!/^[0-9]+$/.test(name)) {
+			//make lower case to remove errors on incorrect capitalization
+			var id = idtable[name.toLowerCase()]
+		} else {
+			var id = name;
+		}
+		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + id + "&show=last10&format=json", display, function() {
+				$("#msg").html("Error in AJAX request.");
+			})
+	}
+
+
+})
+
 .controller('matchDataCtrl', function($scope, $rootScope) {
 
 	$scope.$on('$ionicView.enter', function () {
