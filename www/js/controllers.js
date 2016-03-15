@@ -326,9 +326,10 @@ angular.module('app.controllers', [])
 		var date = new Date(date_int*1000);
 
 		var day = date.getDate();
-		var month = date.getMonth();
+		var month = date.getMonth() + 1;
 		var year = date.getFullYear();
-		return day+'/'+month+'/'+year;
+		//return day+'/'+month+'/'+year;
+		return year+'-'+month+'-'+day;
 	}
 
 	function drawChart(chartdata) {
