@@ -968,7 +968,7 @@ angular.module('app.controllers', [])
 	}
 })
 
-.controller('settingsCtrl', function($scope) {
+.controller('findCtrl', function($scope) {
 
 })
 

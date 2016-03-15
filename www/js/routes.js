@@ -117,12 +117,12 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.settings', {
+    .state('badSquash.find', {
       url: '/page12',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/settings.html',
-          controller: 'settingsCtrl'
+          templateUrl: 'templates/find.html',
+          controller: 'findCtrl'
         }
       }
     })
