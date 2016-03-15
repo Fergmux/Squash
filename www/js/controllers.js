@@ -118,7 +118,12 @@ angular.module('app.controllers', [])
 		//level at start of season
 		$("#levelsseason").html(data.data.statistics.season_level);
 		//player's level 12 months ago
-		$("#levels12").html(data.data.statistics.level_12m_ago);
+		if (data.data.statistics.level_12m_ago == -1) {
+			$("#levels12").parent().hide();
+		} else {
+			$("#levels12").html(data.data.statistics.level_12m_ago);	
+		}
+		
 
 		$("#pointsplayed").html(data.data.statistics.points_won + data.data.statistics.points_lost);
 		$("#pointswon").html(data.data.statistics.points_won);
