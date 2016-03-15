@@ -1,0 +1,64 @@
+<ion-view title="Custom Match">
+    <ion-nav-buttons side="right">
+      <button class="button doubles" ng-click="toggleDoubles()">Doubles</button>
+      <button class="button doubles" ng-click="toggleDoubles()" style="display: none">Singles</button>
+    </ion-nav-buttons>
+    <ion-content overflow-scroll="true" padding="true" class="has-header">
+        <table class="customMatch">
+            <!-- <tr>
+                <td style="text-align: left; width: 45%">Artoliminuni vertagibuski</td>
+                <td style="text-align: center; width: 10%">VS</td>
+                <td style="text-align: right; width: 45%">Torftyests Ssdsivill</td>
+            </tr> -->
+            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 1" id="name1"></td></tr>
+            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 3" id="name3"></td></tr>
+            <tr style="height: 50px; line-height: 50px">
+                <td style="width: 40%; font-size: 52px; text-align: right" id="rounds1">0</td>
+                <td style="width: 20%; font-size: 52px; line-height: 45px; vertical-align: top">-</td>
+                <td style="width: 40%; font-size: 52px; text-align: left" id="rounds2">0</td>
+            </tr>
+            <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 2" id="name2"></td></tr>
+            <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 4" id="name4"></td></tr>
+        </table>
+        <div class="button-bar" style="margin-bottom: 20px">
+            <a class="button button-positive" ng-click="threeRounds()">3 Rounds</a>
+            <a class="button button-positive" ng-click="fiveRounds()">5 Rounds</a>
+        </div>
+        <table class="roundScores">
+            <tr>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score11" ng-change="score1Change()"></td>
+                <td class="middle">Round 1</td>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score12" ng-change="score1Change()"></td>
+            </tr>
+            <tr>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score21" ng-change="score2Change()"></td>
+                <td class="middle">Round 2</td>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score22" ng-change="score2Change()"></td>
+            </tr>
+            <tr>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score31" ng-change="score3Change()"></td>
+                <td class="middle">Round 3</td>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score32" ng-change="score3Change()"></td>
+            </tr>
+            <tr class="moreRounds" style="display: none">
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score41" ng-change="score4Change()"></td>
+                <td class="middle">Round 4</td>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score42" ng-change="score4Change()"></td>
+            </tr>
+            <tr class="moreRounds" style="display: none">
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score51" ng-change="score5Change()"></td>
+                <td class="middle">Round 5</td>
+                <td><input type="number" name="score" placeholder="0" ng-model="scores.score52" ng-change="score5Change()"></td>
+            </tr>
+        </table>
+
+        <label class="item item-input" style="margin: 20px 0px">
+            <span class="input-label">Date</span>
+            <input type="datetime-local" id="dateInput">
+        </label>
+        <div style="text-align: center">
+            <button ng-click="submitScores()" class="button button-positive" id="submitbutton">Submit</button>
+            <!-- <button ng-click="showAlert()" class="button button-positive" id="submitbutton">Submit</button> -->
+        </div>
+    </ion-content>
+</ion-view>

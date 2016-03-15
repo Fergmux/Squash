@@ -1,0 +1,69 @@
+<ion-view title="Find">
+    <ion-content overflow-scroll="true" padding="true" class="has-header">
+
+
+	    <div id="form">
+	        <p>
+	            <label class="searchbar item item-input">
+					<i class="icon ion-search placeholder-icon"></i>
+				  	<input type="search" id="playerid" placeholder="Search">
+				</label>
+	            <button ng-click="onTap()" class="button button-stable smallbutt" id="loadbutton">Search</button>
+	        </p>
+	    </div>
+
+	    <div id="msg"></div>
+	    <div id="loader" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
+
+	    <!-- <div id="playerlist">
+		    <ion-list>
+	          <ion-item ng-repeat="item in items" ng-click="search(item)">
+	            {{item}}
+	          </ion-item>
+	        </ion-list>
+	    </div> -->
+	    <div id="results">
+    		<h2 class="title tabheader">Name </h2>
+    			<div class="card">
+					<div class="item item-text-wrap">
+					    <div id="tab-main"></div>
+					    <div id ="level"></div>
+				  	</div>
+				</div>
+
+    		<h2 class="title tabheader">Rankings </h2>
+    			<div class="card">
+			        <div class="item item-text-wrap">
+			        	<div id = "tab-ranking">
+ 				  			<div id="club_rank"></div>	
+			           		<div id="club_pos"></div>
+			           		<div id="county_pos"></div>
+			           		<div id="country_pos"></div>
+			        	</div>
+			    	</div>
+				</div>
+			<h2 class="title tabheader">Statistics </h2>
+				<div class="card">
+					<div id="tab-stats" class="item item-text-wrap">
+						<div id="team_name"></div>
+		        		<div id="p_matches"></div>
+				        <div id="p_games"></div>
+				        <div id="p_points"></div>
+				        <div id="level_hist"></div>
+		    		</div>
+		    	</div>
+		    	<div class="card">	
+					<div id="line_chart" style="width: 300px; height: 200px"></div>
+		    	</div>
+    
+       		<h2 class="title tabheader"> Matches </h2>
+			<div id="tab-matches">
+			<ion-scroll direction="xy" style="height: 500px">
+    			<table id="dtable" class="display cell-border" width="100%"></table>
+			</ion-scroll>
+			</div>
+
+	    </div>
+
+	</ion-content>
+</ion-view>
