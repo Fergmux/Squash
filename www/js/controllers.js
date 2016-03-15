@@ -248,8 +248,8 @@ angular.module('app.controllers', [])
 
 		$("#loader").show();
 		
-		//get value from search box
-		var searchVal = $("#playerid").val()
+		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
+		var searchVal = $("#playerid").val().trim();
 
 		//if there is no value in search box, bring back rank list, otherwise load individual player
 		if(searchVal=="") {
