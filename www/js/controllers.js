@@ -44,6 +44,7 @@ angular.module('app.controllers', [])
 		console.log(data)
 		if (data.status == "good"){
 			$rootScope.userData = data;
+			$rootScope.loggedIn = true
 			$state.go('badSquash.myProfile')
 		} else {
 			$("#msg").html("Sorry, incorrect email or password")
@@ -94,6 +95,7 @@ angular.module('app.controllers', [])
 		var lowDate = new Date(data.data.statistics.min_level_dateint*1000)
 		month = lowDate.getMonth()+1
 		lowDate = lowDate.getDate()+"/"+month+"/"+lowDate.getFullYear()
+		$("#levels12").parent().show();
 		//player name
 		$("#playerName").val(data.data.summary.player)
 		//player email
@@ -205,12 +207,12 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('rankingsCtrl', function($scope, $rootScope) {
+.controller('findCtrl', function($scope, $rootScope) {
 	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
 		$("#results").hide();
-		$("#loader").show();
-		loadplayers();
+		$("#loader").hide();
+		// loadplayers();
 		loadlookup();
 	})
 
@@ -223,15 +225,17 @@ angular.module('app.controllers', [])
     	});
   	});
 	function loadnames(){
-		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
+		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerArray, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
 	function makePlayerArray(data){
 		data = $.parseJSON(data);
+		console.log(data)
 		for (var x = 0; x < data.data.length; x++) {
 			players[x] = data.data[x].player;
 		}
+		console.log(players)
 	}
 
 	//load in google charts
@@ -255,48 +259,48 @@ angular.module('app.controllers', [])
 		var searchVal = $("#playerid").val().trim();
 
 		//if there is no value in search box, bring back rank list, otherwise load individual player
-		if(searchVal=="") {
-			loadplayers();
-		} else {
+		// if(searchVal=="") {
+		// 	loadplayers();
+		// } else {
 			load(searchVal);
-		}
+		// }
 	}
 
 	//initialse lookup table for player name - ID
 	var idtable = new Object();
 
 	//get the player data using the cache
-	function loadplayers() {
-		Cache.request("http://www.badsquash.co.uk/players.php?leaguetype=1&format=json", displayplayers, function() {
-			$("#msg").html("Error in AJAX request.");
-		})
-	}
+	// function loadplayers() {
+	// 	Cache.request("http://www.squashlevels.com/players.php?&all=&top=&perpage=-1&format=json", displayplayers, function() {
+	// 		$("#msg").html("Error in AJAX request.");
+	// 	})
+	// }
 
 	// push the rankings data to the list
-	function displayplayers(data) {
-		var data = $.parseJSON(data);
-		$scope.items = []
-		for (var i = 0; i < data.data.length; i++) {
-			$scope.items.push(data.data[i].level + " - " + data.data[i].player)
-		}
-		$scope.$apply()
-		$("#loader").hide();
-		$("#playerlist").show();
-	}
+	// function displayplayers(data) {
+	// 	var data = $.parseJSON(data);
+	// 	$scope.items = []
+	// 	for (var i = 0; i < data.data.length; i++) {
+	// 		$scope.items.push(data.data[i].level + " - " + data.data[i].player)
+	// 	}
+	// 	$scope.$apply()
+	// 	$("#loader").hide();
+	// 	$("#playerlist").show();
+	// }
 
-	//when a rank list item is clicked, earch for that person
-	$scope.search = function(item) {
-		$("#playerlist").hide();
-		$("#loader").show();
-		//take the name from the list item
-		var player = item.split("-")[1].trim()
+	// //when a rank list item is clicked, earch for that person
+	// $scope.search = function(item) {
+	// 	$("#playerlist").hide();
+	// 	$("#loader").show();
+	// 	//take the name from the list item
+	// 	var player = item.split("-")[1].trim()
 
-		//put the name in the search box (it looks nice)
-		$("#playerid").val(player)
+	// 	//put the name in the search box (it looks nice)
+	// 	$("#playerid").val(player)
 
-		//load player page
-		load(player);
-	}
+	// 	//load player page
+	// 	load(player);
+	// }
 
 	//calculates percentage change between levels
 	function percChange(lev_before, lev_after) {
@@ -326,10 +330,9 @@ angular.module('app.controllers', [])
 		var date = new Date(date_int*1000);
 
 		var day = date.getDate();
-		var month = date.getMonth() + 1;
+		var month = date.getMonth();
 		var year = date.getFullYear();
-		//return day+'/'+month+'/'+year;
-		return year+'-'+month+'-'+day;
+		return day+'/'+month+'/'+year;
 	}
 
 	function drawChart(chartdata) {
@@ -377,7 +380,8 @@ angular.module('app.controllers', [])
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
-		if (data.status == "good") {
+		console.log(data)
+		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
@@ -392,23 +396,23 @@ angular.module('app.controllers', [])
 			$("#club_rank").html("Club: " + s.club_pos);
 			//displays league ranking and which league
 			//hacky as fuck
-			for(var i = 0; i<3; i++) {
-				if(s.league_pos[i] == null) {
-					// console.log('wan')
-				} else {
-					var league = ''
-					if(i == 0) {
-						league = 'Singles league: '
-					}
-					else if(i == 1) {
-						league = 'Mixed league: '
-					}
-					else if(i == 2) {
-						league = 'Ladies league: '
-					}
-					$("#league_rank"+i).html(league + s.league_pos[i]);
-				}
-			}
+			// for(var i = 0; i<3; i++) {
+			// 	if(s.league_pos[i] == null) {
+			// 		// console.log('wan')
+			// 	} else {
+			// 		var league = ''
+			// 		if(i == 0) {
+			// 			league = 'Singles league: '
+			// 		}
+			// 		else if(i == 1) {
+			// 			league = 'Mixed league: '
+			// 		}
+			// 		else if(i == 2) {
+			// 			league = 'Ladies league: '
+			// 		}
+			// 		$("#league_rank"+i).html(league + s.league_pos[i]);
+			// 	}
+			// }
 
 
 			//displays player statistics
@@ -460,7 +464,7 @@ angular.module('app.controllers', [])
 
 	//load the lookup table data for all players - ID
 	function loadlookup(){
-		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerTable, function() {
+		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerTable, function() {
 			$("#msg").html("Error - id must be a number")
 		})
 	}
@@ -473,6 +477,7 @@ angular.module('app.controllers', [])
 			var player = data.data[x].player.toLowerCase();
 			idtable[player] = playerid;
 		}
+		console.log(idtable)
 		$rootScope.playerTable = idtable;
 	}
 
@@ -482,10 +487,18 @@ angular.module('app.controllers', [])
 		if (!/^[0-9]+$/.test(name)) {
 			//make lower case to remove errors on incorrect capitalization
 			var id = idtable[name.toLowerCase()]
+			console.log(id)
+			console.log(idtable)
 		} else {
 			var id = name;
 		}
-		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + id + "&format=json", display, function() {
+		var timePeriod = ""
+		if ($rootScope.loggedIn) {
+			timePeriod = "show=all"
+		} else {
+			timePeriod = "show=last12m"
+		}
+		Cache.request("http://squashlevels.com/player_detail.php?player=" + id + "&check=1&"+timePeriod+"&format=json", display, function() {
 				$("#msg").html("Error in AJAX request.");
 			})
 	}
@@ -677,7 +690,7 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('playersCtrl', function($scope, $ionicPopup) {
+.controller('customMatchCtrl', function($scope, $ionicPopup) {
 	// list of players for autofill
 	var players = [];
 	//no. of rounds
@@ -972,7 +985,7 @@ angular.module('app.controllers', [])
 	}
 })
 
-.controller('settingsCtrl', function($scope, $state, $ionicHistory) {
+.controller('settingsCtrl', function($scope, $state, $ionicHistory, $rootScope) {
 	$ionicHistory.nextViewOptions({
 	    disableBack: true
 	});
@@ -987,6 +1000,7 @@ angular.module('app.controllers', [])
 	$scope.logout = function() {
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
+		$rootScope.loggedIn = false
 		$state.go('badSquash.login')
 	}
 })
@@ -1008,6 +1022,12 @@ angular.module('app.controllers', [])
 		var matchDate = new Date(thisMatch.dateint*1000)
 		var month = matchDate.getMonth()+1
 		matchDate = matchDate.getDate()+"/"+month+"/"+matchDate.getFullYear()
+
+		$("#positionbefore").parent().show();
+		$("#positionafter").parent().show();
+		$("#opppositionbefore").parent().hide();
+			$("#opppositionafter").parent().hide();
+			$("#opppos").hide();
 
 		if(thisMatch.matchtype == undefined) {
 			$("#league").html(thisMatch.leaguetype)	

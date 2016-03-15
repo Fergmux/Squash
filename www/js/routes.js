@@ -56,12 +56,12 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.rankings', {
+    .state('badSquash.find', {
       url: '/page5',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/rankings.html',
-          controller: 'rankingsCtrl'
+          templateUrl: 'templates/find.html',
+          controller: 'findCtrl'
         }
       }
     })
@@ -103,12 +103,12 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.players', {
+    .state('badSquash.customMatch', {
       url: '/page10',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/players.html',
-          controller: 'playersCtrl'
+          templateUrl: 'templates/customMatch.html',
+          controller: 'customMatchCtrl'
         }
       }
     })
