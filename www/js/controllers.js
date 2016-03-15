@@ -10,11 +10,11 @@ angular.module('app.controllers', [])
 	});
 
 
-	var storedemail = localStorage.getItem("email")
-	var storedpass = localStorage.getItem("password")
+	var storedemail = $.parseJSON(localStorage.getItem("email"))
+	var storedpass = $.parseJSON(localStorage.getItem("password"))
 
 	$scope.$on('$ionicView.loaded', function () {
-		if (storedemail != null && storedpass != null) {
+		if (storedemail != undefined && storedpass != undefined) {
 			login(storedemail, storedpass)
 			console.log(storedemail,storedpass)
 		}
@@ -27,16 +27,14 @@ angular.module('app.controllers', [])
 
 		//store password and email in local storage (like cookies)
 		console.log(email,pass)
-		console.log(email,pass)
-		$("#emailId").val(email);
-		if (storedemail == null) {
+		if (storedemail == undefined) {
 			localStorage["email"] = JSON.stringify(email);
 		}
-		if (storedpass == null) {
-			localStorage.setItem["password"] = JSON.stringify(pass);
+		if (storedpass == undefined) {
+			localStorage["password"] = JSON.stringify(pass);
 		}	
-		console.log(storedpass, localStorage["email"])
-		Cache.request("http://www.badsquash.co.uk/info.php?action=login&email="+email+"&password="+pass+"&stay_logged_in=1&format=json", loadUserData, function() {
+
+		Cache.request("http://www.squashlevels.com/info.php?action=login&email="+email+"&password="+pass+"&stay_logged_in=1&format=json", loadUserData, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
@@ -57,8 +55,8 @@ angular.module('app.controllers', [])
 		var pass = $("#passId").val();
 		//converts pass to md5
 		var passHash = CryptoJS.MD5(pass).toString();
-		delete $window.localStorage.email;
-		delete $window.localStorage.password;
+		localStorage.removeItem("email");
+		localStorage.removeItem("password");
 		login(email, passHash);
 	}
 })
@@ -81,7 +79,7 @@ angular.module('app.controllers', [])
 	});
 
 	function getPlayerInfo(playerid) {
-		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
+		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
 				$("#msg").html("Error in AJAX request.");
 			})
 	}
@@ -195,7 +193,7 @@ angular.module('app.controllers', [])
 	}
 
 	$scope.load = function(match) {
-		$rootScope.matchindex = match.split(" ")[0]
+		$rootScope.matchindex = match.split(" ")[0]-1
 		$state.go('badSquash.matchData')
 	}
 
@@ -968,15 +966,30 @@ angular.module('app.controllers', [])
 	}
 })
 
-.controller('findCtrl', function($scope) {
+.controller('settingsCtrl', function($scope, $state, $ionicHistory) {
+	$ionicHistory.nextViewOptions({
+	    disableBack: true
+	});
 
+	$scope.clearCache = function() {
+		Cache.clean(315360000000);
+		$("#message").html("Cache emptied")
+		setTimeout(function(){ 
+			$("#message").empty()
+		}, 3000);
+	}
+	$scope.logout = function() {
+		localStorage.removeItem("email");
+		localStorage.removeItem("password");
+		$state.go('badSquash.login')
+	}
 })
 
 .controller('matchDataCtrl', function($scope, $rootScope) {
 
 	$scope.$on('$ionicView.enter', function () {
 		var playerid = $rootScope.userData.data.playerid
-		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
+		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
 	});
@@ -985,7 +998,7 @@ angular.module('app.controllers', [])
 		data = $.parseJSON(data);
 		var index = $rootScope.matchindex
 		var thisMatch = data.data.matches[index]
-
+		console.log(data)
 		var matchDate = new Date(thisMatch.dateint*1000)
 		var month = matchDate.getMonth()+1
 		matchDate = matchDate.getDate()+"/"+month+"/"+matchDate.getFullYear()
