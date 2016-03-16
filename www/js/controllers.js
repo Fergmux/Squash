@@ -45,7 +45,7 @@ angular.module('app.controllers', [])
 		if (data.status == "good") {
 			$rootScope.userData = data;
 			$rootScope.loggedIn = true
-			$state.go('badSquash.myProfile')
+			$state.go('squashLevels.myProfile')
 		} else {
 			$("#msg").html("Sorry, incorrect email or password")
 		}
@@ -73,7 +73,7 @@ angular.module('app.controllers', [])
 			$ionicHistory.nextViewOptions({
 				disableBack: true
 			});
-			$state.go('badSquash.login');
+			$state.go('squashLevels.login');
 		} else {
 			getPlayerInfo($rootScope.userData.data.playerid)
 		}
@@ -201,7 +201,7 @@ angular.module('app.controllers', [])
 
 	$scope.load = function(match) {
 		$rootScope.matchindex = match.split(" ")[0] - 1
-		$state.go('badSquash.matchData')
+		$state.go('squashLevels.matchData')
 	}
 
 
@@ -510,8 +510,8 @@ angular.module('app.controllers', [])
 
 
 
-// SquashLevels tab: displays player rankings with filters
-.controller('squashLevelsCtrl', function($scope) {
+//displays player rankings with filters
+.controller('rankingsCtrl', function($scope) {
 
 	//fires when page is loaded for the first time
 	$scope.$on('$ionicView.loaded', function() {
@@ -679,7 +679,7 @@ angular.module('app.controllers', [])
 		var teamid = $("#teamid").val();
 		//make sure it's a number (TODO: search on club name)
 		if (/^[0-9]+$/.test(teamid)) {
-			Cache.request("http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
+			Cache.request("http://www.squashLevels.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
 				$("#msg").html("Error in AJAX equest.");
 			})
 		} else {
@@ -724,7 +724,7 @@ angular.module('app.controllers', [])
 
 	//get list of players data
 	function loadplayers() {
-		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
+		Cache.request("http://www.squashLevels.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
@@ -1006,7 +1006,7 @@ angular.module('app.controllers', [])
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
 		$rootScope.loggedIn = false
-		$state.go('badSquash.login')
+		$state.go('squashLevels.login')
 	}
 })
 
@@ -1016,7 +1016,7 @@ angular.module('app.controllers', [])
 
 	$scope.$on('$ionicView.enter', function() {
 		var playerid = $rootScope.userData.data.playerid
-		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
+		Cache.request("http://www.squashLevels.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
 	});
