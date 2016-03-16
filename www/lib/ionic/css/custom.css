@@ -3,7 +3,10 @@
 	color: #387EF5;
 	margin-top: 20px;
 }
-
+.lesspad {
+	margin: 3px 0px;
+	min-width: 45px;
+}
 .searchbar {
 	width: 78%;
 	float: left;
@@ -65,8 +68,8 @@ table.roundScores > tbody > tr{
 }
 
 table.roundScores > tbody > tr > td {
-	width: 20%;
-	font-size: 20px;
+	width: 30%;
+	font-size: 30px;
 	color: #387EF5;
 	font-weight: 900;
 	text-align: center;
@@ -95,20 +98,41 @@ table.roundScores > tbody > tr > td > input {
 	height: 20px;
 	background-color: transparent!important;
 }
-
-div.row > div.col {
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	background-color: #fafafa;
-	margin: 1px;
-	text-align: center;
+div.topmarg{
+	margin-top: 20px;
 }
-
-div.row > div.col > p {
-	font-weight: bold;
-	color: #387EF5;
+div.row {
+	height: 45px;
+}
+div.row > div.col {
+	text-align: center;
 	font-size: 16px;
-	margin-top: 5px;
+	border-radius: 2px;
+	margin: 2px;
+	line-height: 25px;
+}
+div.row > div.grey {
+	border: 1px solid #ccc;
+	background-color: #fafafa;
+}
+div.row > div.blue {
+	border: 1px solid #0c60ee;
+	background-color: #387ef5;
+	color: #fff;
+}
+div.row > div.blue:active {
+	background-color: #0c60ee;
+}
+div.row > div.top {
+	margin: 1px;
+	line-height: 40px;
+}
+div.row > div.bot {
+	margin: -3px;
+	line-height: 15px;
+}
+div.empty {	
+	height: 30px;
 }
 div.header {
 	margin-top: 10px!important;

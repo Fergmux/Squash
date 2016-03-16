@@ -1,6 +1,6 @@
 <ion-view title="Add a Result">
     <ion-nav-buttons side="right">
-      <button class="button doubles" ng-click="toggleDoubles()">Doubles</button>
+      <!-- <button class="button doubles" ng-click="toggleDoubles()">Doubles</button> -->
       <button class="button doubles" ng-click="toggleDoubles()" style="display: none">Singles</button>
     </ion-nav-buttons>
     <ion-content overflow-scroll="true" padding="true" class="has-header">
@@ -20,37 +20,239 @@
             <tr><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 2" id="name2"></td></tr>
             <tr class="doubles" style="display: none"><td colspan="3"><input class="nameInput" type="text" name="fname" placeholder="Player 4" id="name4"></td></tr>
         </table>
-        <div class="button-bar" style="margin-bottom: 20px">
+        <!-- <div class="button-bar" style="margin-bottom: 20px">
             <a class="button button-positive" ng-click="threeRounds()">3 Rounds</a>
             <a class="button button-positive" ng-click="fiveRounds()">5 Rounds</a>
+        </div> -->
+
+        <!-- <table class="roundScores">
+            <tr>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score11" ng-change="score1Change()"></td>
+                <td class="middle">
+                    1
+                </td>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score12" ng-change="score1Change()"></td>
+            </tr>
+            <tr>
+                <td>
+                    <button id="1a1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="1a5"class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="1b1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="1b5" class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score21" ng-change="score2Change()"></td>
+                <td class="middle">
+                    2
+                </td>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score22" ng-change="score2Change()"></td>
+            </tr>
+            <tr>
+                
+                    <td>
+                        <button id="2a1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="2a5"class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="2b1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="2b5" class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score31" ng-change="score3Change()"></td>
+                <td class="middle">
+                    3
+                </td>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score32" ng-change="score3Change()"></td>
+            </tr>
+            <tr>
+                
+                    <td>
+                        <button id="3a1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="3a5"class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="3b1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="3b5" class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                </td>
+            </tr>
+            <tr class="moreRounds">
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score41" ng-change="score4Change()"></td>
+                <td class="middle">
+                    4
+                </td>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score42" ng-change="score4Change()"></td>
+            </tr>
+            <tr>
+                
+                    <td>
+                        <button id="4a1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="4a5"class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="4b1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="4b5" class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                </td>
+            </tr>
+            <tr class="moreRounds">
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score51" ng-change="score5Change()"></td>
+                <td class="middle">
+                    5
+                </td>
+                <td colspan="2"><input type="number" name="score" placeholder="0" ng-model="scores.score52" ng-change="score5Change()"></td>
+            </tr>
+            <tr>
+                
+                    <td>
+                        <button id="5a1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="5a5"class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                    <td></td>
+                    <td>
+                        <button id="5b1" class="button button-positive lesspad">
+                            +1
+                        </button>
+                    </td>
+                    <td>
+                        <button id="5b5" class="button button-positive lesspad">
+                            +5
+                        </button>
+                    </td>
+                </td>
+            </tr>
+        </table> -->
+
+        <div class="row">
+            <div id="1a" class="col col-33 grey" style="margin-top: -4px">0</div>
+            <div class="col col-33 top" style="margin-top: -4px">Round</div>
+            <div id="1b" class="col col-33 grey" style="margin-top: -4px">0</div>
         </div>
-        <table class="roundScores">
-            <tr>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score11" ng-change="score1Change()"></td>
-                <td class="middle">Round 1</td>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score12" ng-change="score1Change()"></td>
-            </tr>
-            <tr>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score21" ng-change="score2Change()"></td>
-                <td class="middle">Round 2</td>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score22" ng-change="score2Change()"></td>
-            </tr>
-            <tr>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score31" ng-change="score3Change()"></td>
-                <td class="middle">Round 3</td>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score32" ng-change="score3Change()"></td>
-            </tr>
-            <tr class="moreRounds" style="display: none">
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score41" ng-change="score4Change()"></td>
-                <td class="middle">Round 4</td>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score42" ng-change="score4Change()"></td>
-            </tr>
-            <tr class="moreRounds" style="display: none">
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score51" ng-change="score5Change()"></td>
-                <td class="middle">Round 5</td>
-                <td><input type="number" name="score" placeholder="0" ng-model="scores.score52" ng-change="score5Change()"></td>
-            </tr>
-        </table>
+        <div class="row">
+            <div ng-click="s1a1()" class="col col-20 blue">+1</div>
+            <div ng-click="s1a5()" class="col col-20 blue">+5</div>
+            <div class="col col-20 bot">1</div>
+            <div ng-click="s1b1()" class="col col-20 blue">+1</div>
+            <div ng-click="s1b5()"class="col col-20 blue">+5</div>
+        </div>
+        <div class="row empty"></div>
+        <div class="row">
+            <div id="2a" class="col col-33 grey" style="margin-top: -4px">0</div>
+            <div class="col col-33 top" style="margin-top: -4px">Round</div>
+            <div id="2b" class="col col-33 grey" style="margin-top: -4px">0</div>
+        </div>
+        <div class="row">
+            <div ng-click="s2a1()" class="col col-20 blue">+1</div>
+            <div ng-click="s2a5()" class="col col-20 blue">+5</div>
+            <div class="col col-20 bot">2</div>
+            <div ng-click="s2b1()" class="col col-20 blue">+1</div>
+            <div ng-click="s2b5()"class="col col-20 blue">+5</div>
+        </div>
+        <div class="row empty"></div>
+        <div class="row">
+            <div id="3a" class="col col-33 grey" style="margin-top: -4px">0</div>
+            <div class="col col-33 top" style="margin-top: -4px">Round</div>
+            <div id="3b" class="col col-33 grey" style="margin-top: -4px">0</div>
+        </div>
+        <div class="row">
+            <div ng-click="s3a1()" class="col col-20 blue">+1</div>
+            <div ng-click="s3a5()" class="col col-20 blue">+5</div>
+            <div class="col col-20 bot">3</div>
+            <div ng-click="s3b1()" class="col col-20 blue">+1</div>
+            <div ng-click="s3b5()"class="col col-20 blue">+5</div>
+        </div>
+        <div class="row empty"></div>
+        <div class="row">
+            <div id="4a" class="col col-33 grey" style="margin-top: -4px">0</div>
+            <div class="col col-33 top" style="margin-top: -4px">Round</div>
+            <div id="4b" class="col col-33 grey" style="margin-top: -4px">0</div>
+        </div>
+        <div class="row">
+            <div ng-click="s4a1()" class="col col-20 blue">+1</div>
+            <div ng-click="s4a5()" class="col col-20 blue">+5</div>
+            <div class="col col-20 bot">4</div>
+            <div ng-click="s4b1()" class="col col-20 blue">+1</div>
+            <div ng-click="s4b5()"class="col col-20 blue">+5</div>
+        </div>
+        <div class="row empty"></div>
+        <div class="row">
+            <div id="5a" class="col col-33 grey" style="margin-top: -4px">0</div>
+            <div class="col col-33 top" style="margin-top: -4px">Round</div>
+            <div id="5b" class="col col-33 grey" style="margin-top: -4px">0</div>
+        </div>
+        <div class="row">
+            <div ng-click="s5a1()" class="col col-20 blue">+1</div>
+            <div ng-click="s5a5()" class="col col-20 blue">+5</div>
+            <div class="col col-20 bot">5</div>
+            <div ng-click="s5b1()" class="col col-20 blue">+1</div>
+            <div ng-click="s5b5()"class="col col-20 blue">+5</div>
+        </div>
+        <div class="row empty"></div>
+        
 
         <label class="item item-input" style="margin: 20px 0px">
             <span class="input-label">Date</span>

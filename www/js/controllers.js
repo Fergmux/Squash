@@ -715,9 +715,9 @@ angular.module('app.controllers', [])
 	// list of players for autofill
 	var players = [];
 	//no. of rounds
-	var rounds = 3;
+	// var rounds = 3;
 	//if the submission is for a doubles game
-	var doubles = false
+	// var doubles = false
 	//get player data for autocomplete
 	loadplayers();
 	setDateInput();
@@ -741,7 +741,7 @@ angular.module('app.controllers', [])
 
   	//get list of players data
 	function loadplayers(){
-		Cache.request("http://www.badsquash.co.uk/players.php?&leaguetype=1&perpage=-1&format=json", makePlayerArray, function() {
+		Cache.request("http://www.squashlevels.com/players.php?&all=&top=&perpage=-1&format=json", makePlayerArray, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
@@ -752,129 +752,335 @@ angular.module('app.controllers', [])
 			players[x] = data.data[x].player;
 		}
 	}
-	//when three rounds is selected, delete 4th and 5th round inputs and update round counter
-	$scope.threeRounds = function(){
-		rounds = 3;
-		$(".moreRounds").hide();
-		$scope.scores.score41 = undefined;
-		$scope.scores.score42 = undefined;
-		$scope.scores.score51 = undefined;
-		$scope.scores.score52 = undefined;
-		score1[3] = 0;
-		score2[3] = 0;
-		score1[4] = 0;
-		score2[4] = 0;
-		updateRounds();
-	}
-	// show extra round score inputs
-	$scope.fiveRounds = function(){
-		rounds = 5;
-		$(".moreRounds").show();
-	}
-	//toggle items which are dependent on a double input
-	$scope.toggleDoubles = function() {
-		$(".doubles").toggle();
-		doubles = !doubles;
-	}
-
-	//object of score inputs
-	$scope.scores = {}
-
-	//array of wether the player has one the round
 	var score1 = [0, 0, 0, 0, 0]
 	var score2 = [0, 0, 0, 0, 0]
+	var scores = {
+		"1a": 0,
+		"1b": 0,
+		"2a": 0,
+		"2b": 0,
+		"3a": 0,
+		"3b": 0,
+		"4a": 0,
+		"4b": 0,
+		"5a": 0,
+		"5b": 0
+	}
+	$scope.s1a1 = function() {
+		scores["1a"] = scores["1a"] + 1
+		$("#1a").html(scores["1a"])
+		check1Score()
+	}
+	$scope.s1a5 = function() {
+		scores["1a"] = scores["1a"] + 5
+		$("#1a").html(scores["1a"])
+		check1Score()
+	}
+	$scope.s1b1 = function() {
+		scores["1b"] = scores["1b"] + 1
+		$("#1b").html(scores["1b"])
+		check1Score()
+	}
+	$scope.s1b5 = function() {
+		scores["1b"] = scores["1b"] + 5
+		$("#1b").html(scores["1b"])
+		check1Score()
+	}
+	$scope.s2a1 = function() {
+		scores["2a"] = scores["2a"] + 1
+		$("#2a").html(scores["2a"])
+		check2Score()
+	}
+	$scope.s2a5 = function() {
+		scores["2a"] = scores["2a"] + 5
+		$("#2a").html(scores["2a"])
+		check2Score()
+	}
+	$scope.s2b1 = function() {
+		scores["2b"] = scores["2b"] + 1
+		$("#2b").html(scores["2b"])
+		check2Score()
+	}
+	$scope.s2b5 = function() {
+		scores["2b"] = scores["2b"] + 5
+		$("#2b").html(scores["2b"])
+		check2Score()
+	}
+	$scope.s3a1 = function() {
+		scores["3a"] = scores["3a"] + 1
+		$("#3a").html(scores["3a"])
+		check3Score()
+	}
+	$scope.s3a5 = function() {
+		scores["3a"] = scores["3a"] + 5
+		$("#3a").html(scores["3a"])
+		check3Score()
+	}
+	$scope.s3b1 = function() {
+		scores["3b"] = scores["3b"] + 1
+		$("#3b").html(scores["3b"])
+		check3Score()
+	}
+	$scope.s3b5 = function() {
+		scores["3b"] = scores["3b"] + 5
+		$("#3b").html(scores["3b"])
+		check3Score()
+	}
+	$scope.s4a1 = function() {
+		scores["4a"] = scores["4a"] + 1
+		$("#4a").html(scores["4a"])
+		check4Score()
+	}
+	$scope.s4a5 = function() {
+		scores["4a"] = scores["4a"] + 5
+		$("#4a").html(scores["4a"])
+		check4Score()
+	}
+	$scope.s4b1 = function() {
+		scores["4b"] = scores["4b"] + 1
+		$("#4b").html(scores["4b"])
+		check4Score()
+	}
+	$scope.s4b5 = function() {
+		scores["4b"] = scores["4b"] + 5
+		$("#4b").html(scores["4b"])
+		check4Score()
+	}
+	$scope.s5a1 = function() {
+		scores["5a"] = scores["5a"] + 1
+		$("#5a").html(scores["5a"])
+		check5Score()
+	}
+	$scope.s5a5 = function() {
+		scores["5a"] = scores["5a"] + 5
+		$("#5a").html(scores["5a"])
+		check5Score()
+	}
+	$scope.s5b1 = function() {
+		scores["5b"] = scores["5b"] + 1
+		$("#5b").html(scores["5b"])
+		check5Score()
+	}
+	$scope.s5b5 = function() {
+		scores["5b"] = scores["5b"] + 5
+		$("#5b").html(scores["5b"])
+		check5Score()
+	}
 
-	//functions that update the round arrays when each roud score is changed
-	$scope.score1Change = function(){
-		if($scope.scores.score11 > $scope.scores.score12) {
+	function check1Score() {
+		if(scores["1a"] > scores["1b"]) {
 			score1[0] = 1
 			score2[0] = 0
 		} else {
 			score1[0] = 0
 			score2[0] = 1
 		}
-		if($scope.scores.score11 == undefined) {
+		if(scores["1a"] == undefined) {
 			score1[0] = 0
 			score2[0] = 1
 		}
-		if($scope.scores.score12 == undefined) {
+		if(scores["1b"] == undefined) {
 			score1[0] = 1
 			score2[0] = 0
 		}
 		updateRounds();
 	}
-	$scope.score2Change = function(){
-		if($scope.scores.score21 > $scope.scores.score22) {
+	function check2Score() {
+		if(scores["2a"] > scores["2b"]) {
 			score1[1] = 1
 			score2[1] = 0
 		} else {
 			score1[1] = 0
 			score2[1] = 1
 		}
-		if($scope.scores.score21 == undefined) {
+		if(scores["2a"] == undefined) {
 			score1[1] = 0
 			score2[1] = 1
 		}
-		if($scope.scores.score22 == undefined) {
+		if(scores["2b"] == undefined) {
 			score1[1] = 1
 			score2[1] = 0
 		}
 		updateRounds();
 	}
-	$scope.score3Change = function(){
-		if($scope.scores.score31 > $scope.scores.score32) {
+	function check3Score() {
+		if(scores["3a"] > scores["3b"]) {
 			score1[2] = 1
 			score2[2] = 0
 		} else {
 			score1[2] = 0
 			score2[2] = 1
 		}
-		if($scope.scores.score31 == undefined) {
+		if(scores["3a"] == undefined) {
 			score1[2] = 0
 			score2[2] = 1
 		}
-		if($scope.scores.score32 == undefined) {
+		if(scores["3b"] == undefined) {
 			score1[2] = 1
 			score2[2] = 0
 		}
 		updateRounds();
 	}
-	$scope.score4Change = function(){
-		if($scope.scores.score41 > $scope.scores.score42) {
+	function check4Score() {
+		if(scores["4a"] > scores["4b"]) {
 			score1[3] = 1
 			score2[3] = 0
 		} else {
 			score1[3] = 0
 			score2[3] = 1
 		}
-		if($scope.scores.score41 == undefined) {
+		if(scores["4a"] == undefined) {
 			score1[3] = 0
 			score2[3] = 1
 		}
-		if($scope.scores.score42 == undefined) {
+		if(scores["4b"] == undefined) {
 			score1[3] = 1
 			score2[3] = 0
 		}
 		updateRounds();
 	}
-	$scope.score5Change = function(){
-		if($scope.scores.score51 > $scope.scores.score52) {
+	function check5Score() {
+		if(scores["5a"] > scores["5b"]) {
 			score1[4] = 1
 			score2[4] = 0
 		} else {
 			score1[4] = 0
 			score2[4] = 1
 		}
-		if($scope.scores.score51 == undefined) {
+		if(scores["5a"] == undefined) {
 			score1[4] = 0
 			score2[4] = 1
 		}
-		if($scope.scores.score52 == undefined) {
+		if(scores["5b"] == undefined) {
 			score1[4] = 1
 			score2[4] = 0
 		}
 		updateRounds();
 	}
+
+	// /s sels["ea"]te nd 5ts["hb"round inputs and update round counter
+	// // $scope.threeRounds = function(){
+	// 	rounds = 3;
+	// 	$(".moreRounds").hide();
+	// 	$scope.scores.score41 = undefined;
+	// 	$scope.scores.score42 = undefined;
+	// 	$scope.scores.score51 = undefined;
+	// es.scs["oa"]e52 = undefined;
+	// 	score1[3] = 0;
+	// 	score2[3] = 0;
+	// 	score1[4] = 0;
+	// 	score2;
+	//s[" b"]updateRounds();
+	// }
+	// show extra round score inputs
+	// $scope.fiveRounds = function(){
+	// 	rounds = 5;
+	// 	$(".moreRounds").show();
+	// }
+	//toggle items which are dependent on a double input
+	// $scope.toggleDoubles = function() {
+	// 	$(".doubles").toggle();
+	// 	doubles = !doubles;
+	// }
+
+	//object of score inputs
+	// $scope.scores = {}
+
+	// //array of wether the player has one the round
+	// var score1 = [0, 0, 0, 0, 0]
+	// var score2 = [0, 0, 0, 0, 0]
+
+	// //functions that update the round arrays when each roud score is changed
+	// $scope.score1Change = function(){
+	// 	if($scope.scores.score11 > $scope.scores.score12) {
+	// 		score1[0] = 1
+	// 		score2[0] = 0
+	// 	} else {
+	// 		score1[0] = 0
+	// 		score2[0] = 1
+	// 	}
+	// 	if($scope.scores.score11 == undefined) {
+	// 		score1[0] = 0
+	// 		score2[0] = 1
+	// 	}
+	// 	if($scope.scores.score12 == undefined) {
+	// 		score1[0] = 1
+	// 		score2[0] = 0
+	// 	}
+	// 	updateRounds();
+	// }
+	// $scope.score2Change = function(){
+	// 	if($scope.scores.score21 > $scope.scores.score22) {
+	// 		score1[1] = 1
+	// 		score2[1] = 0
+	// 	} else {
+	// 		score1[1] = 0
+	// 		score2[1] = 1
+	// 	}
+	// 	if($scope.scores.score21 == undefined) {
+	// 		score1[1] = 0
+	// 		score2[1] = 1
+	// 	}
+	// 	if($scope.scores.score22 == undefined) {
+	// 		score1[1] = 1
+	// 		score2[1] = 0
+	// 	}
+	// 	updateRounds();
+	// }
+	// $scope.score3Change = function(){
+	// 	if($scope.scores.score31 > $scope.scores.score32) {
+	// 		score1[2] = 1
+	// 		score2[2] = 0
+	// 	} else {
+	// 		score1[2] = 0
+	// 		score2[2] = 1
+	// 	}
+	// 	if($scope.scores.score31 == undefined) {
+	// 		score1[2] = 0
+	// 		score2[2] = 1
+	// 	}
+	// 	if($scope.scores.score32 == undefined) {
+	// 		score1[2] = 1
+	// 		score2[2] = 0
+	// 	}
+	// 	updateRounds();
+	// }
+	// $scope.score4Change = function(){
+	// 	if($scope.scores.score41 > $scope.scores.score42) {
+	// 		score1[3] = 1
+	// 		score2[3] = 0
+	// 	} else {
+	// 		score1[3] = 0
+	// 		score2[3] = 1
+	// 	}
+	// 	if($scope.scores.score41 == undefined) {
+	// 		score1[3] = 0
+	// 		score2[3] = 1
+	// 	}
+	// 	if($scope.scores.score42 == undefined) {
+	// 		score1[3] = 1
+	// 		score2[3] = 0
+	// 	}
+	// 	updateRounds();
+	// }
+	// $scope.score5Change = function(){
+	// 	if($scope.scores.score51 > $scope.scores.score52) {
+	// 		score1[4] = 1
+	// 		score2[4] = 0
+	// 	} else {
+	// 		score1[4] = 0
+	// 		score2[4] = 1
+	// 	}
+	// 	if($scope.scores.score51 == undefined) {
+	// 		score1[4] = 0
+	// 		score2[4] = 1
+	// 	}
+	// 	if($scope.scores.score52 == undefined) {
+	// 		score1[4] = 1
+	// 		score2[4] = 0
+	// 	}
+	// 	updateRounds();
+	// }
 	//update the round counters
 	function updateRounds() {
 		//work out the total of tyhe round arrays
@@ -890,110 +1096,118 @@ angular.module('app.controllers', [])
 	}
 	//when submit button is pressed
 	$scope.submitScores = function() {
-		checkInputs();
+		// checkInputs();
+		checkNames();
 	}
-	function checkInputs(){
-		var first = 0   // wether the score being calculated is the first value or the one it's being compared to
-		var check       //value to calculate against val
-		var val         //value to calculate against check
-		var output = [] //the output array
-		var alerted = 0 //wether or not the userr has been alerted (wether there is an error with the submission)
-		// arrays to loop through to check values from scores object
-		var threeArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32']
-		var fiveArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32', 'score41', 'score42', 'score51', 'score52']
-
-		//if there are not enough scores
-		if (Object.keys($scope.scores).length < rounds*2) {
-			alerted = 1
-			popAlert("Please enter all scores")
+	function checkNames() {
+		if((($.inArray($("#name1").val(), players)) >= 0) && (($.inArray($("#name2").val(), players) >= 0))) {
+			clearPage() 
 		} else {
-			var loopArray;
-			if (rounds = 3) {
-				loopArray = threeArray
-			} else {
-				loopArray = fiveArray
-			}
-			for (x in loopArray) {
-				var score = $scope.scores[loopArray[x]]
-				if (first == 0) {
-					check = score;
-					first = 1
-				} else {
-					var isValid = checkValid(score, check);
-					if (isValid == 1) {
-						output.push[score, check]
-						first = 0
-					} else {
-						alerted = 1
-						popAlert(isValid)
-						break
-					}
-				}
-			}
-		}
-		//if no date, throw error
-		if (alerted == 0) {
-			if ($("#dateInput").val() == undefined) {
-				alerted = 1
-				popAlert("Please set a date and time")
-			}
-		}
-		// if names not entered throw an error
-		if (alerted == 0) {
-			if ($("#name1").val() == "" || $("#name1").val() == "") {
-				alerted = 1
-				popAlert("Please enter both players' names")
-			} else if (doubles) {
-				if ($("#name3").val() == "" || $("#name4").val() == "") {
-					alerted = 1
-					popAlert("Please enter all players' names")
-				}
-			}
-		}
-		//if no alerts thrown then submit data
-		if (alerted == 0) {
-			//submit data (output array)
-			popAlert("Scores submitted!")
-			clearPage();
+			popAlert("Players must already be registered")
 		}
 	}
+	// function checkInputs(){
+	// 	var first = 0   // wether the score being calculated is the first value or the one it's being compared to
+	// 	var check       //value to calculate against val
+	// 	var val         //value to calculate against check
+	// 	var output = [] //the output array
+	// 	var alerted = 0 //wether or not the userr has been alerted (wether there is an error with the submission)
+	// 	// arrays to loop through to check values from scores object
+	// 	var threeArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32']
+	// 	var fiveArray = ['score11', 'score12', 'score21', 'score22', 'score31', 'score32', 'score41', 'score42', 'score51', 'score52']
+
+	// 	//if there are not enough scores
+	// 	if (Object.keys($scope.scores).length < rounds*2) {
+	// 		alerted = 1
+	// 		popAlert("Please enter all scores")
+	// 	} else {
+	// 		var loopArray;
+	// 		if (rounds = 3) {
+	// 			loopArray = threeArray
+	// 		} else {
+	// 			loopArray = fiveArray
+	// 		}
+	// 		for (x in loopArray) {
+	// 			var score = $scope.scores[loopArray[x]]
+	// 			if (first == 0) {
+	// 				check = score;
+	// 				first = 1
+	// 			} else {
+	// 				var isValid = checkValid(score, check);
+	// 				if (isValid == 1) {
+	// 					output.push[score, check]
+	// 					first = 0
+	// 				} else {
+	// 					alerted = 1
+	// 					popAlert(isValid)
+	// 					break
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	//if no date, throw error
+	// 	if (alerted == 0) {
+	// 		if ($("#dateInput").val() == undefined) {
+	// 			alerted = 1
+	// 			popAlert("Please set a date and time")
+	// 		}
+	// 	}
+	// 	// if names not entered throw an error
+	// 	if (alerted == 0) {
+	// 		if ($("#name1").val() == "" || $("#name1").val() == "") {
+	// 			alerted = 1
+	// 			popAlert("Please enter both players' names")
+	// 		} else if (doubles) {
+	// 			if ($("#name3").val() == "" || $("#name4").val() == "") {
+	// 				alerted = 1
+	// 				popAlert("Please enter all players' names")
+	// 			}
+	// 		}
+	// 	}
+	// 	//if no alerts thrown then submit data
+	// 	if (alerted == 0) {
+	// 		//submit data (output array)
+	// 		popAlert("Scores submitted!")
+	// 		clearPage();
+	// 	}
+	// }
 	//throws an alert taking in the text to be displayed as parameter
 	function popAlert(text){
 		$ionicPopup.alert({
-            title: 'Sorry',
+            title: 'Alert',
             type: 'button-assertive',
             content: text
         })
 	}
 	//check wether the scores inputted are valid
-	function checkValid(val, check) {
-		//if some scores have not been entered
-		if (check == undefined || val == undefined) {
-			return "Please enter all scores"
-		}
-		// if any scores are equal
-		if (check == val) {
-			return "Scores cannot be equal"
-		}
-		// if any scores are equal
-		if (check < 0 || val < 0) {
-			return "Scores cannot be negative"
-		}
-		//if either player has not reached 11
-		if (check < 11 && val < 11) {
-			return "One player must score at least 11"
-		}
-		//if one player is on 11 and the other is less than 10, don't check for <2 difference (note the exclamation point)
-		if (!((val == 11 && check < 10) || (val < 10 && check == 11))) {
-			var diff = Math.abs(val-check)
-			if (diff<2) {
-				return "One player must win by two clear points"
-			} else if (diff > 2) {
-				return "Players cannot win by more than two points"
-			}
-		}
-		return 1
-	}
+	// function checkValid(val, check) {
+	// 	//if some scores have not been entered
+	// 	if (check == undefined || val == undefined) {
+	// 		return "Please enter all scores"
+	// 	}
+	// 	// if any scores are equal
+	// 	if (check == val) {
+	// 		return "Scores cannot be equal"
+	// 	}
+	// 	// if any scores are equal
+	// 	if (check < 0 || val < 0) {
+	// 		return "Scores cannot be negative"
+	// 	}
+	// 	//if either player has not reached 11
+	// 	if (check < 11 && val < 11) {
+	// 		return "One player must score at least 11"
+	// 	}
+	// 	//if one player is on 11 and the other is less than 10, don't check for <2 difference (note the exclamation point)
+	// 	if (!((val == 11 && check < 10) || (val < 10 && check == 11))) {
+	// 		var diff = Math.abs(val-check)
+	// 		if (diff<2) {
+	// 			return "One player must win by two clear points"
+	// 		} else if (diff > 2) {
+	// 			return "Players cannot win by more than two points"
+	// 		}
+	// 	}
+	// 	return 1
+	// }
 	//clear the inputs on the page
 	function clearPage() {
 		$scope.scores = {}
@@ -1001,8 +1215,29 @@ angular.module('app.controllers', [])
 		score2 = [0, 0, 0, 0, 0]
 		$("#dateInput").val("");
 		$(".nameInput").val("");
+		scores["1a"] = 0
+		$("#1a").html(scores["1a"])
+		scores["1b"] = 0
+		$("#1b").html(scores["1b"])
+		scores["2a"] = 0
+		$("#2a").html(scores["2a"])
+		scores["2b"] = 0
+		$("#2b").html(scores["2b"])
+		scores["3a"] = 0
+		$("#3a").html(scores["3a"])
+		scores["3b"] = 0
+		$("#3b").html(scores["3b"])
+		scores["4a"] = 0
+		$("#4a").html(scores["4a"])
+		scores["4b"] = 0
+		$("#4b").html(scores["4b"])
+		scores["5a"] = 0
+		$("#5a").html(scores["5a"])
+		scores["5b"] = 0
+		$("#5b").html(scores["5b"])
 		updateRounds();
 		setDateInput();
+		popAlert("Scores Submitted!");
 	}
 })
 
