@@ -421,14 +421,17 @@ angular.module('app.controllers', [])
 
 
 			//displays player statistics
-			$("#team_name").html(data.data.matches.team);
 			$("#p_matches").html("Matches: " + "Won " + s.matches_won + "		Lost " + s.matches_lost);
-			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
+			$("#p_games").html("Games: " +
 				" Won " + s.games_won +
 				" Lost " + s.games_lost);
-			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
+			$("#p_points").html("Points: " +
 				" Won " + s.points_won +
 				" Lost " + s.points_lost);
+
+			$("#p_won").html("Won " + "<br /> Matches " + s.matches_won + "<br /> Games " + s.games_won + "<br /> Points " + s.points_won);
+			$("#p_lost").html("Lost " + "<br /> Matches " + s.matches_lost + "<br /> Games " + s.games_lost + "<br /> Points " + s.points_lost);
+
 
 
 			var matches = data.data.matches;
