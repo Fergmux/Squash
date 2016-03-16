@@ -9,16 +9,16 @@ angular.module('app.routes', [])
   $stateProvider
     
       
-    .state('badSquash', {
+    .state('squashLevels', {
       url: '/side-menu21',
       abstract:true,
-      templateUrl: 'templates/badSquash.html'
+      templateUrl: 'templates/squashLevels.html'
     })
       
     
       
         
-    .state('badSquash.login', {
+    .state('squashLevels.login', {
       url: '/page1',
       views: {
         'side-menu21': {
@@ -42,7 +42,7 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.myProfile', {
+    .state('squashLevels.myProfile', {
       url: '/page3',
       views: {
         'side-menu21': {
@@ -56,7 +56,7 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.find', {
+    .state('squashLevels.find', {
       url: '/page5',
       views: {
         'side-menu21': {
@@ -70,12 +70,12 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.squashLevels', {
+    .state('squashLevels.rankings', {
       url: '/page6',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/squashLevels.html',
-          controller: 'squashLevelsCtrl'
+          templateUrl: 'templates/rankings.html',
+          controller: 'rankingsCtrl'
         }
       },
       // resolve: {
@@ -89,7 +89,7 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.teams', {
+    .state('squashLevels.teams', {
       url: '/page9',
       views: {
         'side-menu21': {
@@ -103,7 +103,7 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.customMatch', {
+    .state('squashLevels.customMatch', {
       url: '/page10',
       views: {
         'side-menu21': {
@@ -113,7 +113,7 @@ angular.module('app.routes', [])
       }
     })
         
-    .state('badSquash.playerProfiles', {
+    .state('squashLevels.playerProfiles', {
       url: '/page11',
       views: {
         'side-menu21': {
@@ -125,7 +125,7 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.settings', {
+    .state('squashLevels.settings', {
       url: '/page12',
       views: {
         'side-menu21': {
@@ -136,7 +136,7 @@ angular.module('app.routes', [])
     })
 
 
-    .state('badSquash.matchData', {
+    .state('squashLevels.matchData', {
       url: '/page13',
       views: {
         'side-menu21': {
