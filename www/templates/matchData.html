@@ -1,45 +1,48 @@
 <ion-view title="Match">
     <ion-content overflow-scroll="true" padding="true" class="has-header">
-        <h2 class="title tabheader" id="league"></h2>
-        <h3 id="date"></h3>
-        
-        <h1 class="title tabheader" id="yourname"></h1>
-        <h4 id="yourclub"></h4>
+        <div id="loading2" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
+        <div id="content" style="display:none">
+            <h2 class="title tabheader" id="league"></h2>
+            <h3 id="date"></h3>
+            
+            <h1 class="title tabheader" id="yourname"></h1>
+            <h4 id="yourclub"></h4>
 
-        <div class="row header">
-            <div class="col">Your Level<br></div>
-            <div class="col" id="pos">Your Position<br></div>
-        </div>
-        <div class="row">
-            <div class="col">Before<br><p id="levelbefore"></p></div>
-            <div class="col">After<br><p id="levelafter"></p></div>
-            <div class="col">Before<br><p id="positionbefore"></p></div>
-            <div class="col">After<br><p id="positionafter"></p></div>
-        </div>
-
-        <h1 class="title tabheader" id="oppname"></h1>
-        <h4 id="oppclub"></h4>
-
-        <div class="row header">
-            <div class="col">Opponent Level<br></div>
-            <div class="col" id="opppos">Opponent Position<br></div>
-        </div>
-        <div class="row">
-            <div class="col">Before<br><p id="opplevelbefore"></p></div>
-            <div class="col">After<br><p id="opplevelafter"></p></div>
-            <div class="col">Before<br><p id="opppositionbefore"></p></div>
-            <div class="col">After<br><p id="opppositionafter"></p></div>
-        </div>
-
-        <h2 class="title tabheader" id="league">Match Results</h2>
-        <div id="scores" class="row"></div>
-        <h2 class="title tabheader" id="league">Game Result</h2>
-        <div class="row" style="text-align: center">
-            <div class="col col-25" style="border:none;background-color:transparent;margin:0px"></div>
-            <div class="col col-50">
-                <div id="gamepoints" style="text-align: center"></div>
+            <div class="row header">
+                <div class="col">Your Level<br></div>
+                <div class="col" id="pos">Your Position<br></div>
             </div>
+            <div class="row">
+                <div class="col">Before<br><p id="levelbefore"></p></div>
+                <div class="col">After<br><p id="levelafter"></p></div>
+                <div class="col">Before<br><p id="positionbefore"></p></div>
+                <div class="col">After<br><p id="positionafter"></p></div>
+            </div>
+
+            <h1 class="title tabheader" id="oppname"></h1>
+            <h4 id="oppclub"></h4>
+
+            <div class="row header">
+                <div class="col">Opponent Level<br></div>
+                <div class="col" id="opppos">Opponent Position<br></div>
+            </div>
+            <div class="row">
+                <div class="col">Before<br><p id="opplevelbefore"></p></div>
+                <div class="col">After<br><p id="opplevelafter"></p></div>
+                <div class="col">Before<br><p id="opppositionbefore"></p></div>
+                <div class="col">After<br><p id="opppositionafter"></p></div>
+            </div>
+
+            <h2 class="title tabheader" id="league">Match Results</h2>
+            <div id="scores" class="row"></div>
+            <h2 class="title tabheader" id="league">Game Result</h2>
+            <div class="row" style="text-align: center">
+                <div class="col col-25" style="border:none;background-color:transparent;margin:0px"></div>
+                <div class="col col-50">
+                    <div id="gamepoints" style="text-align: center"></div>
+                </div>
+            </div>
+            <div style="height:30px"></div>
         </div>
-        <div style="height:30px"></div>
     </ion-content>
 </ion-view>

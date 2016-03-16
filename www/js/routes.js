@@ -70,12 +70,12 @@ angular.module('app.routes', [])
     
       
         
-    .state('badSquash.squashLevels', {
+    .state('badSquash.rankings', {
       url: '/page6',
       views: {
         'side-menu21': {
-          templateUrl: 'templates/squashLevels.html',
-          controller: 'squashLevelsCtrl'
+          templateUrl: 'templates/rankings.html',
+          controller: 'rankingsCtrl'
         }
       },
       // resolve: {

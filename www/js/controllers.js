@@ -43,8 +43,7 @@ angular.module('app.controllers', [])
 		data = $.parseJSON(data);
 		console.log(data)
 		if (data.status == "good"){
-			$rootScope.userData = data;
-			$rootScope.loggedIn = true
+			localStorage["userData"] = data;
 			$state.go('badSquash.myProfile')
 		} else {
 			$("#msg").html("Sorry, incorrect email or password")
@@ -69,15 +68,24 @@ angular.module('app.controllers', [])
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 
 	$scope.$on('$ionicView.enter', function () {
-		if ($rootScope.userData == undefined) {
-			$ionicHistory.nextViewOptions({
-			    disableBack: true
-			});
-			$state.go('badSquash.login');
-		} else {
-			getPlayerInfo($rootScope.userData.data.playerid)
+		console.log(localStorage["email"], localStorage["password"])
+		if (localStorage["email"] != undefined && localStorage["password"] != undefined) {
+			Cache.request("http://www.squashlevels.com/info.php?action=login&email="+$.parseJSON(localStorage["email"])+"&password="+$.parseJSON(localStorage["password"])+"&stay_logged_in=1&format=json", loadUserData, function() {
+				$state.go('badSquash.login');
+			})
 		}
-	});
+	})
+			
+	function loadUserData(data) {
+		$ionicHistory.nextViewOptions({
+		    disableBack: true
+		});
+		data = $.parseJSON(data);
+		console.log(data)
+		localStorage["userData"] = JSON.stringify(data);
+		console.log($.parseJSON(localStorage["userData"]))
+		getPlayerInfo($.parseJSON(localStorage["userData"]).data.playerid)
+	}
 
 	function getPlayerInfo(playerid) {
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
@@ -86,7 +94,7 @@ angular.module('app.controllers', [])
 	}
 	
 	function displayProfile(data) {
-		var playerData = $rootScope.userData
+		var playerData = $.parseJSON(localStorage["userData"])
 		data = $.parseJSON(data);
 		console.log(data)
 		var highDate = new Date(data.data.statistics.max_level_dateint*1000)
@@ -192,15 +200,29 @@ angular.module('app.controllers', [])
 		}
 
 		$scope.matches = []
+		console.log(data.data.matches)
 		for (var i = 0; i < data.data.matches.length; i++) {
-			$scope.matches.push( i+1 + " - " + data.data.matches[i].opponent)
+			var scores = data.data.matches[i].games_score.split("-")
+			var color = "red"
+			if (scores[0] > scores[1]) {
+				color = "green"
+			}
+			$scope.matches[i] = {
+				name: data.data.matches[i].opponent,
+				color: color,
+				index: i
+			}
 		}
 		$scope.$apply()
+		console.log("hideicon")
+		$("#content").show()
+		$("#loading3").hide()
 
 	}
 
-	$scope.load = function(match) {
-		$rootScope.matchindex = match.split(" ")[0]-1
+	$scope.load = function(index) {
+		// console.log(index)
+		$rootScope.matchindex = index
 		$state.go('badSquash.matchData')
 	}
 
@@ -210,8 +232,7 @@ angular.module('app.controllers', [])
 .controller('findCtrl', function($scope, $rootScope) {
 	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
-		$("#results").hide();
-		$("#loader").hide();
+		
 		// loadplayers();
 		loadlookup();
 	})
@@ -253,7 +274,7 @@ angular.module('app.controllers', [])
 		$("#results").hide();
 		$("#playerlist").hide();
 
-		$("#loader").show();
+		$("#loading1").show();
 		
 		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
 		var searchVal = $("#playerid").val().trim();
@@ -267,7 +288,7 @@ angular.module('app.controllers', [])
 	}
 
 	//initialse lookup table for player name - ID
-	var idtable = new Object();
+	
 
 	//get the player data using the cache
 	// function loadplayers() {
@@ -455,11 +476,11 @@ angular.module('app.controllers', [])
 				}
 				]
 			});
-			$("#loader").hide();
+			$("#loading1").hide();
 			$("#results").show();
 			$("#tab-main").html(drawChart(chartdata));
 		} else {
-			$("#loader").hide();
+			$("#loading1").hide();
 			$("#msg").html("Error - " + data.user_message);
 		}
 	}
@@ -471,6 +492,7 @@ angular.module('app.controllers', [])
 		})
 	}
 
+	var idtable = new Object();
 	//populate the player -ID lookup table
 	function makePlayerTable(data) {
 		data = $.parseJSON(data);
@@ -480,7 +502,7 @@ angular.module('app.controllers', [])
 			idtable[player] = playerid;
 		}
 		console.log(idtable)
-		$rootScope.playerTable = idtable;
+		$("#loading1").hide()
 	}
 
 	//load the data for the player page with the cache
@@ -494,13 +516,7 @@ angular.module('app.controllers', [])
 		} else {
 			var id = name;
 		}
-		var timePeriod = ""
-		if ($rootScope.loggedIn) {
-			timePeriod = "show=all"
-		} else {
-			timePeriod = "show=last12m"
-		}
-		Cache.request("http://squashlevels.com/player_detail.php?player=" + id + "&check=1&"+timePeriod+"&format=json", display, function() {
+		Cache.request("http://squashlevels.com/player_detail.php?player=" + id + "&check=1&show=all&format=json", display, function() {
 				$("#msg").html("Error in AJAX request.");
 			})
 	}
@@ -509,20 +525,17 @@ angular.module('app.controllers', [])
 
 
 // SquashLevels tab: displays player rankings with filters
-.controller('squashLevelsCtrl', function($scope) {
+.controller('rankingsCtrl', function($scope, $rootScope, $state) {
 
 	//fires when page is loaded for the first time
 	$scope.$on('$ionicView.loaded', function () {
-		$("#filters").hide();
-		$("#tabs").hide();
-		$("#loading").show();
 		changeHiddenInput();
 	})
 	
 	//When search buttton is pressed, hide results, reload data, hide filters
 	$scope.onTap = function() {
 		$("#msg").empty();
-		$("#loading").show();
+		$("#loading4").show();
 		changeHiddenInput();
 		$("#filters").slideToggle('slow');
 	}
@@ -542,35 +555,41 @@ angular.module('app.controllers', [])
 		if (rank.status == "good") {
 
 			var rankData = rank.data;
+			console.log(rankData)
 
-			$scope.groups = [];
+			$scope.players = [];
 			//populate rank list with data (Position - Name)
 			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
-				$scope.groups[i] = {
-				    name: info.position + " - " + info.player,
-				    items: []
+				$scope.players[i] = {
+				    name: info.position + ". " + info.player + " - " + info.level,
+				    id: info.playerid
 				};
 				//make date human readable
-				var date = new Date(info.lastmatch_date * 1000).toLocaleDateString();
+				// var date = new Date(info.lastmatch_date * 1000).toLocaleDateString();
 				
 				//push player level, to dropdown
-				$scope.groups[i].items.push("Level: " + info.level);
+				// $scope.groups[i].items.push("Level: " + info.level);
 				
 				//if the player has a club, push that to dropdown
-				if (typeof info.club != 'undefined' && info.club != '') {
-			    	$scope.groups[i].items.push("Club: " + info.club);
-			    }
+				// if (typeof info.club != 'undefined' && info.club != '') {
+			    	// $scope.groups[i].items.push("Club: " + info.club);
+			    // }
 			    
 			    //push the player's last match datae to dropdown
-			    $scope.groups[i].items.push("Last Match: " + date);
+			    // $scope.groups[i].items.push("Last Match: " + date);
 			}
 			$scope.$apply();
-			$("#loading").hide();
+			$("#loading4").hide();
 			$("#tabs").show();
 		} else {
 			$("#msg").html("Error - No results for your query");
 		}
+	}
+
+	$scope.tapped = function(id) {
+		$rootScope.tapped = id
+		$state.go('badSquash.playerProfiles')
 	}
 
 	/*
@@ -1002,7 +1021,6 @@ angular.module('app.controllers', [])
 	$scope.logout = function() {
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
-		$rootScope.loggedIn = false
 		$state.go('badSquash.login')
 	}
 })
@@ -1012,8 +1030,8 @@ angular.module('app.controllers', [])
 .controller('playerProfilesCtrl', function($scope, $rootScope) {
 
 	$scope.$on('$ionicView.enter', function() {
-		var playerid = $rootScope.userData.data.playerid
-		Cache.request("http://www.badsquash.co.uk/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
+		var playerid = $rootScope.tapped
+		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
 	});
@@ -1096,6 +1114,7 @@ angular.module('app.controllers', [])
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
+		console.log(data)
 		if (data.status == "good") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
@@ -1106,20 +1125,20 @@ angular.module('app.controllers', [])
 		
 			var s = data.data.statistics;
 
-			$("#club_pos").html("Club: " + s.club_pos);
-			$("#county_pos").html("County: " + s.county_pos);
-			$("#country_pos").html("Country: " + s.country_pos);
-			$("#overall_pos").html("Overall: " + s.overall_pos);
+			$("#club_pos").html("Club Position: " + s.club_pos);
+			$("#county_pos").html("County Position: " + s.county_pos);
+			$("#country_pos").html("Country Position: " + s.country_pos);
+			$("#overall_pos").html("Overall Position: " + s.overall_pos);
 
 			//displays player statistics
 			$("#team_name").html(data.data.matches.team);
-			$("#p_matches").html("Matches: " + "W " + s.matches_won + "		L " + s.matches_lost);
+			$("#p_matches").html("Matches: " + "Won " + s.matches_won + " Lost " + s.matches_lost);
 			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
-				" won " + s.games_won +
-				" lost " + s.games_lost);
+				" Won " + s.games_won +
+				" Lost " + s.games_lost);
 			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
-				" won " + s.points_won +
-				" lost " + s.points_lost);
+				" Won " + s.points_won +
+				" Lost " + s.points_lost);
 
 
 			var matches = data.data.matches;
@@ -1148,29 +1167,16 @@ angular.module('app.controllers', [])
 				}
 				]
 			});
-			$("#loader").hide();
+			$("#loading5").hide();
 			$("#results").show();
 			$("#tab-main").html(drawChart(chartdata));
 		} else {
-			$("#loader").hide();
+			$("#loading5").hide();
 			$("#msg").html("Error - " + data.user_message);
 		}
 	}
 
 
-	//load the data for the player page with the cache
-	function load(name) {
-		//test if they are searching for ID or player name
-		if (!/^[0-9]+$/.test(name)) {
-			//make lower case to remove errors on incorrect capitalization
-			var id = idtable[name.toLowerCase()]
-		} else {
-			var id = name;
-		}
-		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + id + "&show=last10&format=json", display, function() {
-				$("#msg").html("Error in AJAX request.");
-			})
-	}
 
 
 })
@@ -1178,7 +1184,7 @@ angular.module('app.controllers', [])
 .controller('matchDataCtrl', function($scope, $rootScope) {
 
 	$scope.$on('$ionicView.enter', function () {
-		var playerid = $rootScope.userData.data.playerid
+		var playerid = $.parseJSON(localStorage["userData"]).data.playerid
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayMatch, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
@@ -1187,8 +1193,10 @@ angular.module('app.controllers', [])
 	function displayMatch(data) {
 		data = $.parseJSON(data);
 		var index = $rootScope.matchindex
+		console.log(index)
 		var thisMatch = data.data.matches[index]
 		console.log(data)
+		console.log(thisMatch)
 		var matchDate = new Date(thisMatch.dateint*1000)
 		var month = matchDate.getMonth()+1
 		matchDate = matchDate.getDate()+"/"+month+"/"+matchDate.getFullYear()
@@ -1208,7 +1216,7 @@ angular.module('app.controllers', [])
 
 
 
-		$("#yourname").html($rootScope.userData.data.tempname)
+		$("#yourname").html($.parseJSON(localStorage["userData"]).data.tempname)
 		if(thisMatch.club == undefined) {
 			$("#yourclub").html(thisMatch.team)
 		} else {
@@ -1258,6 +1266,9 @@ angular.module('app.controllers', [])
 
 		var games = thisMatch.games_score.split("-")
 		$("#gamepoints").html("<h1 style='color: green; margin-bottom:0px'>" + games[0] + " - " + games[1] + "</h1>")
+
+		$("#loading2").hide()
+		$("#content").show()
 	}
 
 })
