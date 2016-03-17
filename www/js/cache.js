@@ -62,9 +62,8 @@ var Cache = {
 
     /* Request data from cache */
     request: function(k, callbackDone, callbackFail) {
-        /*add proxy*/    
+        /*add proxy*/
         k = "https://crossorigin.me/" + k + "&appid=SL2.0"
-
         /* Make AJAX request */
         var data = $.ajax({
             url: k

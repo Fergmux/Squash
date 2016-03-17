@@ -389,7 +389,14 @@ angular.module('app.controllers', [])
 
 			$("#tab-main").html(name);
 			$("#level").html("Level: " + s.end_level);
-			$("#club_pos").html("Club Position: " + s.club_pos);
+
+			if(s.club_pos >= 0) {
+				$("#club_pos").html("Club Position: " + s.club_pos);
+			} else {
+				$("#club_pos").html("Club Position: N/A")
+			}
+			
+
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
 
@@ -444,7 +451,7 @@ angular.module('app.controllers', [])
 	// }
 
 	//load the data for the player page with the cache
-	function load(name) {
+	function loadData(name) {
 		//test if they are searching for ID or player name
 		if (!/^[0-9]+$/.test(name)) {
 			// var ids = $.parseJSON(localStorage["idlookup"]) KEEP
@@ -1238,39 +1245,152 @@ angular.module('app.controllers', [])
 		return day + '/' + month + '/' + year;
 	}
 
-	function drawChart(chartdata) {
-		try {
-			var data = new google.visualization.DataTable();
-			data.addColumn('date', 'date');
-			data.addColumn('number', 'level');
 
-			for (var i = 0; i < chartdata.length; i++) {
-				date = new Date(chartdata[i][0] * 1000)
-				data.addRow([date, chartdata[i][1]]);
-			}
-			var options = {
-				title: 'Level History',
-				colors: ['blue'],
-				legend: {
-					position: 'none'
-				},
-				width: 380,
-				pointSize: 3,
-				hAxis: {
-					format: 'd MMM yy',
-					textStyle: {
-						fontSize: 8
-					}
-				},
-				vAxis: {
-					baseline: 0,
-				}
-			};
-			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
-			chart.draw(data, options);
-		} catch (err) {
-		}
+	/**
+	* ChartJS level history chart
+	*/
+	//get context with jQuery using get
+	var ctx = $("#hist_chart").get(0).getContext("2d");
+	//create hist_chart using ChartJS
+var data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+        {
+            label: "My First dataset",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: [65, 59, 80, 81, 56, 55, 40]
+        },
+        {
+            label: "My Second dataset",
+            fillColor: "rgba(151,187,205,0.2)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: [28, 48, 40, 19, 86, 27, 90]
+        }
+    ]
+};
+
+		var options = {
+
+
+    ///Boolean - Whether grid lines are shown across the chart
+    scaleShowGridLines : true,
+
+    //String - Colour of the grid lines
+    scaleGridLineColor : "rgba(0,0,0,.05)",
+
+    //Number - Width of the grid lines
+    scaleGridLineWidth : 1,
+
+    //Boolean - Whether to show horizontal lines (except X axis)
+    scaleShowHorizontalLines: true,
+
+    //Boolean - Whether to show vertical lines (except Y axis)
+    scaleShowVerticalLines: true,
+
+    //Boolean - Whether the line is curved between points
+    bezierCurve : true,
+
+    //Number - Tension of the bezier curve between points
+    bezierCurveTension : 0.4,
+
+    //Boolean - Whether to show a dot for each point
+    pointDot : true,
+
+    //Number - Radius of each point dot in pixels
+    pointDotRadius : 4,
+
+    //Number - Pixel width of point dot stroke
+    pointDotStrokeWidth : 1,
+
+    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+    pointHitDetectionRadius : 20,
+
+    //Boolean - Whether to show a stroke for datasets
+    datasetStroke : true,
+
+    //Number - Pixel width of dataset stroke
+    datasetStrokeWidth : 2,
+
+    //Boolean - Whether to fill the dataset with a colour
+    datasetFill : true,
+
+    responsive: true,
+    maintainAspectRatio: true,
+
+    //String - A legend template
+    legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+
+};
+
+
+		
+
+				var histChart = new Chart(ctx).Line(data, options);
+
+
+
+	function drawChart(chartdata) {
+
+
+
+
+
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// function drawChart(chartdata) {
+	// 	try {
+	// 		var data = new google.visualization.DataTable();
+	// 		data.addColumn('date', 'date');
+	// 		data.addColumn('number', 'level');
+
+	// 		for (var i = 0; i < chartdata.length; i++) {
+	// 			date = new Date(chartdata[i][0] * 1000)
+	// 			data.addRow([date, chartdata[i][1]]);
+	// 		}
+	// 		var options = {
+	// 			title: 'Level History',
+	// 			colors: ['blue'],
+	// 			legend: {
+	// 				position: 'none'
+	// 			},
+	// 			width: 380,
+	// 			pointSize: 3,
+	// 			hAxis: {
+	// 				format: 'd MMM yy',
+	// 				textStyle: {
+	// 					fontSize: 8
+	// 				}
+	// 			},
+	// 			vAxis: {
+	// 				baseline: 0,
+	// 			}
+	// 		};
+	// 		var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+	// 		chart.draw(data, options);
+	// 	} catch (err) {
+	// 	}
+	// }
 
 	function chartData(match) {
 		if (match.dateint) {
@@ -1297,7 +1417,11 @@ angular.module('app.controllers', [])
 			//TODO: find better way			
 			var s = data.data.statistics;
 			//displays club ranking
-			$("#club_pos").html("Club Position: " + s.club_pos);
+			if(s.club_pos >= 0) {
+				$("#club_pos").html("Club Position: " + s.club_pos);
+			} else {
+				$("#club_pos").html("Club Position: N/A")
+			}
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
 			//displays league ranking and which league
