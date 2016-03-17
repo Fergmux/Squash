@@ -43,7 +43,7 @@ angular.module('app.controllers', [])
 		data = $.parseJSON(data);
 		console.log(data)
 		if (data.status == "good") {
-			$rootScope.userData = data;
+			localStorage["userData"] = JSON.stringify(data);
 			$rootScope.loggedIn = true
 			$state.go('squashLevels.myProfile')
 		} else {
@@ -69,13 +69,13 @@ angular.module('app.controllers', [])
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 
 	$scope.$on('$ionicView.enter', function() {
-		if ($rootScope.userData == undefined) {
+		if ($.parseJSON(localStorage["email"]) == undefined && $.parseJSON(localStorage["password"]) == undefined) {
 			$ionicHistory.nextViewOptions({
 				disableBack: true
 			});
 			$state.go('squashLevels.login');
 		} else {
-			getPlayerInfo($rootScope.userData.data.playerid)
+			getPlayerInfo($.parseJSON(localStorage["userData"]).data.playerid)
 		}
 	})
 			
@@ -102,10 +102,14 @@ angular.module('app.controllers', [])
 		console.log(data)
 		var highDate = new Date(data.data.statistics.max_level_dateint * 1000)
 		var month = highDate.getMonth() + 1
-		highDate = highDate.getDate() + "/" + month + "/" + highDate.getFullYear()
+		var year = highDate.getFullYear().toString().split("")
+		year = year[2] + year[3]
+		highDate = highDate.getDate() + "/" + month + "/" + year
 		var lowDate = new Date(data.data.statistics.min_level_dateint * 1000)
 		month = lowDate.getMonth() + 1
-		lowDate = lowDate.getDate() + "/" + month + "/" + lowDate.getFullYear()
+		year = lowDate.getFullYear().toString().split("")
+		year = year[2] + year[3]
+		lowDate = lowDate.getDate() + "/" + month + "/" + year
 		$("#levels12").parent().show();
 		//player name
 		$("#playerName").val(data.data.summary.player)
@@ -218,13 +222,13 @@ angular.module('app.controllers', [])
 		}
 		$scope.$apply()
 		console.log("hideicon")
-		$("#content").show()
+		$("#content3").show()
 		$("#loading3").hide()
 
 	}
 
-	$scope.load = function(match) {
-		$rootScope.matchindex = match.split(" ")[0] - 1
+	$scope.load = function(index) {
+		$rootScope.matchindex = index
 		$state.go('squashLevels.matchData')
 	}
 
@@ -424,36 +428,15 @@ angular.module('app.controllers', [])
 			$("#country_pos").html("Country Position: " + s.country_pos);
 			//displays league ranking and which league
 
-			// for(var i = 0; i<3; i++) {
-			// 	if(s.league_pos[i] == null) {
-			// 		// console.log('wan')
-			// 	} else {
-			// 		var league = ''
-			// 		if(i == 0) {
-			// 			league = 'Singles league: '
-			// 		}
-			// 		else if(i == 1) {
-			// 			league = 'Mixed league: '
-			// 		}
-			// 		else if(i == 2) {
-			// 			league = 'Ladies league: '
-			// 		}
-			// 		$("#league_rank"+i).html(league + s.league_pos[i]);
-			// 	}
-			// }
+			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
+			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
+			$("#p_won").html("Points: <span class='green bold'>"+s.points_won+"<span>")
+			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
+			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
+			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
 
-
-			//displays player statistics
-			$("#p_matches").html("Matches: " + "Won " + s.matches_won + "		Lost " + s.matches_lost);
-			$("#p_games").html("Games: " +
-				" Won " + s.games_won +
-				" Lost " + s.games_lost);
-			$("#p_points").html("Points: " +
-				" Won " + s.points_won +
-				" Lost " + s.points_lost);
-
-			$("#p_won").html("Won " + "<br /> Matches " + s.matches_won + "<br /> Games " + s.games_won + "<br /> Points " + s.points_won);
-			$("#p_lost").html("Lost " + "<br /> Matches " + s.matches_lost + "<br /> Games " + s.games_lost + "<br /> Points " + s.points_lost);
+			
+			
 
 
 
@@ -596,7 +579,7 @@ angular.module('app.controllers', [])
 
 	$scope.tapped = function(id) {
 		$rootScope.tapped = id
-		$state.go('badSquash.playerProfiles')
+		$state.go('squashLevels.playerProfiles')
 	}
 
 	/*
@@ -1360,30 +1343,30 @@ angular.module('app.controllers', [])
 	function display(data) {
 		var data = $.parseJSON(data);
 		console.log(data)
-		if (data.status == "good") {
+		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
 
+			
 			$("#tab-main").html(name);
 			$("#level").html("Level: " + level);
 
-			var s = data.data.statistics;
 
+			//TODO: find better way			
+			var s = data.data.statistics;
+			//displays club ranking
 			$("#club_pos").html("Club Position: " + s.club_pos);
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
-			$("#overall_pos").html("Overall Position: " + s.overall_pos);
+			//displays league ranking and which league
 
-			//displays player statistics
-			$("#team_name").html(data.data.matches.team);
-			$("#p_matches").html("Matches: " + "Won " + s.matches_won + " Lost " + s.matches_lost);
-			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
-				" Won " + s.games_won +
-				" Lost " + s.games_lost);
-			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
-				" Won " + s.points_won +
-				" Lost " + s.points_lost);
+			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
+			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
+			$("#p_won").html("Points: <span class='green bold'>"+s.points_won+"<span>")
+			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
+			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
+			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
 
 
 			var matches = data.data.matches;
@@ -1501,17 +1484,18 @@ angular.module('app.controllers', [])
 			var scores = points[n].split("-")
 			console.log(scores)
 			if (scores[0] > scores[1]) {
-				$("#scores").append("<div class='col' style='font-weight: bold; color:green'>" + points[n] + "</div>")
+				$("#scores").append("<div class='col c' style='font-weight: bold; color:green'>" + points[n] + "</div>")
 			} else {
-				$("#scores").append("<div class='col' style='font-weight: bold; color:red'>" + points[n] + "</div>")
+				$("#scores").append("<div class='col c' style='font-weight: bold; color:red'>" + points[n] + "</div>")
 			}
 		}
 
 		var games = thisMatch.games_score.split("-")
 		$("#gamepoints").html("<h1 style='color: green; margin-bottom:0px'>" + games[0] + " - " + games[1] + "</h1>")
 
+
+		$("#content2").show()
 		$("#loading2").hide()
-		$("#content").show()
 	}
 
 })

@@ -78,11 +78,6 @@ angular.module('app.routes', [])
           controller: 'rankingsCtrl'
         }
       },
-      // resolve: {
-      //   filts: function(FiltService) {
-      //     return FiltService.getFilts()
-      //   }
-      // }
     })
         
       

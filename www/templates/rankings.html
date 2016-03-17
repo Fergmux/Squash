@@ -4,7 +4,7 @@
 </ion-nav-buttons>
     <ion-content overflow-scroll="true" padding="true" class="has-header">
     <div id="tab-rankingCounty">
-    	<div class="list" id="filters">
+    	<div class="list" id="filters" style="display:none">
 		  	<label class="item item-input item-select">
 			    <div class="input-label">Club</div>
 			    <select id="clubs" name="clubs">
@@ -1541,23 +1541,14 @@
 	    </div>
 
 	    <div id="msg"></div>
-	   	<div id="loading" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
+	   	<div id="loading4" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
 
-	    <div id="tabs">
+	    <div id="tabs" style="display:none">
 			<h2 class="title tabheader"> Rank </h2>
 	 		<ion-list>
-			    <div ng-repeat="group in groups">
-			      <ion-item class="item-stable"
-			                ng-click="toggleGroup(group)"
-			                ng-class="{active: isGroupShown(group)}">
-			          <i class="icon" ng-class="isGroupShown(group) ? 'ion-minus' : 'ion-plus'"></i>
-			        &nbsp;
-			        {{group.name}}
-			      </ion-item>
-			      <ion-item class="item-accordion"
-			                ng-repeat="item in group.items"
-			                ng-show="isGroupShown(group)">
-			        {{item}}
+			    <div ng-repeat="player in players">
+			      <ion-item class="item-stable" ng-click="tapped(player.id)">
+			        {{player.name}}
 			      </ion-item>
 			    </div>
 	      	</ion-list>
