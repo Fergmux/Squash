@@ -9,69 +9,21 @@ angular.module('app.controllers', [])
 	    disableBack: true
 	});
 
-
 	var storedemail = $.parseJSON(localStorage.getItem("email"))
 	var storedpass = $.parseJSON(localStorage.getItem("password"))
 
 	$scope.$on('$ionicView.loaded', function () {
 		if (storedemail != undefined || storedpass != undefined) {
 			login(storedemail, storedpass)
-			if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
-				loadnames()
-			}
-			console.log(storedemail,storedpass)
-			console.log(localStorage["idlookup"],localStorage["allplayers"])
 		}
 	})
 	
-	function loadnames() {
-		var time = new Date().getTime()/1000
-		key = Math.round(Math.sqrt(time * 100) - 100)
-		console.log(key)
-
-		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
-		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
-		var data = $.ajax({
-            url: k
-        }).done(function(){
-            makePlayerArray(data.responseText)
-            makePlayerTable(data.responseText)
-        }).fail(function(){
-            
-        });
-		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
-		// 	$("#msg").html("Error - AJAX failed")
-		// })
-	}
-
-	function makePlayerArray(data) {
-		var players = []
-		data = $.parseJSON(data);
-		console.log(data)
-		for (var x = 0; x < data.data.length; x++) {
-			players[x] = data.data[x].player;
-		}
-		console.log(players)
-		localStorage["allplayers"] = JSON.stringify(players)
-	}
-	//populate the player -ID lookup table
-	function makePlayerTable(data) {
-		var ids = []
-		data = $.parseJSON(data);
-		console.log(data)
-		for (var x = 0; x < data.data.length; x++) {
-			ids[x] = data.data[x].playerid;
-		}
-		localStorage["idlookup"] = JSON.stringify(ids)
-	}
+	// pass = "uniapp"
+	// 0094539787173fdbc36ecf1c1827193a
+	// email = "app.developer@bristol.ac.uk"
 
 	function login(email, pass) {
-		// pass = "uniapp"
-		// 0094539787173fdbc36ecf1c1827193a
-		// email = "app.developer@bristol.ac.uk"
-
 		//store password and email in local storage (like cookies)
-		console.log(email, pass)
 		if (storedemail == undefined) {
 			localStorage["email"] = JSON.stringify(email);
 		}
@@ -86,10 +38,8 @@ angular.module('app.controllers', [])
 
 	function loadUserData(data) {
 		data = $.parseJSON(data);
-		console.log(data)
 		if (data.status == "good") {
 			localStorage["userData"] = JSON.stringify(data);
-			$rootScope.loggedIn = true
 			$state.go('squashLevels.myProfile')
 		} else {
 			$("#msg").html("Sorry, incorrect email or password")
@@ -101,6 +51,7 @@ angular.module('app.controllers', [])
 		var pass = $("#passId").val();
 		//converts pass to md5
 		var passHash = CryptoJS.MD5(pass).toString();
+		//store email and password in local storage
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
 		login(email, passHash);
@@ -114,6 +65,7 @@ angular.module('app.controllers', [])
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 
 	$scope.$on('$ionicView.enter', function() {
+		// if no log in details found, go to log in page, and disable back button, otherwise load user details
 		if ($.parseJSON(localStorage["email"]) == undefined && $.parseJSON(localStorage["password"]) == undefined) {
 			$ionicHistory.nextViewOptions({
 				disableBack: true
@@ -123,17 +75,6 @@ angular.module('app.controllers', [])
 			getPlayerInfo($.parseJSON(localStorage["userData"]).data.playerid)
 		}
 	})
-			
-	function loadUserData(data) {
-		$ionicHistory.nextViewOptions({
-		    disableBack: true
-		});
-		data = $.parseJSON(data);
-		console.log(data)
-		localStorage["userData"] = JSON.stringify(data);
-		console.log($.parseJSON(localStorage["userData"]))
-		getPlayerInfo($.parseJSON(localStorage["userData"]).data.playerid)
-	}
 
 	function getPlayerInfo(playerid) {
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
@@ -142,14 +83,16 @@ angular.module('app.controllers', [])
 	}
 
 	function displayProfile(data) {
-		var playerData = $.parseJSON(localStorage["userData"])
 		data = $.parseJSON(data);
-		console.log(data)
-		var highDate = new Date(data.data.statistics.max_level_dateint * 1000)
-		var month = highDate.getMonth() + 1
-		var year = highDate.getFullYear().toString().split("")
+		var playerData = $.parseJSON(localStorage["userData"])
+
+		//to display the date of maximum levels
+		var highDate = new Date(data.data.statistics.max_level_dateint * 1000) //*1000 to convert to ms
+		var month = highDate.getMonth() + 1 //month returned is 0-11 so +1
+		var year = highDate.getFullYear().toString().split("") // get just last 2 characters of year (to save space, eg. 06 insted of 2006)
 		year = year[2] + year[3]
 		highDate = highDate.getDate() + "/" + month + "/" + year
+		
 		var lowDate = new Date(data.data.statistics.min_level_dateint * 1000)
 		month = lowDate.getMonth() + 1
 		year = lowDate.getFullYear().toString().split("")
@@ -252,10 +195,12 @@ angular.module('app.controllers', [])
 		}
 
 		$scope.matches = []
-		console.log(data.data.matches)
+		//populating the list of past matches
 		for (var i = 0; i < data.data.matches.length; i++) {
+			// find scores of the games, to work out who won
 			var scores = data.data.matches[i].games_score.split("-")
 			var color = "red"
+			// if they won then make it green, else stays red
 			if (scores[0] > scores[1]) {
 				color = "green"
 			}
@@ -266,7 +211,7 @@ angular.module('app.controllers', [])
 			}
 		}
 		$scope.$apply()
-		console.log("hideicon")
+
 		$("#content3").show()
 		$("#loading3").hide()
 
@@ -283,19 +228,62 @@ angular.module('app.controllers', [])
 .controller('findCtrl', function($scope, $rootScope) {
 	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
-		
+		// if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
+		if (allplayers == undefined || idlookup == undefined) {
+			loadnames()
+		}
 	})
 
+	var allplayers
+	var idlookup
 
+	function loadnames() {
+		// to calculate the key
+		var time = new Date().getTime()/1000
+		key = Math.round(Math.sqrt(time * 100) - 100)
 
-	$(function() {
+		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
+		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
+		var data = $.ajax({
+            url: k
+        }).done(function(){
+            makePlayerArray(data.responseText)
+            makePlayerTable(data.responseText)
+        }).fail(function(){
+            
+        });
+		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
+		// 	$("#msg").html("Error - AJAX failed")
+		// })
+	}
+
+	function makePlayerArray(data) {
+		// make array of players for auto complete and id lookup - KEEP COMMENTS
+		var players = []
+		data = $.parseJSON(data);
+		for (var x = 0; x < data.data.length; x++) {
+			players[x] = data.data[x].player;
+		}
+		// localStorage["allplayers"] = JSON.stringify(players) - KEEP
+		allplayers = players
 		$("#playerid").autocomplete({
-			source: $.parseJSON(localStorage["allplayers"]),
+			// source: $.parseJSON(localStorage["allplayers"]), - KEEP
+			source: allplayers,
 			minLength: 3
 		});
-	});
-
+	}
 	
+	function makePlayerTable(data) {
+		// make array of ids for player id lookup
+		var ids = []
+		data = $.parseJSON(data);
+		for (var x = 0; x < data.data.length; x++) {
+			ids[x] = data.data[x].playerid;
+		}
+		// localStorage["idlookup"] = JSON.stringify(ids) - KEEP
+		idlookup = ids
+		$("#loading1").hide()
+	}
 
 
 
@@ -309,60 +297,15 @@ angular.module('app.controllers', [])
 	$scope.onTap = function() {
 		//empty error message
 		$("#msg").empty();
-
 		//hide results
 		$("#results").hide();
 		$("#playerlist").hide();
-
 		$("#loading1").show();
 		
 		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
 		var searchVal = $("#playerid").val().trim();
-
-
-		//if there is no value in search box, bring back rank list, otherwise load individual player
-		// if(searchVal=="") {
-		// 	loadplayers();
-		// } else {
-			load(searchVal);
-		// }
+		load(searchVal);
 	}
-
-	//initialse lookup table for player name - ID
-	
-
-	//get the player data using the cache
-	// function loadplayers() {
-	// 	Cache.request("http://www.squashlevels.com/players.php?&all=&top=&perpage=-1&format=json", displayplayers, function() {
-	// 		$("#msg").html("Error in AJAX request.");
-	// 	})
-	// }
-
-	// push the rankings data to the list
-	// function displayplayers(data) {
-	// 	var data = $.parseJSON(data);
-	// 	$scope.items = []
-	// 	for (var i = 0; i < data.data.length; i++) {
-	// 		$scope.items.push(data.data[i].level + " - " + data.data[i].player)
-	// 	}
-	// 	$scope.$apply()
-	// 	$("#loader").hide();
-	// 	$("#playerlist").show();
-	// }
-
-	// //when a rank list item is clicked, earch for that person
-	// $scope.search = function(item) {
-	// 	$("#playerlist").hide();
-	// 	$("#loader").show();
-	// 	//take the name from the list item
-	// 	var player = item.split("-")[1].trim()
-
-	// 	//put the name in the search box (it looks nice)
-	// 	$("#playerid").val(player)
-
-	// 	//load player page
-	// 	load(player);
-	// }
 
 	//calculates percentage change between levels
 	function percChange(lev_before, lev_after) {
@@ -375,7 +318,6 @@ angular.module('app.controllers', [])
 	}
 
 	function readmatch(match) {
-
 		if (match.leaguetypeid) {
 			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
@@ -390,7 +332,6 @@ angular.module('app.controllers', [])
 
 	function format_date(date_int) {
 		var date = new Date(date_int*1000);
-
 		var day = date.getDate();
 		var month = date.getMonth();
 		var year = date.getFullYear();
@@ -427,7 +368,6 @@ angular.module('app.controllers', [])
 			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
 			chart.draw(data, options);
 		} catch (err) {
-			console.log("err: Empty chart_data");
 		}
 	}
 
@@ -443,23 +383,15 @@ angular.module('app.controllers', [])
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
-		console.log(data)
 		if (data.status == "good" || data.status == "warn") {
-			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
-			var level = data.data.statistics.end_level;
+			var s = data.data.statistics;
 
 			$("#tab-main").html(name);
-			$("#level").html("Level: " + level);
-
-
-			//TODO: find better way			
-			var s = data.data.statistics;
-			//displays club ranking
+			$("#level").html("Level: " + s.end_level);
 			$("#club_pos").html("Club Position: " + s.club_pos);
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
-			//displays league ranking and which league
 
 			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
 			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
@@ -467,11 +399,6 @@ angular.module('app.controllers', [])
 			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
 			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
 			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
-
-			
-			
-
-
 
 			var matches = data.data.matches;
 			var matchdata = [];
@@ -499,6 +426,7 @@ angular.module('app.controllers', [])
 					title: "Level Change"
 				}]
 			});
+
 			$("#loading1").hide();
 			$("#results").show();
 			$("#tab-main").html(drawChart(chartdata));
@@ -508,22 +436,22 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	//load the lookup table data for all players - ID
-	function loadlookup() {
+	//load the lookup table data for all players - ID ---------- KEEP
+ 	// function loadlookup() { --------------------------------- KEEP ALL
 		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerTable, function() {
 		// 	$("#msg").html("Error - id must be a number")
 		// })
-	}
-
-	
+	// }
 
 	//load the data for the player page with the cache
 	function load(name) {
 		//test if they are searching for ID or player name
 		if (!/^[0-9]+$/.test(name)) {
-			//make lower case to remove errors on incorrect capitalization
-			var ids = $.parseJSON(localStorage["idlookup"])
-			var players = $.parseJSON(localStorage["allplayers"])
+			// var ids = $.parseJSON(localStorage["idlookup"]) KEEP
+			var ids = idlookup
+			// var players = $.parseJSON(localStorage["allplayers"]) KEEP
+			var players = allplayers
+
 			var index = players.indexOf(name)
 			var id = ids[index]
 		} else {
@@ -534,8 +462,6 @@ angular.module('app.controllers', [])
 			})
 	}
 })
-
-
 
 // SquashLevels tab: displays player rankings with filters
 .controller('rankingsCtrl', function($scope, $rootScope, $state) {
@@ -568,29 +494,15 @@ angular.module('app.controllers', [])
 		if (rank.status == "good") {
 
 			var rankData = rank.data;
-			console.log(rankData)
 
 			$scope.players = [];
-			//populate rank list with data (Position - Name)
+			//populate rank list with data (Position - Name - Level)
 			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
 				$scope.players[i] = {
 				    name: info.position + ". " + info.player + " - " + info.level,
 				    id: info.playerid
 				};
-				//make date human readable
-				// var date = new Date(info.lastmatch_date * 1000).toLocaleDateString();
-				
-				//push player level, to dropdown
-				// $scope.groups[i].items.push("Level: " + info.level);
-				
-				//if the player has a club, push that to dropdown
-				// if (typeof info.club != 'undefined' && info.club != '') {
-			    	// $scope.groups[i].items.push("Club: " + info.club);
-			    // }
-			    
-			    //push the player's last match datae to dropdown
-			    // $scope.groups[i].items.push("Last Match: " + date);
 			}
 			$scope.$apply();
 			$("#loading4").hide();
@@ -604,22 +516,6 @@ angular.module('app.controllers', [])
 		$rootScope.tapped = id
 		$state.go('squashLevels.playerProfiles')
 	}
-
-	/*
-	 * if given group is the selected group, deselect it
-	 * else, select the given group
-	 */
-	//this is all code for the accordian dropdown style, ripped straight from internet, don't break
-	$scope.toggleGroup = function(group) {
-		if ($scope.isGroupShown(group)) {
-			$scope.shownGroup = null;
-		} else {
-			$scope.shownGroup = group;
-		}
-	};
-	$scope.isGroupShown = function(group) {
-		return $scope.shownGroup === group;
-	};
 
 	//get the dropdown inpiuts
 	function changeHiddenInput() {
@@ -646,81 +542,81 @@ angular.module('app.controllers', [])
 .controller('teamsCtrl', function($scope) {
 
 	// return date in readable format
-	function format_date(date) {
-		var monthNames = [
-			"Jan", "Feb", "Mar", "Apr", "May",
-			"Jun", "Jul", "Aug", "Sep", "Oct",
-			"Nov", "Dec"
-		];
-		var day = date.getDate();
-		var month = date.getMonth();
-		var year = date.getFullYear();
+// 	function format_date(date) {
+// 		var monthNames = [
+// 			"Jan", "Feb", "Mar", "Apr", "May",
+// 			"Jun", "Jul", "Aug", "Sep", "Oct",
+// 			"Nov", "Dec"
+// 		];
+// 		var day = date.getDate();
+// 		var month = date.getMonth();
+// 		var year = date.getFullYear();
 
-		var formatted_date = String(day) + " " + monthNames[month] + " " + String(year);
-		return formatted_date;
+// 		var formatted_date = String(day) + " " + monthNames[month] + " " + String(year);
+// 		return formatted_date;
 
-	}
+// 	}
 
-	function read_team_match(match) {
-		var seconds = match.dateint;
-		var date = new Date(seconds * 1000);
-		var formatted_date = format_date(date);
+// 	function read_team_match(match) {
+// 		var seconds = match.dateint;
+// 		var date = new Date(seconds * 1000);
+// 		var formatted_date = format_date(date);
 
-		if (match.withdrawn == "false") {
-			var attendance = 'Yes';
-		} else {
-			var attendance = 'No';
-		}
+// 		if (match.withdrawn == "false") {
+// 			var attendance = 'Yes';
+// 		} else {
+// 			var attendance = 'No';
+// 		}
 
-		return [match.other_team.name, formatted_date, attendance];
-	}
+// 		return [match.other_team.name, formatted_date, attendance];
+// 	}
 
-	//display the team data in the table
-	function displayteam(teamdata) {
-		var data = $.parseJSON(teamdata);
+// 	//display the team data in the table
+// 	function displayteam(teamdata) {
+// 		var data = $.parseJSON(teamdata);
 
-		if (data.status == "good") {
-			var name = data.data.captain;
-			var contact = data.data.contact;
-			$("#team_name").html("Captain: " + name + "<br>Contact Number: " + contact);
+// 		if (data.status == "good") {
+// 			var name = data.data.captain;
+// 			var contact = data.data.contact;
+// 			$("#team_name").html("Captain: " + name + "<br>Contact Number: " + contact);
 
-			var team_matches = data.data.matches;
-			var team_matchdata = [];
-			for (var i = 0; i < team_matches.length; i++) {
-				var t = read_team_match(team_matches[i]);
-				team_matchdata.push(t);
-			}
-			//set columns for the datatable
-			$("#dteamtable").DataTable({
-				data: team_matchdata,
-				columns: [{
-					title: "Opponent"
-				}, {
-					title: "Date"
-				}, {
-					title: "Availible"
-				}, ]
-			});
-		}
-	}
+// 			var team_matches = data.data.matches;
+// 			var team_matchdata = [];
+// 			for (var i = 0; i < team_matches.length; i++) {
+// 				var t = read_team_match(team_matches[i]);
+// 				team_matchdata.push(t);
+// 			}
+// 			//set columns for the datatable
+// 			$("#dteamtable").DataTable({
+// 				data: team_matchdata,
+// 				columns: [{
+// 					title: "Opponent"
+// 				}, {
+// 					title: "Date"
+// 				}, {
+// 					title: "Availible"
+// 				}, ]
+// 			});
+// 		}
+// 	}
 
-	function loadteam() {
-		//get team id from the search box
-		var teamid = $("#teamid").val();
-		//make sure it's a number (TODO: search on club name)
-		if (/^[0-9]+$/.test(teamid)) {
-			Cache.request("http://www.squashLevels.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
-				$("#msg").html("Error in AJAX equest.");
-			})
-		} else {
-			$("#msg").html("Error - id must be a number");
-		}
-	}
+// 	function loadteam() {
+// 		//get team id from the search box
+// 		var teamid = $("#teamid").val();
+// 		//make sure it's a number (TODO: search on club name)
+// 		if (/^[0-9]+$/.test(teamid)) {
+// 			Cache.request("http://www.squashLevels.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
+// 				$("#msg").html("Error in AJAX equest.");
+// 			})
+// 		} else {
+// 			$("#msg").html("Error - id must be a number");
+// 		}
+// 	}
 
-	//when search button is pressed
-	$scope.onTap = function() {
-		loadteam();
-	}
+// 	//when search button is pressed
+// 	$scope.onTap = function() {
+// 		loadteam();
+// 	}
 
 })
 
@@ -745,10 +641,43 @@ angular.module('app.controllers', [])
 	//autocomplet function
 	$(function() {
 		$(".nameInput").autocomplete({
-			source: $parseJSON(localStorage["allplayers"]),
+			// source: $parseJSON(localStorage["allplayers"]),
+			source: allplayers,
 			minLength: 3
 		});
 	});
+
+	var allplayers
+
+	function loadnames() {
+		// load player array for autocomplete
+		// work out key
+		var time = new Date().getTime()/1000
+		key = Math.round(Math.sqrt(time * 100) - 100)
+
+		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
+		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
+		var data = $.ajax({
+            url: k
+        }).done(function(){
+            makePlayerArray(data.responseText)
+        }).fail(function(){
+            
+        });
+		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
+		// 	$("#msg").html("Error - AJAX failed")
+		// })
+	}
+
+	function makePlayerArray(data) {
+		var players = []
+		data = $.parseJSON(data);
+		for (var x = 0; x < data.data.length; x++) {
+			players[x] = data.data[x].player;
+		}
+		// localStorage["allplayers"] = JSON.stringify(players)
+		allplayers = players
+	}
 
   	
 	var score1 = [0, 0, 0, 0, 0]
@@ -765,6 +694,7 @@ angular.module('app.controllers', [])
 		"5a": 0,
 		"5b": 0
 	}
+	// functions for when buttons are clicked
 	$scope.s1a1 = function() {
 		scores["1a"] = scores["1a"] + 1
 		$("#1a").html(scores["1a"])
@@ -865,7 +795,7 @@ angular.module('app.controllers', [])
 		$("#5b").html(scores["5b"])
 		check5Score()
 	}
-
+	// check who's winning each round after button is pressed
 	function check1Score() {
 		if(scores["1a"] > scores["1b"]) {
 			score1[0] = 1
@@ -1099,7 +1029,9 @@ angular.module('app.controllers', [])
 		checkNames();
 	}
 	function checkNames() {
-		var players = $.parseJSON(localStorage["allplayers"])
+		// var players = $.parseJSON(localStorage["allplayers"])
+		var players = allplayers
+		// check players are already registered
 		if((($.inArray($("#name1").val(), players)) >= 0) && (($.inArray($("#name2").val(), players) >= 0))) {
 			clearPage() 
 		} else {
@@ -1245,7 +1177,7 @@ angular.module('app.controllers', [])
 	$ionicHistory.nextViewOptions({
 		disableBack: true
 	});
-
+	// when cache clear button is pressed
 	$scope.clearCache = function() {
 		Cache.clean(315360000000);
 		$("#message").html("Cache emptied")
@@ -1253,10 +1185,11 @@ angular.module('app.controllers', [])
 			$("#message").empty()
 		}, 3000);
 	}
+	// when logging out, delete saved details
 	$scope.logout = function() {
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
-		$rootScope.loggedIn = false
+		localStorage.removeItem("userData");
 		$state.go('squashLevels.login')
 	}
 })
@@ -1336,7 +1269,6 @@ angular.module('app.controllers', [])
 			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
 			chart.draw(data, options);
 		} catch (err) {
-			console.log("err: Empty chart_data");
 		}
 	}
 
@@ -1352,7 +1284,6 @@ angular.module('app.controllers', [])
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
-		console.log(data)
 		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
@@ -1430,9 +1361,7 @@ angular.module('app.controllers', [])
 	function displayMatch(data) {
 		data = $.parseJSON(data);
 		var index = $rootScope.matchindex
-		console.log(index)
 		var thisMatch = data.data.matches[index]
-		console.log(data)
 		var matchDate = new Date(thisMatch.dateint * 1000)
 		var month = matchDate.getMonth() + 1
 		matchDate = matchDate.getDate() + "/" + month + "/" + matchDate.getFullYear()
@@ -1492,7 +1421,6 @@ angular.module('app.controllers', [])
 		$("#scores").empty();
 		for (var n = 0; n < points.length; n++) {
 			var scores = points[n].split("-")
-			console.log(scores)
 			if (scores[0] > scores[1]) {
 				$("#scores").append("<div class='col c' style='font-weight: bold; color:green'>" + points[n] + "</div>")
 			} else {

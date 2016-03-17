@@ -111,7 +111,7 @@ div.row > div.c {
 	margin: 1px;
 	font-weight: bold;
 	text-align: center;
-	color: #333;
+	color: #444;
 }
 div.row > div.c > p {
 	font-weight: normal;
@@ -127,7 +127,7 @@ span.red {
 	color: red;
 }
 .card {
-	color: #333;
+	color: #444;
 	font-size: 17px;
 }
 div.row > div.col > p.bold {
