@@ -26,15 +26,15 @@ angular.module('app.controllers', [])
 		// email = "app.developer@bristol.ac.uk"
 
 		//store password and email in local storage (like cookies)
-		console.log(email,pass)
+		console.log(email, pass)
 		if (storedemail == undefined) {
 			localStorage["email"] = JSON.stringify(email);
 		}
 		if (storedpass == undefined) {
 			localStorage["password"] = JSON.stringify(pass);
-		}	
+		}
 
-		Cache.request("http://www.squashlevels.com/info.php?action=login&email="+email+"&password="+pass+"&stay_logged_in=1&format=json", loadUserData, function() {
+		Cache.request("http://www.squashlevels.com/info.php?action=login&email=" + email + "&password=" + pass + "&stay_logged_in=1&format=json", loadUserData, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
@@ -42,9 +42,10 @@ angular.module('app.controllers', [])
 	function loadUserData(data) {
 		data = $.parseJSON(data);
 		console.log(data)
-		if (data.status == "good"){
-			localStorage["userData"] = data;
-			$state.go('badSquash.myProfile')
+		if (data.status == "good") {
+			$rootScope.userData = data;
+			$rootScope.loggedIn = true
+			$state.go('squashLevels.myProfile')
 		} else {
 			$("#msg").html("Sorry, incorrect email or password")
 		}
@@ -67,12 +68,14 @@ angular.module('app.controllers', [])
 
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
 
-	$scope.$on('$ionicView.enter', function () {
-		console.log(localStorage["email"], localStorage["password"])
-		if (localStorage["email"] != undefined && localStorage["password"] != undefined) {
-			Cache.request("http://www.squashlevels.com/info.php?action=login&email="+$.parseJSON(localStorage["email"])+"&password="+$.parseJSON(localStorage["password"])+"&stay_logged_in=1&format=json", loadUserData, function() {
-				$state.go('badSquash.login');
-			})
+	$scope.$on('$ionicView.enter', function() {
+		if ($rootScope.userData == undefined) {
+			$ionicHistory.nextViewOptions({
+				disableBack: true
+			});
+			$state.go('squashLevels.login');
+		} else {
+			getPlayerInfo($rootScope.userData.data.playerid)
 		}
 	})
 			
@@ -89,20 +92,20 @@ angular.module('app.controllers', [])
 
 	function getPlayerInfo(playerid) {
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&format=json", displayProfile, function() {
-				$("#msg").html("Error in AJAX request.");
-			})
+			$("#msg").html("Error in AJAX request.");
+		})
 	}
-	
+
 	function displayProfile(data) {
 		var playerData = $.parseJSON(localStorage["userData"])
 		data = $.parseJSON(data);
 		console.log(data)
-		var highDate = new Date(data.data.statistics.max_level_dateint*1000)
-		var month = highDate.getMonth()+1
-		highDate = highDate.getDate()+"/"+month+"/"+highDate.getFullYear()
-		var lowDate = new Date(data.data.statistics.min_level_dateint*1000)
-		month = lowDate.getMonth()+1
-		lowDate = lowDate.getDate()+"/"+month+"/"+lowDate.getFullYear()
+		var highDate = new Date(data.data.statistics.max_level_dateint * 1000)
+		var month = highDate.getMonth() + 1
+		highDate = highDate.getDate() + "/" + month + "/" + highDate.getFullYear()
+		var lowDate = new Date(data.data.statistics.min_level_dateint * 1000)
+		month = lowDate.getMonth() + 1
+		lowDate = lowDate.getDate() + "/" + month + "/" + lowDate.getFullYear()
 		$("#levels12").parent().show();
 		//player name
 		$("#playerName").val(data.data.summary.player)
@@ -131,17 +134,17 @@ angular.module('app.controllers', [])
 		if (data.data.statistics.level_12m_ago == -1) {
 			$("#levels12").parent().hide();
 		} else {
-			$("#levels12").html(data.data.statistics.level_12m_ago);	
+			$("#levels12").html(data.data.statistics.level_12m_ago);
 		}
-		
+
 
 		$("#pointsplayed").html(data.data.statistics.points_won + data.data.statistics.points_lost);
 		$("#pointswon").html(data.data.statistics.points_won);
 		$("#pointslost").html(data.data.statistics.points_lost);
 		if (data.data.statistics.points_win_ratio > 0.5) {
-			$("#pointsratio").css("color", "green")	
+			$("#pointsratio").css("color", "green")
 		} else {
-			$("#pointsratio").css("color", "red")	
+			$("#pointsratio").css("color", "red")
 		}
 		$("#pointsratio").html(data.data.statistics.points_win_ratio);
 
@@ -149,9 +152,9 @@ angular.module('app.controllers', [])
 		$("#gameswon").html(data.data.statistics.games_won);
 		$("#gameslost").html(data.data.statistics.games_lost);
 		if (data.data.statistics.games_win_ratio > 0.5) {
-			$("#pointsratio").css("color", "green")	
+			$("#pointsratio").css("color", "green")
 		} else {
-			$("#pointsratio").css("color", "red")	
+			$("#pointsratio").css("color", "red")
 		}
 		$("#gamesratio").html(data.data.statistics.games_win_ratio);
 
@@ -159,44 +162,44 @@ angular.module('app.controllers', [])
 		$("#matcheswon").html(data.data.statistics.matches_won);
 		$("#matcheslost").html(data.data.statistics.matches_lost);
 		if (data.data.statistics.matches_win_ratio > 0.5) {
-			$("#pointsratio").css("color", "green")	
+			$("#pointsratio").css("color", "green")
 		} else {
-			$("#pointsratio").css("color", "red")	
+			$("#pointsratio").css("color", "red")
 		}
 		$("#matchesratio").html(data.data.statistics.matches_win_ratio);
 
-		var overallchange = (((data.data.statistics.end_level/data.data.statistics.initial_level).toFixed(2) * 100) - 100)
-		var last12 = ((data.data.statistics.level_change_last_12m.toFixed(2)*100) - 100)
-		var lastmatch = ((data.data.statistics.level_change_last_match.toFixed(2)*100) - 100)
-		var thisseason = ((data.data.statistics.level_change_this_season.toFixed(2)*100) - 100)
+		var overallchange = (((data.data.statistics.end_level / data.data.statistics.initial_level).toFixed(2) * 100) - 100)
+		var last12 = ((data.data.statistics.level_change_last_12m.toFixed(2) * 100) - 100)
+		var lastmatch = ((data.data.statistics.level_change_last_match.toFixed(2) * 100) - 100)
+		var thisseason = ((data.data.statistics.level_change_this_season.toFixed(2) * 100) - 100)
 
 		if (overallchange > 0) {
 			$("#levelchangeoverall").css("color", "green");
-			$("#levelchangeoverall").html("+"+overallchange+"%");
+			$("#levelchangeoverall").html("+" + overallchange + "%");
 		} else {
 			$("#levelchangeoverall").css("color", "red");
-			$("#levelchangeoverall").html(overallchange+"%");
+			$("#levelchangeoverall").html(overallchange + "%");
 		}
 		if (last12 > 0) {
 			$("#levelchange12").css("color", "green");
-			$("#levelchange12").html("+"+last12+"%");
+			$("#levelchange12").html("+" + last12 + "%");
 		} else {
 			$("#levelchange12").css("color", "red");
-			$("#levelchange12").html(last12+"%");
+			$("#levelchange12").html(last12 + "%");
 		}
 		if (lastmatch > 0) {
 			$("#levelchangelast").css("color", "green");
-			$("#levelchangelast").html("+"+lastmatch+"%");
+			$("#levelchangelast").html("+" + lastmatch + "%");
 		} else {
 			$("#levelchangelast").css("color", "red");
-			$("#levelchangelast").html(lastmatch+"%");
+			$("#levelchangelast").html(lastmatch + "%");
 		}
 		if (thisseason > 0) {
 			$("#levelchangeseason").css("color", "green");
-			$("#levelchangeseason").html("+"+thisseason+"%");
+			$("#levelchangeseason").html("+" + thisseason + "%");
 		} else {
 			$("#levelchangeseason").css("color", "red");
-			$("#levelchangeseason").html(thisseason+"%");
+			$("#levelchangeseason").html(thisseason + "%");
 		}
 
 		$scope.matches = []
@@ -220,10 +223,9 @@ angular.module('app.controllers', [])
 
 	}
 
-	$scope.load = function(index) {
-		// console.log(index)
-		$rootScope.matchindex = index
-		$state.go('badSquash.matchData')
+	$scope.load = function(match) {
+		$rootScope.matchindex = match.split(" ")[0] - 1
+		$state.go('squashLevels.matchData')
 	}
 
 
@@ -241,16 +243,18 @@ angular.module('app.controllers', [])
 	loadnames();
 
 	$(function() {
-    	$( "#playerid" ).autocomplete({
-      		source: players
-    	});
-  	});
-	function loadnames(){
+		$("#playerid").autocomplete({
+			source: players
+		});
+	});
+
+	function loadnames() {
 		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerArray, function() {
 			$("#msg").html("Error - AJAX failed")
 		})
 	}
-	function makePlayerArray(data){
+
+	function makePlayerArray(data) {
 		data = $.parseJSON(data);
 		console.log(data)
 		for (var x = 0; x < data.data.length; x++) {
@@ -326,10 +330,10 @@ angular.module('app.controllers', [])
 	//calculates percentage change between levels
 	function percChange(lev_before, lev_after) {
 		var change = ((lev_before - lev_after) / lev_before) * 100;
-		if(change >= 0) {
-			return "+"+Number(change).toFixed(2)+"%";
+		if (change >= 0) {
+			return "+" + Number(change).toFixed(2) + "%";
 		} else {
-			return Number(change).toFixed(2)+"%";
+			return Number(change).toFixed(2) + "%";
 		}
 	}
 
@@ -367,18 +371,19 @@ angular.module('app.controllers', [])
                 data.addRow([date, chartdata[i][1]]);
 			}
 			var options = {
-				title: 'Level History',
-				colors: ['red'],
-                legend: {position: 'none'},
-                width: 380,
-                pointSize: 3,
+				colors: ['blue'],
+				legend: {
+					position: 'none'
+				},
+				width: 450,
+				pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
 					textStyle: {
-						fontSize: 8
+						fontSize: 10
 					}
 				},
-    			vAxis: {
+				vAxis: {
 					baseline: 0,
 				}
 			};
@@ -408,17 +413,17 @@ angular.module('app.controllers', [])
 			var level = data.data.statistics.end_level;
 
 			$("#tab-main").html(name);
-			$("#level").html("Level: "+level);
+			$("#level").html("Level: " + level);
 
 
-//TODO: find better way			
+			//TODO: find better way			
 			var s = data.data.statistics;
 			//displays club ranking
 			$("#club_pos").html("Club Position: " + s.club_pos);
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
 			//displays league ranking and which league
-			
+
 			// for(var i = 0; i<3; i++) {
 			// 	if(s.league_pos[i] == null) {
 			// 		// console.log('wan')
@@ -439,14 +444,17 @@ angular.module('app.controllers', [])
 
 
 			//displays player statistics
-			$("#team_name").html(data.data.matches.team);
 			$("#p_matches").html("Matches: " + "Won " + s.matches_won + "		Lost " + s.matches_lost);
-			$("#p_games").html("Games: " + (s.games_won + s.games_lost) +
+			$("#p_games").html("Games: " +
 				" Won " + s.games_won +
 				" Lost " + s.games_lost);
-			$("#p_points").html("Points: " + (s.points_won + s.points_lost) +
+			$("#p_points").html("Points: " +
 				" Won " + s.points_won +
 				" Lost " + s.points_lost);
+
+			$("#p_won").html("Won " + "<br /> Matches " + s.matches_won + "<br /> Games " + s.games_won + "<br /> Points " + s.points_won);
+			$("#p_lost").html("Lost " + "<br /> Matches " + s.matches_lost + "<br /> Games " + s.games_lost + "<br /> Points " + s.points_lost);
+
 
 
 			var matches = data.data.matches;
@@ -462,8 +470,8 @@ angular.module('app.controllers', [])
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
-// add title for date
-				columns: [{ 
+				// add title for date
+				columns: [{
 					title: "Date"
 				}, {
 					title: "Opponent"
@@ -473,8 +481,7 @@ angular.module('app.controllers', [])
 					title: "Level before"
 				}, {
 					title: "Level Change"
-				}
-				]
+				}]
 			});
 			$("#loading1").hide();
 			$("#results").show();
@@ -486,7 +493,7 @@ angular.module('app.controllers', [])
 	}
 
 	//load the lookup table data for all players - ID
-	function loadlookup(){
+	function loadlookup() {
 		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerTable, function() {
 			$("#msg").html("Error - id must be a number")
 		})
@@ -531,7 +538,7 @@ angular.module('app.controllers', [])
 	$scope.$on('$ionicView.loaded', function () {
 		changeHiddenInput();
 	})
-	
+
 	//When search buttton is pressed, hide results, reload data, hide filters
 	$scope.onTap = function() {
 		$("#msg").empty();
@@ -593,15 +600,15 @@ angular.module('app.controllers', [])
 	}
 
 	/*
-	* if given group is the selected group, deselect it
-	* else, select the given group
-	*/
+	 * if given group is the selected group, deselect it
+	 * else, select the given group
+	 */
 	//this is all code for the accordian dropdown style, ripped straight from internet, don't break
 	$scope.toggleGroup = function(group) {
 		if ($scope.isGroupShown(group)) {
-	  		$scope.shownGroup = null;
+			$scope.shownGroup = null;
 		} else {
-	  		$scope.shownGroup = group;
+			$scope.shownGroup = group;
 		}
 	};
 	$scope.isGroupShown = function(group) {
@@ -625,8 +632,8 @@ angular.module('app.controllers', [])
 	//This loads the data for desplaying rankings, calls displayRank on success
 	function loadRanking() {
 		Cache.request("http://squashlevels.com/players.php?check=1&limit_confidence=1&club=" + clubs + "&county=" + county + "&country=" + country + "&show=" + show + "&events=" + events + "&matchtype=" + matchtype + "&playercat=" + agegroup + "&playertype=" + gender + "&search=Search+name&format=json", displayRank, function() {
-				$("#msg").html("Error in AJAX request for rank");
-			})
+			$("#msg").html("Error in AJAX request for rank");
+		})
 	}
 })
 
@@ -665,7 +672,7 @@ angular.module('app.controllers', [])
 	//display the team data in the table
 	function displayteam(teamdata) {
 		var data = $.parseJSON(teamdata);
-		
+
 		if (data.status == "good") {
 			var name = data.data.captain;
 			var contact = data.data.contact;
@@ -696,9 +703,9 @@ angular.module('app.controllers', [])
 		var teamid = $("#teamid").val();
 		//make sure it's a number (TODO: search on club name)
 		if (/^[0-9]+$/.test(teamid)) {
-			Cache.request("http://www.badsquash.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
-					$("#msg").html("Error in AJAX equest.");
-				})
+			Cache.request("http://www.squashLevels.co.uk/team.php?team=" + teamid + "&format=json", displayteam, function() {
+				$("#msg").html("Error in AJAX equest.");
+			})
 		} else {
 			$("#msg").html("Error - id must be a number");
 		}
@@ -722,22 +729,22 @@ angular.module('app.controllers', [])
 	loadplayers();
 	setDateInput();
 	//set date input to current date/time
-	function setDateInput(){
+	function setDateInput() {
 		//get current date
 		var currentTime = new Date();
 		//convert date to ISO
 		currentTime = currentTime.toISOString()
 		//convert date string to dattime input format
-		currentTime = currentTime.substring(0,16)
+		currentTime = currentTime.substring(0, 16)
 		$("#dateInput").val(currentTime)
 	}
 
 	//autocomplet function
 	$(function() {
-    	$( ".nameInput" ).autocomplete({
-      		source: players
-    	});
-  	});
+		$(".nameInput").autocomplete({
+			source: players
+		});
+	});
 
   	//get list of players data
 	function loadplayers(){
@@ -746,7 +753,7 @@ angular.module('app.controllers', [])
 		})
 	}
 	//populate player array with data
-	function makePlayerArray(data){
+	function makePlayerArray(data) {
 		data = $.parseJSON(data);
 		for (var x = 0; x < data.data.length; x++) {
 			players[x] = data.data[x].player;
@@ -1085,10 +1092,10 @@ angular.module('app.controllers', [])
 	function updateRounds() {
 		//work out the total of tyhe round arrays
 		var total1 = score1.reduce(function(previousValue, currentValue, currentIndex, array) {
-		  return previousValue + currentValue;
+			return previousValue + currentValue;
 		});
 		var total2 = score2.reduce(function(previousValue, currentValue, currentIndex, array) {
-		  return previousValue + currentValue;
+			return previousValue + currentValue;
 		});
 		//set round conters to array total
 		$("#rounds1").html(total1)
@@ -1172,7 +1179,7 @@ angular.module('app.controllers', [])
 	// 	}
 	// }
 	//throws an alert taking in the text to be displayed as parameter
-	function popAlert(text){
+	function popAlert(text) {
 		$ionicPopup.alert({
             title: 'Alert',
             type: 'button-assertive',
@@ -1243,20 +1250,21 @@ angular.module('app.controllers', [])
 
 .controller('settingsCtrl', function($scope, $state, $ionicHistory, $rootScope) {
 	$ionicHistory.nextViewOptions({
-	    disableBack: true
+		disableBack: true
 	});
 
 	$scope.clearCache = function() {
 		Cache.clean(315360000000);
 		$("#message").html("Cache emptied")
-		setTimeout(function(){ 
+		setTimeout(function() {
 			$("#message").empty()
 		}, 3000);
 	}
 	$scope.logout = function() {
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
-		$state.go('badSquash.login')
+		$rootScope.loggedIn = false
+		$state.go('squashLevels.login')
 	}
 })
 
@@ -1274,17 +1282,17 @@ angular.module('app.controllers', [])
 	//calculates percentage change between levels
 	function percChange(lev_before, lev_after) {
 		var change = ((lev_before - lev_after) / lev_before) * 100;
-		if(change >= 0) {
-			return "+"+Number(change).toFixed(2)+"%";
+		if (change >= 0) {
+			return "+" + Number(change).toFixed(2) + "%";
 		} else {
-			return Number(change).toFixed(2)+"%";
+			return Number(change).toFixed(2) + "%";
 		}
 	}
 
 	function readmatch(match) {
 
 		if (match.leaguetypeid) {
-			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+			return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
 			if (match.matchtypeid) {
 				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
@@ -1296,12 +1304,12 @@ angular.module('app.controllers', [])
 	}
 
 	function format_date(date_int) {
-		var date = new Date(date_int*1000);
+		var date = new Date(date_int * 1000);
 
 		var day = date.getDate();
 		var month = date.getMonth();
 		var year = date.getFullYear();
-		return day+'/'+month+'/'+year;
+		return day + '/' + month + '/' + year;
 	}
 
 	function drawChart(chartdata) {
@@ -1311,22 +1319,24 @@ angular.module('app.controllers', [])
 			data.addColumn('number', 'level');
 
 			for (var i = 0; i < chartdata.length; i++) {
-				date = new Date(chartdata[i][0]*1000)
-                data.addRow([date, chartdata[i][1]]);
+				date = new Date(chartdata[i][0] * 1000)
+				data.addRow([date, chartdata[i][1]]);
 			}
 			var options = {
 				title: 'Level History',
 				colors: ['blue'],
-                legend: {position: 'none'},
-                width: 380,
-                pointSize: 3,
+				legend: {
+					position: 'none'
+				},
+				width: 380,
+				pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
 					textStyle: {
 						fontSize: 8
 					}
 				},
-    			vAxis: {
+				vAxis: {
 					baseline: 0,
 				}
 			};
@@ -1356,8 +1366,8 @@ angular.module('app.controllers', [])
 			var level = data.data.statistics.end_level;
 
 			$("#tab-main").html(name);
-			$("#level").html("Level: "+level);
-		
+			$("#level").html("Level: " + level);
+
 			var s = data.data.statistics;
 
 			$("#club_pos").html("Club Position: " + s.club_pos);
@@ -1389,7 +1399,7 @@ angular.module('app.controllers', [])
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
-				columns: [{ 
+				columns: [{
 					title: "Date"
 				}, {
 					title: "Opponent"
@@ -1399,8 +1409,7 @@ angular.module('app.controllers', [])
 					title: "Level before"
 				}, {
 					title: "Level Change"
-				}
-				]
+				}]
 			});
 			$("#loading5").hide();
 			$("#results").show();
@@ -1431,21 +1440,20 @@ angular.module('app.controllers', [])
 		console.log(index)
 		var thisMatch = data.data.matches[index]
 		console.log(data)
-		console.log(thisMatch)
-		var matchDate = new Date(thisMatch.dateint*1000)
-		var month = matchDate.getMonth()+1
-		matchDate = matchDate.getDate()+"/"+month+"/"+matchDate.getFullYear()
+		var matchDate = new Date(thisMatch.dateint * 1000)
+		var month = matchDate.getMonth() + 1
+		matchDate = matchDate.getDate() + "/" + month + "/" + matchDate.getFullYear()
 
 		$("#positionbefore").parent().show();
 		$("#positionafter").parent().show();
 		$("#opppositionbefore").parent().hide();
-			$("#opppositionafter").parent().hide();
-			$("#opppos").hide();
+		$("#opppositionafter").parent().hide();
+		$("#opppos").hide();
 
-		if(thisMatch.matchtype == undefined) {
-			$("#league").html(thisMatch.leaguetype)	
+		if (thisMatch.matchtype == undefined) {
+			$("#league").html(thisMatch.leaguetype)
 		} else {
-			$("#league").html(thisMatch.matchtype)	
+			$("#league").html(thisMatch.matchtype)
 		}
 		$("#date").html(matchDate)
 
@@ -1457,7 +1465,7 @@ angular.module('app.controllers', [])
 		} else {
 			$("#yourclub").html(thisMatch.club)
 		}
-		if(thisMatch.position_before == -1 || thisMatch.position_after == -1) {
+		if (thisMatch.position_before == -1 || thisMatch.position_after == -1) {
 			$("#positionbefore").parent().hide();
 			$("#positionafter").parent().hide();
 			$("#pos").hide();
@@ -1467,16 +1475,16 @@ angular.module('app.controllers', [])
 		}
 		$("#levelbefore").html(thisMatch.level_before)
 		$("#levelafter").html(thisMatch.level_after)
-		
+
 
 
 		$("#oppname").html(thisMatch.opponent)
-		if(thisMatch.opponent_club == undefined) {
+		if (thisMatch.opponent_club == undefined) {
 			$("#oppclub").html(thisMatch.opponent_team)
 		} else {
 			$("#oppclub").html(thisMatch.opponent_club)
 		}
-		if(thisMatch.opponent_position_after == -1 || thisMatch.opponent_position_after == -1) {
+		if (thisMatch.opponent_position_after == -1 || thisMatch.opponent_position_after == -1) {
 			$("#opppositionbefore").parent().hide();
 			$("#opppositionafter").parent().hide();
 			$("#opppos").hide();
@@ -1507,16 +1515,3 @@ angular.module('app.controllers', [])
 	}
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
