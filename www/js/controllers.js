@@ -14,15 +14,60 @@ angular.module('app.controllers', [])
 	var storedpass = $.parseJSON(localStorage.getItem("password"))
 
 	$scope.$on('$ionicView.loaded', function () {
-		if (storedemail != undefined && storedpass != undefined) {
+		if (storedemail != undefined || storedpass != undefined) {
 			login(storedemail, storedpass)
+			if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
+				loadnames()
+			}
 			console.log(storedemail,storedpass)
+			console.log(localStorage["idlookup"],localStorage["allplayers"])
 		}
 	})
 	
+	function loadnames() {
+		var time = new Date().getTime()/1000
+		key = Math.round(Math.sqrt(time * 100) - 100)
+		console.log(key)
+
+		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
+		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
+		var data = $.ajax({
+            url: k
+        }).done(function(){
+            makePlayerArray(data.responseText)
+            makePlayerTable(data.responseText)
+        }).fail(function(){
+            
+        });
+		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
+		// 	$("#msg").html("Error - AJAX failed")
+		// })
+	}
+
+	function makePlayerArray(data) {
+		var players = []
+		data = $.parseJSON(data);
+		console.log(data)
+		for (var x = 0; x < data.data.length; x++) {
+			players[x] = data.data[x].player;
+		}
+		console.log(players)
+		localStorage["allplayers"] = JSON.stringify(players)
+	}
+	//populate the player -ID lookup table
+	function makePlayerTable(data) {
+		var ids = []
+		data = $.parseJSON(data);
+		console.log(data)
+		for (var x = 0; x < data.data.length; x++) {
+			ids[x] = data.data[x].playerid;
+		}
+		localStorage["idlookup"] = JSON.stringify(ids)
+	}
 
 	function login(email, pass) {
 		// pass = "uniapp"
+		// 0094539787173fdbc36ecf1c1827193a
 		// email = "app.developer@bristol.ac.uk"
 
 		//store password and email in local storage (like cookies)
@@ -239,33 +284,20 @@ angular.module('app.controllers', [])
 	//only fires when page list first entered
 	$scope.$on('$ionicView.loaded', function () {
 		
-		// loadplayers();
-		loadlookup();
 	})
 
-	var players = []
-	loadnames();
+
 
 	$(function() {
 		$("#playerid").autocomplete({
-			source: players
+			source: $.parseJSON(localStorage["allplayers"]),
+			minLength: 3
 		});
 	});
 
-	function loadnames() {
-		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerArray, function() {
-			$("#msg").html("Error - AJAX failed")
-		})
-	}
+	
 
-	function makePlayerArray(data) {
-		data = $.parseJSON(data);
-		console.log(data)
-		for (var x = 0; x < data.data.length; x++) {
-			players[x] = data.data[x].player;
-		}
-		console.log(players)
-	}
+
 
 	//load in google charts
 	google.charts.load('current', {
@@ -286,6 +318,7 @@ angular.module('app.controllers', [])
 		
 		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
 		var searchVal = $("#playerid").val().trim();
+
 
 		//if there is no value in search box, bring back rank list, otherwise load individual player
 		// if(searchVal=="") {
@@ -477,32 +510,22 @@ angular.module('app.controllers', [])
 
 	//load the lookup table data for all players - ID
 	function loadlookup() {
-		Cache.request("http://www.squashlevels.com/players.php?&check=1&limit_confidence=1&club=all&county=all&country=all&show=all&events=1&matchtype=all&playercat=all&playertype=all&search=Search+name&perpage=-1&format=json", makePlayerTable, function() {
-			$("#msg").html("Error - id must be a number")
-		})
+		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerTable, function() {
+		// 	$("#msg").html("Error - id must be a number")
+		// })
 	}
 
-	var idtable = new Object();
-	//populate the player -ID lookup table
-	function makePlayerTable(data) {
-		data = $.parseJSON(data);
-		for (x in data.data) {
-			var playerid = data.data[x].playerid;
-			var player = data.data[x].player.toLowerCase();
-			idtable[player] = playerid;
-		}
-		console.log(idtable)
-		$("#loading1").hide()
-	}
+	
 
 	//load the data for the player page with the cache
 	function load(name) {
 		//test if they are searching for ID or player name
 		if (!/^[0-9]+$/.test(name)) {
 			//make lower case to remove errors on incorrect capitalization
-			var id = idtable[name.toLowerCase()]
-			console.log(id)
-			console.log(idtable)
+			var ids = $.parseJSON(localStorage["idlookup"])
+			var players = $.parseJSON(localStorage["allplayers"])
+			var index = players.indexOf(name)
+			var id = ids[index]
 		} else {
 			var id = name;
 		}
@@ -702,14 +725,11 @@ angular.module('app.controllers', [])
 })
 
 .controller('customMatchCtrl', function($scope, $ionicPopup) {
-	// list of players for autofill
-	var players = [];
+
 	//no. of rounds
 	// var rounds = 3;
 	//if the submission is for a doubles game
 	// var doubles = false
-	//get player data for autocomplete
-	loadplayers();
 	setDateInput();
 	//set date input to current date/time
 	function setDateInput() {
@@ -725,23 +745,12 @@ angular.module('app.controllers', [])
 	//autocomplet function
 	$(function() {
 		$(".nameInput").autocomplete({
-			source: players
+			source: $parseJSON(localStorage["allplayers"]),
+			minLength: 3
 		});
 	});
 
-  	//get list of players data
-	function loadplayers(){
-		Cache.request("http://www.squashlevels.com/players.php?&all=&top=&perpage=-1&format=json", makePlayerArray, function() {
-			$("#msg").html("Error - AJAX failed")
-		})
-	}
-	//populate player array with data
-	function makePlayerArray(data) {
-		data = $.parseJSON(data);
-		for (var x = 0; x < data.data.length; x++) {
-			players[x] = data.data[x].player;
-		}
-	}
+  	
 	var score1 = [0, 0, 0, 0, 0]
 	var score2 = [0, 0, 0, 0, 0]
 	var scores = {
@@ -1090,6 +1099,7 @@ angular.module('app.controllers', [])
 		checkNames();
 	}
 	function checkNames() {
+		var players = $.parseJSON(localStorage["allplayers"])
 		if((($.inArray($("#name1").val(), players)) >= 0) && (($.inArray($("#name2").val(), players) >= 0))) {
 			clearPage() 
 		} else {
