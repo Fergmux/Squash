@@ -294,7 +294,7 @@ angular.module('app.controllers', [])
 				source: players,
 				minLength: 2
 			});
-		},500)
+		},3000)
 	}
 	// function makePlayerArray(data) {
 	// 	// make array of players for auto complete and id lookup - KEEP COMMENTS
