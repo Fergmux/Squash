@@ -225,290 +225,340 @@ angular.module('app.controllers', [])
 
 })
 
+
 .controller('findCtrl', function($scope, $rootScope) {
-	//only fires when page list first entered
-	$scope.$on('$ionicView.loaded', function () {
-		// if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
-		if (allplayers == undefined || idlookup == undefined) {
-			// loadNames()
-		}
-	})
-
-	$("#playerid").keyup(function(){loadAutocomplete()})
-
-	var allplayers
-	var idlookup
-
-	function loadNames() {
-		// to calculate the key
-		
-		console.log(key)
-		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
-		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
-		var data = $.ajax({
-            url: k
-        }).done(function(){
-            // makePlayerArray(data.responseText)
-            console.log("you")
-            loadAutocomplete()
-            makePlayerTable(data.responseText)
-        }).fail(function(){
-            
-        });
-		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
-		// 	$("#msg").html("Error - AJAX failed")
-		// })
-	}
-
-	function loadAutocomplete() {
-		console.log("fuck")
-		var time = new Date().getTime()/1000
-		var key = Math.round(Math.sqrt(time * 100) - 100)
-		var input = $("#playerid").val()
-		input = input.replace(" ", "+")
-		var time = new Date().getTime()/1000
-		key = Math.round(Math.sqrt(time * 100) - 100)
-		console.log(input)
-		var data = $.ajax({
-            url: "https://crossorigin.me/http://www.squashlevels.com/info.php?action=find&name="+input+"&key="+key+"&format=json&appid=SL2.0"
-        }).done(function(){
-            /* If request succeeds, insert data into cache and execute cache */
-            makePlayerArray(data)
-        }).fail(function(){
-		
-			$("#msg").html("Error - AJAX failed")
-		})
-	}
-	function makePlayerArray(data) {
-		console.log("you")
-		var players = []
-		console.log(data)
-		data = $.parseJSON(data.responseText);
-		console.log(data)
-		for (var x = 0; x < data.data.length; x++) {
-			players[x] = data.data[x].player;
-		}
-		console.log($("#playerid").val())
-		setTimeout(function(){
-			$("#playerid").autocomplete({
-				source: players,
-				minLength: 2
-			});
-		},3000)
-	}
-	// function makePlayerArray(data) {
-	// 	// make array of players for auto complete and id lookup - KEEP COMMENTS
-	// 	var players = []
-	// 	var data = $.ajax("http://www.badsquash.co.uk/info.php?action=find&name=j+smith&key="+key+"&format=json")
-	// 	data = $.parseJSON(data);
-	// 	for (var x = 0; x < data.data.length; x++) {
-	// 		players[x] = data.data[x].player;
-	// 	}
-	// 	// localStorage["allplayers"] = JSON.stringify(players) - KEEP
-	// 	allplayers = players
-	// 	$("#playerid").autocomplete({
-	// 		// source: $.parseJSON(localStorage["allplayers"]), - KEEP
-	// 		source: allplayers,
-	// 		minLength: 3
-	// 	});
-	// }
+	// $scope.$on('$ionicView.loaded', function () {
 	
-	function makePlayerTable(data) {
-		// make array of ids for player id lookup
-		var ids = []
-		data = $.parseJSON(data);
-		for (var x = 0; x < data.data.length; x++) {
-			ids[x] = data.data[x].playerid;
+	// })
+	/*
+	* Every time a key is typed, send output to url to return an
+	* autocomplete list of size 10
+	*/
+
+	// initialise search string, playerid lookup and player arrays as empty
+	var searchString = "";
+	var playerIdLookup = [];
+
+	$("#char_press").keydown(function(e) {
+		keypress = String.fromCharCode(e.keyCode);
+		// if backspace pressed remove last char
+		if(e.keyCode == 8) {
+			searchString = searchString.substring(0, searchString.length - 1);
+		} 
+		// if space pressed insert "+"
+		else if(e.keyCode == 32) {
+			searchString = searchString + "+";
+		} 
+		// else concat char pressed to search_string
+		else {
+			searchString = searchString + keypress;	
 		}
-		// localStorage["idlookup"] = JSON.stringify(ids) - KEEP
-		idlookup = ids
-		$("#loading1").hide()
-	}
-
-
-
-	//load in google charts
-	google.charts.load('current', {
-		packages: ['corechart']
+		searchString = searchString.toLowerCase();
+		console.log(searchString);
+		loadPlayerList(searchString);
 	});
-	google.charts.setOnLoadCallback(drawChart);
 
-	//when search button is pressed
-	$scope.onTap = function() {
-		//empty error message
-		$("#msg").empty();
-		//hide results
-		$("#results").hide();
-		$("#playerlist").hide();
-		$("#loading1").show();
+
+	/* function to get url key */
+	function getKey() {
+		var time = new Date().getTime()/1000;
+		return Math.round(Math.sqrt(time * 100) - 100);
+	}
+
+	/* creates list of players for autocomplete and id lookup */
+	function createAutoList(data) {
+		var playersArray = []
+		data = $.parseJSON(data);
+		for (var i = 0; i < data.data.length; i++) {
+			playersArray[i] = data.data[i].player;
+		}
+		// console.log(playersArray);
+
+		$("#char_press").autocomplete({
+			source: playersArray,
+			minLength: 2,
+			delay: 1000
+		})
+
+	}
+
+	/* make array of ids for player id lookup */
+	function createPlayerIdArray(data) {
+		var playerIds = []
+		data = $.parseJSON(data);
+		for(var i = 0; i < data.data.length; i++) {
+			playerIds[i] = data.data[i].playerid;
+		}
+		playerIdLookup = playerIds;
+		$("#loading1").hide();
+	}
+
+	/* loads list of players from squashlevels from input string */
+	function loadPlayerList(search_string) {
+		var key = "&key=" + getKey();
+		var search = "&name=" + search_string;
+		var proxy = "https://crossorigin.me/";
+		var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
+		// make request to squashlevels find url
+		var data = $.ajax({
+			url: request_url
+		}).done(function(){
+			createAutoList(data.responseText);
+			createPlayerIdArray(data.responseText);
+		}).fail(function(){
+			console.error("Ajax request failed!");
+		});
+	}
+
+	console.log(getKey());
+})
+
+// .controller('findCtrl', function($scope, $rootScope) {
+// 	//only fires when page list first entered
+// 	$scope.$on('$ionicView.loaded', function () {
+// 		// if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
+// 		if (allplayers == undefined || idlookup == undefined) {
+// 			loadnames()
+// 		}
+// 	})
+
+// 	var allplayers
+// 	var idlookup
+
+// 	function loadnames() {
+// 		// to calculate the key
+// 		var time = new Date().getTime()/1000
+// 		key = Math.round(Math.sqrt(time * 100) - 100)
+
+// 		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
+// 		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
+
+// 		console.log(key);
+// 		var data = $.ajax({
+//             url: k
+//         }).done(function(){
+//             makePlayerArray(data.responseText)
+//             makePlayerTable(data.responseText)
+//         }).fail(function(){
+            
+//         });
+// 		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerArray, function() {
+// 		// 	$("#msg").html("Error - AJAX failed")
+// 		// })
+// 	}
+
+// 	function makePlayerArray(data) {
+// 		// make array of players for auto complete and id lookup - KEEP COMMENTS
+// 		var players = []
+// 		data = $.parseJSON(data);
+// 		for (var x = 0; x < data.data.length; x++) {
+// 			players[x] = data.data[x].player;
+// 		}
+// 		// localStorage["allplayers"] = JSON.stringify(players) - KEEP
+// 		allplayers = players
+// 		$("#playerid").autocomplete({
+// 			// source: $.parseJSON(localStorage["allplayers"]), - KEEP
+// 			source: allplayers,
+// 			minLength: 3
+// 		});
+// 	}
+	
+// 	function makePlayerTable(data) {
+// 		// make array of ids for player id lookup
+// 		var ids = []
+// 		data = $.parseJSON(data);
+// 		for (var x = 0; x < data.data.length; x++) {
+// 			ids[x] = data.data[x].playerid;
+// 		}
+// 		// localStorage["idlookup"] = JSON.stringify(ids) - KEEP
+// 		idlookup = ids
+// 		$("#loading1").hide()
+// 	}
+
+
+
+// 	//load in google charts
+// 	google.charts.load('current', {
+// 		packages: ['corechart']
+// 	});
+// 	google.charts.setOnLoadCallback(drawChart);
+
+// 	//when search button is pressed
+// 	$scope.onTap = function() {
+// 		//empty error message
+// 		$("#msg").empty();
+// 		//hide results
+// 		$("#results").hide();
+// 		$("#playerlist").hide();
+// 		$("#loading1").show();
 		
-		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
-		var searchVal = $("#playerid").val().trim();
-		loadData(searchVal);
-	}
+// 		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
+// 		var searchVal = $("#playerid").val().trim();
+// 		loadnames(searchVal);
+// 	}
 
-	//calculates percentage change between levels
-	function percChange(lev_before, lev_after) {
-		var change = ((lev_before - lev_after) / lev_before) * 100;
-		if (change >= 0) {
-			return "+" + Number(change).toFixed(2) + "%";
-		} else {
-			return Number(change).toFixed(2) + "%";
-		}
-	}
+// 	//calculates percentage change between levels
+// 	function percChange(lev_before, lev_after) {
+// 		var change = ((lev_before - lev_after) / lev_before) * 100;
+// 		if (change >= 0) {
+// 			return "+" + Number(change).toFixed(2) + "%";
+// 		} else {
+// 			return Number(change).toFixed(2) + "%";
+// 		}
+// 	}
 
-	function readmatch(match) {
-		if (match.leaguetypeid) {
-			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
-		} else {
-			if (match.matchtypeid) {
-				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
-			} else {
-				// something went wrong
-				return ["error", "", "", "", ""];
-			}
-		}
-	}
+// 	function readmatch(match) {
+// 		if (match.leaguetypeid) {
+// 			return [format_date(match.dateint) ,match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+// 		} else {
+// 			if (match.matchtypeid) {
+// 				return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
+// 			} else {
+// 				// something went wrong
+// 				return ["error", "", "", "", ""];
+// 			}
+// 		}
+// 	}
 
-	function format_date(date_int) {
-		var date = new Date(date_int*1000);
-		var day = date.getDate();
-		var month = date.getMonth();
-		var year = date.getFullYear();
-		return day+'/'+month+'/'+year;
-	}
+// 	function format_date(date_int) {
+// 		var date = new Date(date_int*1000);
+// 		var day = date.getDate();
+// 		var month = date.getMonth();
+// 		var year = date.getFullYear();
+// 		return day+'/'+month+'/'+year;
+// 	}
 
-	function drawChart(chartdata) {
-		try {
-			var data = new google.visualization.DataTable();
-			data.addColumn('date', 'date');
-			data.addColumn('number', 'level');
+// 	function drawChart(chartdata) {
+// 		try {
+// 			var data = new google.visualization.DataTable();
+// 			data.addColumn('date', 'date');
+// 			data.addColumn('number', 'level');
 
-			for (var i = 0; i < chartdata.length; i++) {
-				date = new Date(chartdata[i][0]*1000)
-                data.addRow([date, chartdata[i][1]]);
-			}
-			var options = {
-				colors: ['blue'],
-				legend: {
-					position: 'none'
-				},
-				width: 450,
-				pointSize: 3,
-				hAxis: {
-					format: 'd MMM yy',
-					textStyle: {
-						fontSize: 10
-					}
-				},
-				vAxis: {
-					baseline: 0,
-				}
-			};
-			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
-			chart.draw(data, options);
-		} catch (err) {
-		}
-	}
+// 			for (var i = 0; i < chartdata.length; i++) {
+// 				date = new Date(chartdata[i][0]*1000)
+//                 data.addRow([date, chartdata[i][1]]);
+// 			}
+// 			var options = {
+// 				colors: ['blue'],
+// 				legend: {
+// 					position: 'none'
+// 				},
+// 				width: 450,
+// 				pointSize: 3,
+// 				hAxis: {
+// 					format: 'd MMM yy',
+// 					textStyle: {
+// 						fontSize: 10
+// 					}
+// 				},
+// 				vAxis: {
+// 					baseline: 0,
+// 				}
+// 			};
+// 			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+// 			chart.draw(data, options);
+// 		} catch (err) {
+// 		}
+// 	}
 
-	function chartData(match) {
-		if (match.dateint) {
-			return [match.dateint, match.level_after];
-		} else {
-			return ["error", "", "", "", ""];
-		}
-	}
+// 	function chartData(match) {
+// 		if (match.dateint) {
+// 			return [match.dateint, match.level_after];
+// 		} else {
+// 			return ["error", "", "", "", ""];
+// 		}
+// 	}
 
 
-	//display the player profile
-	function display(data) {
-		var data = $.parseJSON(data);
-		if (data.status == "good" || data.status == "warn") {
-			var name = data.data.summary.player;
-			var s = data.data.statistics;
+// 	//display the player profile
+// 	function display(data) {
+// 		var data = $.parseJSON(data);
+// 		if (data.status == "good" || data.status == "warn") {
+// 			var name = data.data.summary.player;
+// 			var s = data.data.statistics;
 
-			$("#tab-main").html(name);
-			$("#level").html("Level: " + s.end_level);
+// 			$("#tab-main").html(name);
+// 			$("#level").html("Level: " + s.end_level);
 
-			if(s.club_pos >= 0) {
-				$("#club_pos").html("Club Position: " + s.club_pos);
-			} else {
-				$("#club_pos").html("Club Position: N/A")
-			}
+// 			if(s.club_pos >= 0) {
+// 				$("#club_pos").html("Club Position: " + s.club_pos);
+// 			} else {
+// 				$("#club_pos").html("Club Position: N/A")
+// 			}
 			
 
-			$("#county_pos").html("County Position: " + s.county_pos);
-			$("#country_pos").html("Country Position: " + s.country_pos);
+// 			$("#county_pos").html("County Position: " + s.county_pos);
+// 			$("#country_pos").html("Country Position: " + s.country_pos);
 
-			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
-			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
-			$("#p_won").html("Points: <span class='green bold'>"+s.points_won+"<span>")
-			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
-			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
-			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
+// 			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
+// 			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
+// 			$("#p_won").html("Points: <span class='green bold'>"+s.points_won+"<span>")
+// 			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
+// 			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
+// 			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
 
-			var matches = data.data.matches;
-			var matchdata = [];
-			var chartdata = [];
-			for (var i = 0; i < matches.length; i++) {
-				var t = readmatch(matches[i]);
-				var c = chartData(matches[i]);
-				matchdata.push(t);
-				chartdata.push(c);
-			}
-			//define the table columns
-			$("#dtable").dataTable({
-				data: matchdata,
-				"bDestroy": true,
-				// add title for date
-				columns: [{
-					title: "Date"
-				}, {
-					title: "Opponent"
-				}, {
-					title: "Score"
-				}, {
-					title: "Level before"
-				}, {
-					title: "Level Change"
-				}]
-			});
+// 			var matches = data.data.matches;
+// 			var matchdata = [];
+// 			var chartdata = [];
+// 			for (var i = 0; i < matches.length; i++) {
+// 				var t = readmatch(matches[i]);
+// 				var c = chartData(matches[i]);
+// 				matchdata.push(t);
+// 				chartdata.push(c);
+// 			}
+// 			//define the table columns
+// 			$("#dtable").dataTable({
+// 				data: matchdata,
+// 				"bDestroy": true,
+// 				// add title for date
+// 				columns: [{
+// 					title: "Date"
+// 				}, {
+// 					title: "Opponent"
+// 				}, {
+// 					title: "Score"
+// 				}, {
+// 					title: "Level before"
+// 				}, {
+// 					title: "Level Change"
+// 				}]
+// 			});
 
-			$("#loading1").hide();
-			$("#results").show();
-			$("#tab-main").html(drawChart(chartdata));
-		} else {
-			$("#loading1").hide();
-			$("#msg").html("Error - " + data.user_message);
-		}
-	}
+// 			$("#loading1").hide();
+// 			$("#results").show();
+// 			$("#tab-main").html(drawChart(chartdata));
+// 		} else {
+// 			$("#loading1").hide();
+// 			$("#msg").html("Error - " + data.user_message);
+// 		}
+// 	}
 
-	//load the lookup table data for all players - ID ---------- KEEP
- 	// function loadlookup() { --------------------------------- KEEP ALL
-		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerTable, function() {
-		// 	$("#msg").html("Error - id must be a number")
-		// })
-	// }
+// 	//load the lookup table data for all players - ID ---------- KEEP
+//  	// function loadlookup() { --------------------------------- KEEP ALL
+// 		// Cache.request("http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json", makePlayerTable, function() {
+// 		// 	$("#msg").html("Error - id must be a number")
+// 		// })
+// 	// }
 
-	//load the data for the player page with the cache
-	function loadData(name) {
-		//test if they are searching for ID or player name
-		if (!/^[0-9]+$/.test(name)) {
-			// var ids = $.parseJSON(localStorage["idlookup"]) KEEP
-			var ids = idlookup
-			// var players = $.parseJSON(localStorage["allplayers"]) KEEP
-			var players = allplayers
+// 	//load the data for the player page with the cache
+// 	function loadData(name) {
+// 		//test if they are searching for ID or player name
+// 		if (!/^[0-9]+$/.test(name)) {
+// 			// var ids = $.parseJSON(localStorage["idlookup"]) KEEP
+// 			var ids = idlookup
+// 			// var players = $.parseJSON(localStorage["allplayers"]) KEEP
+// 			var players = allplayers
 
-			var index = players.indexOf(name)
-			var id = ids[index]
-		} else {
-			var id = name;
-		}
-		Cache.request("http://squashlevels.com/player_detail.php?player=" + id + "&check=1&show=all&format=json", display, function() {
-				$("#msg").html("Error in AJAX request.");
-			})
-	}
-})
+// 			var index = players.indexOf(name)
+// 			var id = ids[index]
+// 		} else {
+// 			var id = name;
+// 		}
+// 		Cache.request("http://squashlevels.com/player_detail.php?player=" + id + "&check=1&show=all&format=json", display, function() {
+// 				$("#msg").html("Error in AJAX request.");
+// 			})
+// 	}
+// })
 
 // SquashLevels tab: displays player rankings with filters
 .controller('rankingsCtrl', function($scope, $rootScope, $state) {
