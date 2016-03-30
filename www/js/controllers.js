@@ -230,24 +230,27 @@ angular.module('app.controllers', [])
 	$scope.$on('$ionicView.loaded', function () {
 		// if (localStorage["allplayers"] == undefined || localStorage["idlookup"] == undefined) {
 		if (allplayers == undefined || idlookup == undefined) {
-			loadnames()
+			// loadNames()
 		}
 	})
+
+	$("#playerid").keyup(function(){loadAutocomplete()})
 
 	var allplayers
 	var idlookup
 
-	function loadnames() {
+	function loadNames() {
 		// to calculate the key
-		var time = new Date().getTime()/1000
-		key = Math.round(Math.sqrt(time * 100) - 100)
-
+		
+		console.log(key)
 		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
 		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
 		var data = $.ajax({
             url: k
         }).done(function(){
-            makePlayerArray(data.responseText)
+            // makePlayerArray(data.responseText)
+            console.log("you")
+            loadAutocomplete()
             makePlayerTable(data.responseText)
         }).fail(function(){
             
@@ -257,21 +260,58 @@ angular.module('app.controllers', [])
 		// })
 	}
 
+	function loadAutocomplete() {
+		console.log("fuck")
+		var time = new Date().getTime()/1000
+		var key = Math.round(Math.sqrt(time * 100) - 100)
+		var input = $("#playerid").val()
+		input = input.replace(" ", "+")
+		var time = new Date().getTime()/1000
+		key = Math.round(Math.sqrt(time * 100) - 100)
+		console.log(input)
+		var data = $.ajax({
+            url: "https://crossorigin.me/http://www.squashlevels.com/info.php?action=find&name="+input+"&key="+key+"&format=json&appid=SL2.0"
+        }).done(function(){
+            /* If request succeeds, insert data into cache and execute cache */
+            makePlayerArray(data)
+        }).fail(function(){
+		
+			$("#msg").html("Error - AJAX failed")
+		})
+	}
 	function makePlayerArray(data) {
-		// make array of players for auto complete and id lookup - KEEP COMMENTS
+		console.log("you")
 		var players = []
-		data = $.parseJSON(data);
+		console.log(data)
+		data = $.parseJSON(data.responseText);
+		console.log(data)
 		for (var x = 0; x < data.data.length; x++) {
 			players[x] = data.data[x].player;
 		}
-		// localStorage["allplayers"] = JSON.stringify(players) - KEEP
-		allplayers = players
-		$("#playerid").autocomplete({
-			// source: $.parseJSON(localStorage["allplayers"]), - KEEP
-			source: allplayers,
-			minLength: 3
-		});
+		console.log($("#playerid").val())
+		setTimeout(function(){
+			$("#playerid").autocomplete({
+				source: players,
+				minLength: 2
+			});
+		},500)
 	}
+	// function makePlayerArray(data) {
+	// 	// make array of players for auto complete and id lookup - KEEP COMMENTS
+	// 	var players = []
+	// 	var data = $.ajax("http://www.badsquash.co.uk/info.php?action=find&name=j+smith&key="+key+"&format=json")
+	// 	data = $.parseJSON(data);
+	// 	for (var x = 0; x < data.data.length; x++) {
+	// 		players[x] = data.data[x].player;
+	// 	}
+	// 	// localStorage["allplayers"] = JSON.stringify(players) - KEEP
+	// 	allplayers = players
+	// 	$("#playerid").autocomplete({
+	// 		// source: $.parseJSON(localStorage["allplayers"]), - KEEP
+	// 		source: allplayers,
+	// 		minLength: 3
+	// 	});
+	// }
 	
 	function makePlayerTable(data) {
 		// make array of ids for player id lookup
@@ -304,7 +344,7 @@ angular.module('app.controllers', [])
 		
 		//get value from search box, trim removes leading/trailing whitespace as some smartphone keyboards add spaces after names
 		var searchVal = $("#playerid").val().trim();
-		load(searchVal);
+		loadData(searchVal);
 	}
 
 	//calculates percentage change between levels
@@ -444,7 +484,7 @@ angular.module('app.controllers', [])
 	// }
 
 	//load the data for the player page with the cache
-	function load(name) {
+	function loadData(name) {
 		//test if they are searching for ID or player name
 		if (!/^[0-9]+$/.test(name)) {
 			// var ids = $.parseJSON(localStorage["idlookup"]) KEEP
@@ -654,7 +694,7 @@ angular.module('app.controllers', [])
 		// work out key
 		var time = new Date().getTime()/1000
 		key = Math.round(Math.sqrt(time * 100) - 100)
-
+		console.log(key)
 		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
 		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
 		var data = $.ajax({
@@ -1284,6 +1324,8 @@ angular.module('app.controllers', [])
 	//display the player profile
 	function display(data) {
 		var data = $.parseJSON(data);
+		$("#results").show();
+		console.log(data)
 		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
