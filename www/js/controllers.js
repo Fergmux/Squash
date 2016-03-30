@@ -429,7 +429,14 @@ angular.module('app.controllers', [])
 
 			$("#tab-main").html(name);
 			$("#level").html("Level: " + s.end_level);
-			$("#club_pos").html("Club Position: " + s.club_pos);
+
+			if(s.club_pos >= 0) {
+				$("#club_pos").html("Club Position: " + s.club_pos);
+			} else {
+				$("#club_pos").html("Club Position: N/A")
+			}
+			
+
 			$("#county_pos").html("County Position: " + s.county_pos);
 			$("#country_pos").html("Country Position: " + s.country_pos);
 
@@ -1151,7 +1158,7 @@ angular.module('app.controllers', [])
             content: text
         })
 	}
-	//check wether the scores inputted are valid
+	//check whether the scores inputted are valid
 	// function checkValid(val, check) {
 	// 	//if some scores have not been entered
 	// 	if (check == undefined || val == undefined) {
@@ -1235,9 +1242,10 @@ angular.module('app.controllers', [])
 })
 
 
-
+/* Controller for all player profiles */
 .controller('playerProfilesCtrl', function($scope, $rootScope) {
 
+	/* Load page when player link is tapped and make request to cache */
 	$scope.$on('$ionicView.enter', function() {
 		var playerid = $rootScope.tapped
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
@@ -1245,7 +1253,14 @@ angular.module('app.controllers', [])
 		})
 	});
 
-	//calculates percentage change between levels
+	/* Load in google charts library for level history charts */
+	google.charts.load('current', {
+		packages: ['corechart']
+	});
+	/* Draws chart */
+	google.charts.setOnLoadCallback(drawChart);
+
+	/* function to calculate percentage change between levels */
 	function percChange(lev_before, lev_after) {
 		var change = ((lev_before - lev_after) / lev_before) * 100;
 		if (change >= 0) {
@@ -1255,8 +1270,19 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	function readmatch(match) {
+	/* function to format a date with a UNIX time date input */
+	function format_date(date_int) {
+		// creates date object in, *1000 as js uses ms
+		var date = new Date(date_int * 1000);
+		var day = date.getDate();
+		var month = date.getMonth();
+		var year = date.getFullYear();
+		// return in desired format
+		return day + '/' + month + '/' + year;
+	}
 
+	/* function to read match data, ready to be placed in a table */
+	function readmatch(match) {
 		if (match.leaguetypeid) {
 			return [format_date(match.dateint), match.opponent, match.games_score, match.level_before, percChange(match.level_before, match.level_after)];
 		} else {
@@ -1269,32 +1295,34 @@ angular.module('app.controllers', [])
 		}
 	}
 
-	function format_date(date_int) {
-		var date = new Date(date_int * 1000);
-
-		var day = date.getDate();
-		var month = date.getMonth();
-		var year = date.getFullYear();
-		return day + '/' + month + '/' + year;
+	/* formats player chart data ready to be inputted */
+	function chartData(match) {
+		if (match.dateint) {
+			return [match.dateint, match.level_after];
+		} else {
+			return ["error", "", "", "", ""];
+		}
 	}
 
+	/* function to draw level history chart w/ Google charts library */
 	function drawChart(chartdata) {
 		try {
 			var data = new google.visualization.DataTable();
+			// set data columns
 			data.addColumn('date', 'date');
 			data.addColumn('number', 'level');
-
+			// input players chart data as rows
 			for (var i = 0; i < chartdata.length; i++) {
 				date = new Date(chartdata[i][0] * 1000)
 				data.addRow([date, chartdata[i][1]]);
 			}
+			// set chart options
 			var options = {
 				title: 'Level History',
 				colors: ['blue'],
 				legend: {
 					position: 'none'
 				},
-				width: 380,
 				pointSize: 3,
 				hAxis: {
 					format: 'd MMM yy',
@@ -1306,52 +1334,54 @@ angular.module('app.controllers', [])
 					baseline: 0,
 				}
 			};
-			var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
-			chart.draw(data, options);
-		} catch (err) {
+			/* function called on a window resize redrawing the chart */
+			function resize() {
+				var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
+				chart.draw(data, options);	
+			}
+			window.onload = resize();
+			window.onresize = resize;
+
+		} 
+		//throw error if chart fails
+		catch (err) {
 		}
 	}
 
-	function chartData(match) {
-		if (match.dateint) {
-			return [match.dateint, match.level_after];
-		} else {
-			return ["error", "", "", "", ""];
-		}
-	}
-
-
-	//display the player profile
+	/* function to display player data */
 	function display(data) {
 		var data = $.parseJSON(data);
-		$("#results").show();
-		console.log(data)
+		// check data status is good
 		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
+			var stats = data.data.statistics;
 
-			
+			// main player tab displays player name, level and rankings
 			$("#tab-main").html(name);
+		
+			// display player level	
 			$("#level").html("Level: " + level);
+			// display club ranking if player is in a club (club_pos > 0)
+			if(stats.club_pos >= 0) {
+				$("#club_pos").html("Club Position: " + stats.club_pos);
+			} else {
+				$("#club_pos").html("Club Position: N/A")
+			}
+			// display county and country position
+			$("#county_pos").html("County Position: " + stats.county_pos);
+			$("#country_pos").html("Country Position: " + stats.country_pos);
+			
+			// displays games, matches, points which are won and lost
+			$("#m_won").html("Matches: <span class='green bold'>"+stats.matches_won+"<span>")
+			$("#g_won").html("Games: <span class='green bold'>"+stats.games_won+"<span>")
+			$("#p_won").html("Points: <span class='green bold'>"+stats.points_won+"<span>")
+			$("#m_lost").html("Matches: <span class='red bold'>"+stats.matches_lost+"<span>")
+			$("#g_lost").html("Games: <span class='red bold'>"+stats.games_lost+"<span>")
+			$("#p_lost").html("Points: <span class='red bold'>"+stats.points_lost+"<span>")
 
-
-			//TODO: find better way			
-			var s = data.data.statistics;
-			//displays club ranking
-			$("#club_pos").html("Club Position: " + s.club_pos);
-			$("#county_pos").html("County Position: " + s.county_pos);
-			$("#country_pos").html("Country Position: " + s.country_pos);
-			//displays league ranking and which league
-
-			$("#m_won").html("Matches: <span class='green bold'>"+s.matches_won+"<span>")
-			$("#g_won").html("Games: <span class='green bold'>"+s.games_won+"<span>")
-			$("#p_won").html("Points: <span class='green bold'>"+s.points_won+"<span>")
-			$("#m_lost").html("Matches: <span class='red bold'>"+s.matches_lost+"<span>")
-			$("#g_lost").html("Games: <span class='red bold'>"+s.games_lost+"<span>")
-			$("#p_lost").html("Points: <span class='red bold'>"+s.points_lost+"<span>")
-
-
+			// push data for matches and charts to respective functions
 			var matches = data.data.matches;
 			var matchdata = [];
 			var chartdata = [];
@@ -1361,7 +1391,8 @@ angular.module('app.controllers', [])
 				matchdata.push(t);
 				chartdata.push(c);
 			}
-			//define the table columns
+
+			// define jQuery table columns
 			$("#dtable").dataTable({
 				data: matchdata,
 				"bDestroy": true,
@@ -1377,6 +1408,7 @@ angular.module('app.controllers', [])
 					title: "Level Change"
 				}]
 			});
+
 			$("#loading5").hide();
 			$("#results").show();
 			$("#tab-main").html(drawChart(chartdata));
@@ -1385,10 +1417,6 @@ angular.module('app.controllers', [])
 			$("#msg").html("Error - " + data.user_message);
 		}
 	}
-
-
-
-
 })
 
 .controller('matchDataCtrl', function($scope, $rootScope) {
