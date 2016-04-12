@@ -37,9 +37,11 @@
             </div>
             <h2 class="title tabheader"> Matches </h2>
             <div id="tab-matches">
-                <ion-scroll direction="xy" style="height: 500px">
-                    <table id="dtable" class="display cell-border" width="100%"></table>
-                </ion-scroll>
+                <ion-list>
+                        <ion-item ng-repeat="match in matches" ng-click="load(match.index)" style="color:{{match.color}}">
+                            {{match.name}}<div style='float:right'>{{match.score}}</div>
+                        </ion-item>
+                </ion-list>
             </div>
         </div>
         <div style="height:30px"></div>
