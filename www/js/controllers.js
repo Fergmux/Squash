@@ -15,10 +15,13 @@ angular.module('app.controllers', [])
 	    disableBack: true
 	});
 
-	var storedemail = $.parseJSON(localStorage.getItem("email"))
-	var storedpass = $.parseJSON(localStorage.getItem("password"))
+	var storedemail;
+	var storedpass;
 
-	$scope.$on('$ionicView.loaded', function () {
+	$scope.$on('$ionicView.enter', function () {
+		storedemail = $.parseJSON(localStorage.getItem("email"))
+		storedpass = $.parseJSON(localStorage.getItem("password"))
+		console.log(storedemail,storedpass)
 		if (storedemail != undefined || storedpass != undefined) {
 			login(storedemail, storedpass)
 		}
@@ -69,10 +72,14 @@ angular.module('app.controllers', [])
 })
 
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
+	
 
 	$scope.$on('$ionicView.enter', function() {
+		var storedemail = $.parseJSON(localStorage.getItem("email"))
+		var storedpass = $.parseJSON(localStorage.getItem("password"))
+		console.log(storedemail,storedpass)
 		// if no log in details found, go to log in page, and disable back button, otherwise load user details
-		if ($.parseJSON(localStorage["email"]) == undefined && $.parseJSON(localStorage["password"]) == undefined) {
+		if (storedemail == undefined && storedpass == undefined) {
 			$ionicHistory.nextViewOptions({
 				disableBack: true
 			});
@@ -229,6 +236,16 @@ angular.module('app.controllers', [])
 		$state.go('squashLevels.matchData')
 	}
 
+	var playerIds = []
+			playerIds[i] = data.data[i].playerid;
+	$scope.onTap = function() {
+		console.log('tapped')
+		var index = playersArray.indexOf($("#char_press").val())
+		// console.log(playersArray, $("char_press").val())
+		$rootScope.tapped = playerIds[index];
+		// console.log(index,playerIds)
+		$state.go('squashLevels.playerProfiles')
+	}
 })
 
 // .controller('findCtrl', function($scope, $rootScope) {
@@ -889,6 +906,7 @@ angular.module('app.controllers', [])
 	/* Load page when player link is tapped and make request to cache */
 	$scope.$on('$ionicView.enter', function() {
 		var playerid = $rootScope.tapped
+		console.log(playerid)
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
@@ -968,7 +986,9 @@ angular.module('app.controllers', [])
 	function display(data) {
 		var data = $.parseJSON(data);
 		// check data status is good
+		console.log(data)
 		if (data.status == "good" || data.status == "warn") {
+
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
@@ -1164,4 +1184,18 @@ angular.module('app.controllers', [])
 		$("#loading2").hide()
 	}
 
+})
+
+.controller('sideMenuCtrl', function($scope, $rootScope) {
+	var storedemail
+	var storedpass
+	$scope.$on('$ionicView.enter', function () {
+		storedemail = $.parseJSON(localStorage.getItem("email"))
+		storedpass = $.parseJSON(localStorage.getItem("password"))
+		if (storedemail != undefined && storedpass != undefined) {
+			$('#menulogin').hide();
+		} else {
+			$('#menulogin').show();
+		}
+	})
 })
