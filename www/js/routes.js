@@ -12,7 +12,8 @@ angular.module('app.routes', [])
     .state('squashLevels', {
       url: '/side-menu21',
       abstract:true,
-      templateUrl: 'templates/squashLevels.html'
+      templateUrl: 'templates/squashLevels.html',
+      controller: 'sideMenuCtrl'
     })
       
     

@@ -9,10 +9,13 @@ angular.module('app.controllers', [])
 	    disableBack: true
 	});
 
-	var storedemail = $.parseJSON(localStorage.getItem("email"))
-	var storedpass = $.parseJSON(localStorage.getItem("password"))
+	var storedemail;
+	var storedpass;
 
-	$scope.$on('$ionicView.loaded', function () {
+	$scope.$on('$ionicView.enter', function () {
+		storedemail = $.parseJSON(localStorage.getItem("email"))
+		storedpass = $.parseJSON(localStorage.getItem("password"))
+		console.log(storedemail,storedpass)
 		if (storedemail != undefined || storedpass != undefined) {
 			login(storedemail, storedpass)
 		}
@@ -63,10 +66,14 @@ angular.module('app.controllers', [])
 })
 
 .controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicHistory) {
+	
 
 	$scope.$on('$ionicView.enter', function() {
+		var storedemail = $.parseJSON(localStorage.getItem("email"))
+		var storedpass = $.parseJSON(localStorage.getItem("password"))
+		console.log(storedemail,storedpass)
 		// if no log in details found, go to log in page, and disable back button, otherwise load user details
-		if ($.parseJSON(localStorage["email"]) == undefined && $.parseJSON(localStorage["password"]) == undefined) {
+		if (storedemail == undefined && storedpass == undefined) {
 			$ionicHistory.nextViewOptions({
 				disableBack: true
 			});
@@ -226,7 +233,7 @@ angular.module('app.controllers', [])
 })
 
 
-.controller('findCtrl', function($scope, $rootScope) {
+.controller('findCtrl', function($scope, $rootScope, $state) {
 	// $scope.$on('$ionicView.loaded', function () {
 	
 	// })
@@ -237,7 +244,8 @@ angular.module('app.controllers', [])
 
 	// initialise search string, playerid lookup and player arrays as empty
 	var searchString = "";
-	var playerIdLookup = [];
+	var playersArray = []
+	var playerIds = []
 
 	$("#char_press").keydown(function(e) {
 		keypress = String.fromCharCode(e.keyCode);
@@ -265,31 +273,20 @@ angular.module('app.controllers', [])
 		return Math.round(Math.sqrt(time * 100) - 100);
 	}
 
-	/* creates list of players for autocomplete and id lookup */
-	function createAutoList(data) {
-		var playersArray = []
+	/* make array of ids for player id lookup */
+	function createPlayerIdArray(data) {
 		data = $.parseJSON(data);
-		for (var i = 0; i < data.data.length; i++) {
+		for(var i = 0; i < data.data.length; i++) {
+			playerIds[i] = data.data[i].playerid;
 			playersArray[i] = data.data[i].player;
 		}
-		// console.log(playersArray);
-
+		console.log(playerIds)
+		console.log(playersArray)
 		$("#char_press").autocomplete({
 			source: playersArray,
 			minLength: 2,
 			delay: 1000
 		})
-
-	}
-
-	/* make array of ids for player id lookup */
-	function createPlayerIdArray(data) {
-		var playerIds = []
-		data = $.parseJSON(data);
-		for(var i = 0; i < data.data.length; i++) {
-			playerIds[i] = data.data[i].playerid;
-		}
-		playerIdLookup = playerIds;
 		$("#loading1").hide();
 	}
 
@@ -303,13 +300,20 @@ angular.module('app.controllers', [])
 		var data = $.ajax({
 			url: request_url
 		}).done(function(){
-			createAutoList(data.responseText);
 			createPlayerIdArray(data.responseText);
 		}).fail(function(){
 			console.error("Ajax request failed!");
 		});
 	}
 
+	$scope.onTap = function() {
+		console.log('tapped')
+		var index = playersArray.indexOf($("#char_press").val())
+		// console.log(playersArray, $("char_press").val())
+		$rootScope.tapped = playerIds[index];
+		// console.log(index,playerIds)
+		$state.go('squashLevels.playerProfiles')
+	}
 	console.log(getKey());
 })
 
@@ -1298,6 +1302,7 @@ angular.module('app.controllers', [])
 	/* Load page when player link is tapped and make request to cache */
 	$scope.$on('$ionicView.enter', function() {
 		var playerid = $rootScope.tapped
+		console.log(playerid)
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
@@ -1402,7 +1407,9 @@ angular.module('app.controllers', [])
 	function display(data) {
 		var data = $.parseJSON(data);
 		// check data status is good
+		console.log(data)
 		if (data.status == "good" || data.status == "warn") {
+
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
@@ -1480,6 +1487,7 @@ angular.module('app.controllers', [])
 
 	function displayMatch(data) {
 		data = $.parseJSON(data);
+		// console.log(data)
 		var index = $rootScope.matchindex
 		var thisMatch = data.data.matches[index]
 		var matchDate = new Date(thisMatch.dateint * 1000)
@@ -1556,4 +1564,18 @@ angular.module('app.controllers', [])
 		$("#loading2").hide()
 	}
 
+})
+
+.controller('sideMenuCtrl', function($scope, $rootScope) {
+	var storedemail
+	var storedpass
+	$scope.$on('$ionicView.enter', function () {
+		storedemail = $.parseJSON(localStorage.getItem("email"))
+		storedpass = $.parseJSON(localStorage.getItem("password"))
+		if (storedemail != undefined && storedpass != undefined) {
+			$('#menulogin').hide();
+		} else {
+			$('#menulogin').show();
+		}
+	})
 })
