@@ -1,3 +1,9 @@
+
+	/* Load in google charts library for level history charts */
+	google.charts.load('current', {
+		packages: ['corechart']
+	});
+
 angular.module('app.controllers', [])
 
 .controller('loginCtrl', function($scope, $rootScope, $state, $ionicHistory, $window) {
@@ -597,17 +603,22 @@ angular.module('app.controllers', [])
 			for (var i = 0; i < rankData.length; i++) {
 				var info = rankData[i];
 				$scope.players[i] = {
-				    name: info.position + ". " + info.player + " - " + info.level,
+				    name: info.position + ". " + info.player,
+				    level: info.level,
 				    id: info.playerid
 				};
+				
 			}
-			$scope.$apply();
+			
+			$("#ranklist").players;
 			$("#loading4").hide();
 			$("#tabs").show();
 		} else {
 			$("#msg").html("Error - No results for your query");
 		}
 	}
+
+
 
 	$scope.tapped = function(id) {
 		$rootScope.tapped = id
@@ -1303,10 +1314,7 @@ angular.module('app.controllers', [])
 		})
 	});
 
-	/* Load in google charts library for level history charts */
-	google.charts.load('current', {
-		packages: ['corechart']
-	});
+
 	/* Draws chart */
 	google.charts.setOnLoadCallback(drawChart);
 
