@@ -1544,15 +1544,16 @@
 	   	<div id="loading4" style="text-align:center; margin-top: 20px"><img src="../img/ajax-loader.gif"></img></div>
 
 	    <div id="tabs" style="display:none">
-			<h2 class="title tabheader"> Rank </h2>
+			<h4 class="title tabheader" style='float: right; width: 49%; text-align: right' > Level </h4>
+			<h4 class = "title tabheader" style='float: left; width: 49%'> Name </h4>
 	 		<ion-list>
-			    <div ng-repeat="player in players">
+	 		   <div ng-repeat="player in players">
 			      <ion-item class="item-stable" ng-click="tapped(player.id)">
-			        {{player.name}}
+			        {{player.name}}<div style='float:right'>{{player.level}}</div>
 			      </ion-item>
 			    </div>
 	      	</ion-list>
-		    <ul id="ranklist"></ul>
+	    
 	    </div>
 
 	</ion-content>
