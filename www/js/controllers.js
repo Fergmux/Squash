@@ -21,7 +21,7 @@ angular.module('app.controllers', [])
 	$scope.$on('$ionicView.enter', function () {
 		storedemail = $.parseJSON(localStorage.getItem("email"))
 		storedpass = $.parseJSON(localStorage.getItem("password"))
-		console.log(storedemail,storedpass)
+		// console.log(storedemail,storedpass)
 		if (storedemail != undefined || storedpass != undefined) {
 			login(storedemail, storedpass)
 		}
@@ -98,7 +98,7 @@ angular.module('app.controllers', [])
 		})
 	}
 
-	    /* Draws chart */
+	/* Draws chart */
     google.charts.setOnLoadCallback(drawChart);
 
     /* function to format a date with a UNIX time date input */
@@ -212,16 +212,16 @@ angular.module('app.controllers', [])
             }
 
             // list to store match results on player profiles   
-            $scope.matches = []
+            $scope.matches = [];
             //populating the list of past matches
             for (var i = 0; i < matches.length; i++) {
                 // find scores of the games, to work out who won
-                var scores = matches[i].games_score.split("-")
+                var scores = matches[i].games_score.split("-");
                 // console.log(matches[i]);
-                var color = "red"
+                var color = "red";
                 // if they won then make it green, else stays red
                 if (scores[0] > scores[1]) {
-                    color = "green"
+                    color = "green";
                 }
                 // add match outcome in the list and perhaps level change   
                 console.log(matches[i].games_score);    
@@ -234,10 +234,10 @@ angular.module('app.controllers', [])
                     index: i
                 }
             }
-            $scope.$apply()
+            $scope.$apply();
 
-            $("#content3").show()
-            $("#loading3").hide()
+            $("#content3").show();
+            $("#loading3").hide();
 
             
 
@@ -328,7 +328,7 @@ angular.module('app.controllers', [])
 	function loadPlayerList(search_string) {
 		var key = "&key=" + getKey();
 		var search = "&name=" + search_string;
-		var proxy = "https://crossorigin.me/";
+		var proxy = "https://cors-anywhere.herokuapp.com/";
 		var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
 		var data = $.ajax({
