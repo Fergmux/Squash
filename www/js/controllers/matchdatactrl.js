@@ -21,7 +21,6 @@ starter.controller('matchDataCtrl', function($scope, $rootScope) {
 		data = $.parseJSON(data);
 		var index = $rootScope.matchindex;
 		var thisMatch = data.data.matches[index];
-		console.log(data.data.summary.player);
 		var playerName = data.data.summary.player;
 		var matchDate = new Date(thisMatch.dateint * 1000);
 		var month = matchDate.getMonth() + 1;
