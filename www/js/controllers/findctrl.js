@@ -66,7 +66,7 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 	function loadPlayerList(search_string) {
 		var key = "&key=" + getKey();
 		var search = "&name=" + search_string;
-		var proxy = "https://cors-anywhere.herokuapp.com/";
+		var proxy = "http://localhost:8080/";
 		var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
 		var data = $.ajax({
