@@ -1,33 +1,18 @@
 starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 
-	/* Load page when player link is tapped and make request to cache */
+	// get player id and make a request to the cache
 	$scope.$on('$ionicView.enter', function() {
-		$("#msg").html();
-		var playerid = $rootScope.tapped
-		console.log(playerid)
-		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
+		var playerId = $rootScope.tapped;
+		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerId + "&show=last10&format=json", displayPlayerData, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
 	});
 
-
-	/* Draws chart */
+	// draw chart through google charting lib
 	google.charts.setOnLoadCallback(drawChart);
 
-	/* function to format a date with a UNIX time date input */
-	function format_date(date_int) {
-		// creates date object in, *1000 as js uses ms
-		var date = new Date(date_int * 1000);
-		var day = date.getDate();
-		var month = date.getMonth();
-		var year = date.getFullYear();
-		// return in desired format
-		return day + '/' + month + '/' + year;
-	}
-
-
-	/* formats player chart data ready to be inputted */
-	function chartData(match) {
+	// formats player chart data ready to be inputted 
+	function formatChart(match) {
 		if (match.dateint) {
 			return [match.dateint, match.level_after];
 		} else {
@@ -35,17 +20,17 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 		}
 	}
 
-	/* function to draw level history chart w/ Google charts library */
-	function drawChart(chartdata) {
+	// input chart data and draw levelhist chart
+	function drawChart(chartData) {
 		try {
 			var data = new google.visualization.DataTable();
 			// set data columns
 			data.addColumn('date', 'date');
 			data.addColumn('number', 'level');
 			// input players chart data as rows
-			for (var i = 0; i < chartdata.length; i++) {
-				date = new Date(chartdata[i][0] * 1000)
-				data.addRow([date, chartdata[i][1]]);
+			for (var i = 0; i < chartData.length; i++) {
+				date = new Date(chartData[i][0] * 1000);
+				data.addRow([date, chartData[i][1]]);
 			}
 			// set chart options
 			var options = {
@@ -65,14 +50,16 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 					baseline: 0,
 				}
 			};
-			/* function called on a window resize redrawing the chart */
+
+			// function called on page resize redrawing the graph
 			function resize() {
 				var chart = new google.visualization.LineChart(document.getElementById('line_chart'));
 				chart.draw(data, options);
 			}
+
+			// resize graph on windows resize
 			window.onload = resize();
 			window.onresize = resize;
-
 		}
 		//throw error if chart fails
 		catch (err) {
@@ -80,13 +67,12 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 		}
 	}
 
-	/* function to display player data */
-	function display(data) {
+	// function to pull in player data and format it ready to display
+	function displayPlayerData(data) {
 		var data = $.parseJSON(data);
-		// check data status is good
-		console.log(data)
-		if (data.status == "good" || data.status == "warn") {
 
+		// check data status is good
+		if (data.status == "good" || data.status == "warn") {
 			var id = data.data.summary.playerid;
 			var name = data.data.summary.player;
 			var level = data.data.statistics.end_level;
@@ -94,50 +80,44 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 
 			// main player tab displays player name, level and rankings
 			$("#tab-main").html(name);
-
-			// display player level
 			$("#level").html("Level: " + level);
-			// display club ranking if player is in a club (club_pos > 0)
+			// display club ranking if player is in a club (-1 returned if not in a club)
 			if(stats.club_pos >= 0) {
 				$("#club_pos").html("Club Position: " + stats.club_pos);
 			} else {
-				$("#club_pos").html("Club Position: N/A")
+				$("#club_pos").html("Club Position: N/A");
 			}
 			// display county and country position
 			$("#county_pos").html("County Position: " + stats.county_pos);
 			$("#country_pos").html("Country Position: " + stats.country_pos);
-
-			// displays games, matches, points which are won and lost
-			$("#m_won").html("Matches: <span class='green bold'>"+stats.matches_won+"<span>")
-			$("#g_won").html("Games: <span class='green bold'>"+stats.games_won+"<span>")
-			$("#p_won").html("Points: <span class='green bold'>"+stats.points_won+"<span>")
-			$("#m_lost").html("Matches: <span class='red bold'>"+stats.matches_lost+"<span>")
-			$("#g_lost").html("Games: <span class='red bold'>"+stats.games_lost+"<span>")
-			$("#p_lost").html("Points: <span class='red bold'>"+stats.points_lost+"<span>")
-
+			// display games, matches, points which are won and lost
+			$("#m_won").html("Matches: <span class='green bold'>"+stats.matches_won+"<span>");
+			$("#g_won").html("Games: <span class='green bold'>"+stats.games_won+"<span>");
+			$("#p_won").html("Points: <span class='green bold'>"+stats.points_won+"<span>");
+			$("#m_lost").html("Matches: <span class='red bold'>"+stats.matches_lost+"<span>");
+			$("#g_lost").html("Games: <span class='red bold'>"+stats.games_lost+"<span>");
+			$("#p_lost").html("Points: <span class='red bold'>"+stats.points_lost+"<span>");
+			
 			// push data for matches and charts to respective functions
 			var matches = data.data.matches;
-			var matchdata = [];
-			var chartdata = [];
+			var chartDataArray = [];
 			for (var i = 0; i < matches.length; i++) {
-				var c = chartData(matches[i]);
-				chartdata.push(c);
+				var c = formatChart(matches[i]);
+				chartDataArray.push(c);
 			}
 
 			// list to store match results on player profiles	
-			$scope.matches = []
-			//populating the list of past matches
+			$scope.matches = [];
+			// populating the list of past matches
 			for (var i = 0; i < matches.length; i++) {
-				// find scores of the games, to work out who won
-				var scores = matches[i].games_score.split("-")
-				// console.log(matches[i]);
-				var color = "red"
-				// if they won then make it green, else stays red
+				// find scores of the games to find match winner
+				var scores = matches[i].games_score.split("-");
+				// player win displays green name, red otherwise
+				var color = "red";
 				if (scores[0] > scores[1]) {
-					color = "green"
+					color = "green";
 				}
-				// add match outcome in the list and perhaps level change	
-				console.log(matches[i].games_score);	
+				// displays match opponent name and scare in list
 				$scope.matches[i] = {
 					name: matches[i].opponent,
 					score: matches[i].games_score,	
@@ -145,20 +125,25 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 					index: i
 				}
 			}
-			$scope.$apply()
-			$("#content3").show()
-			$("#loading3").hide()
 
+			// hide loading button and display content
+			$scope.$apply();
+			$("#content3").show();
+			$("#loading3").hide();
+
+			// on match button press load matchdata page
 			$scope.load = function(index) {
-				$rootScope.matchindex = index
-				$rootScope.matchId = $rootScope.tapped
-				$state.go('squashLevels.matchData')
+				$rootScope.matchindex = index;
+				$rootScope.matchId = $rootScope.tapped;
+				$state.go('squashLevels.matchData');
 			}	
 
+			// hide loading button show results tab and draw chart
 			$("#loading5").hide();
 			$("#results").show();
-			$("#tab-main").html(drawChart(chartdata));
+			$("#tab-main").html(drawChart(chartDataArray));
 		} else {
+			//throw error if poor data status
 			$("#loading5").hide();
 			$("#msg").html("Error - " + data.user_message);
 		}
