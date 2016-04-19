@@ -1,6 +1,6 @@
-# www/js/controllers/rankingsctrl.js
+# www/js/controllers/settingsctrl.js
 
-This file contains methods implementing behaviour on the rankings screen.
+This file contains methods implementing behaviour on the settings screen.
 
 ## Methods
 
