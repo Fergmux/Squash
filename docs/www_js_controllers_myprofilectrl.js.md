@@ -1,6 +1,6 @@
 # www/js/controllers/myprofilectrl.js
 
-This file contains methods implementing behaviour on the custom match screen.
+This file contains methods implementing behaviour on the my profile screen.
 
 ## Methods
 
