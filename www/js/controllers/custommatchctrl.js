@@ -10,13 +10,12 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 		// convert date to ISO
 		currentTime = currentTime.toISOString();
 		// convert date string to dattime input format
-		currentTime = currentTime.substring(0, 16)
+		currentTime = currentTime.substring(0, 16);
 		$("#dateInput").val(currentTime);
 	}
 
 	// initialise search string, playerid lookup and player arrays as empty
 	var searchString = "";
-	var playerIdLookup = [];
 
 	// record keypresses and store in searchString
 	$("#name1, #name2").keydown(function(e) {
@@ -29,7 +28,7 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 		else if(e.keyCode == 32) {
 			searchString = searchString + "+";
 		} 
-		// else concat char pressed to search_string
+		// else concat char pressed to searchString
 		else {
 			searchString = searchString + keypress;	
 		}
@@ -38,148 +37,66 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 	});
 
 
-	/* function to get url key */
+	// function to get url key using Richard's formula
 	function getKey() {
 		var time = new Date().getTime()/1000;
 		return Math.round(Math.sqrt(time * 100) - 100);
 	}
 
-	/* creates list of players for autocomplete and id lookup */
+	// creates list of players for autocomplete and id lookup
 	function createAutoList(data, id) {
-		var playersArray = []
+		var playersArray = [];
+		var playerIds = [];
 		data = $.parseJSON(data);
+		// loop through data and fill array (max 10)
 		for (var i = 0; i < data.data.length; i++) {
 			playersArray[i] = data.data[i].player;
-		}
-		console.log(playersArray)
-		$('#'+id).autocomplete({
-			source: playersArray,
-			minLength: 2,
-			delay: 1300
-		})
-
-	}
-
-	/* make array of ids for player id lookup */
-	function createPlayerIdArray(data) {
-		var playerIds = []
-		data = $.parseJSON(data);
-		for(var i = 0; i < data.data.length; i++) {
 			playerIds[i] = data.data[i].playerid;
 		}
-		playerIdLookup = playerIds;
+		// load autocomplete on either name input
+		id = '#' + id;
+		$(id).autocomplete({
+			source: playersArray,
+			minLength: 2,
+			delay: 1300,
+			// to ensure name selection is from autocompleye dropdown (no new names)
+			change: function (event, ui) {
+                if(!ui.item){
+                    $(id).val("");
+                }
+            }
+		})
 	}
 
-	/* loads list of players from squashlevels from input string */
-	function loadPlayerList(search_string, id) {
+	// loads list of players from squashlevels from input string
+	function loadPlayerList(searchString, id) {
 		var key = "&key=" + getKey();
-		var search = "&name=" + search_string;
+		var search = "&name=" + searchString;
 		var proxy = "https://cors-anywhere.herokuapp.com/";
-		var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
+		var requestUrl = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
-		console.log(request_url)
+		console.log(requestUrl)
 		var data = $.ajax({
-			url: request_url
+			url: requestUrl
 		}).done(function(){
 			createAutoList(data.responseText, id);
-			createPlayerIdArray(data.responseText);
 		}).fail(function(){
 			console.error("Ajax request failed!");
 		});
 	}
 
-	// array of players to be displayed in autocomplete
-	// var allplayers;
-
-	// // load player array for autocomplete
-	// function loadnames() {
-	// 	var key = getKey();
-	// 	var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
-	// 	k = "https://crossorigin.me/" + k + "&appid=SL2.0"
-	// 	var data = $.ajax({
- //            url: k
- //        }).done(function(){
- //            makePlayerArray(data.responseText)
- //        }).fail(function(){
-
- //        });
-	// }
-
-	// function makePlayerArray(data) {
-	// 	var players = []
-	// 	data = $.parseJSON(data);
-	// 	for (var x = 0; x < data.data.length; x++) {
-	// 		players[x] = data.data[x].player;
-	// 	}
-	// 	// localStorage["allplayers"] = JSON.stringify(players)
-	// 	allplayers = players
-	// }
-
-	/* creates list of players for autocomplete and id lookup */
-	// function createAutoList(data) {
-	// 	var playersArray = []
-	// 	data = $.parseJSON(data);
-	// 	for (var i = 0; i < data.data.length; i++) {
-	// 		playersArray[i] = data.data[i].player;
-	// 	}
-
-	// 	$("#char_press").autocomplete({
-	// 		source: playersArray,
-	// 		minLength: 2,
-	// 		delay: 1300
-	// 	})
-
-	// }
-
-	// /* make array of ids for player id lookup */
-	// function createPlayerIdArray(data) {
-	// 	var playerIds = []
-	// 	data = $.parseJSON(data);
-	// 	for(var i = 0; i < data.data.length; i++) {
-	// 		playerIds[i] = data.data[i].playerid;
-	// 	}
-	// 	playerIdLookup = playerIds;
-	// 	console.log(playerIdLookup);
-	// 	$("#loading1").hide();
-	// }
-
-	//  loads list of players from squashlevels from input string 
-	// function loadPlayerList(search_string) {
-	// 	var key = "&key=" + getKey();
-	// 	var search = "&name=" + search_string;
-	// 	var proxy = "https://cors-anywhere.herokuapp.com/";
-	// 	var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
-	// 	// make request to squashlevels find url
-	// 	var data = $.ajax({
-	// 		url: request_url
-	// 	}).done(function(){
-	// 		createAutoList(data.responseText);
-	// 		createPlayerIdArray(data.responseText);
-	// 	}).fail(function(){
-	// 		console.error("Ajax request failed!");
-	// 	});
-	// }
-
+	// array of who is winning each round
 	var rounds = [-1, -1, -1, -1, -1]
-	var scores = {
-		"1a": 0,
-		"1b": 0,
-		"2a": 0,
-		"2b": 0,
-		"3a": 0,
-		"3b": 0,
-		"4a": 0,
-		"4b": 0,
-		"5a": 0,
-		"5b": 0
-	}
+	// object of the scores of the rounds
+	var scores = {"1a": 0, "1b": 0, "2a": 0, "2b": 0, "3a": 0, "3b": 0, "4a": 0, "4b": 0, "5a": 0, "5b": 0}
 
-	// Score button callback
+	// when a score change button is pressed
 	$scope.scoreBtnCallback = function(btn, add) {
+		// change the score in the scores object
 		if (scores[btn] + add >= 0) {
 			scores[btn] = scores[btn] + add
 		}
-
+		// update input value
 		$("#" + btn).val(scores[btn])
 		checkScores();
 	}
@@ -195,14 +112,14 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 				rounds[i-1] = 1;
 			}
 		}
-
 		updateRounds();
 	}
 
+	// update the round scores based on who is winnning each round in the rounds array
 	function updateRounds() {
 		var totalA = 0;
 		var totalB = 0;
-
+		// if one player is winning a round, update their total
 		for (var i = 0; i < 5; i++) {
 			if (rounds[i] == 0) {
 				totalA++;
@@ -210,25 +127,14 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 				totalB++;
 			}
 		}
-
+		// put totals into the page
 		$("#rounds1").html(totalA);
 		$("#rounds2").html(totalB);
 	}
 
 	//when submit button is pressed
 	$scope.submitScores = function() {
-		// checkInputs();
-		checkNames();
-	}
-	function checkNames() {
-		// var players = $.parseJSON(localStorage["allplayers"])
-		var players = allplayers
-		// check players are already registered
-		if((($.inArray($("#name1").val(), players)) >= 0) && (($.inArray($("#name2").val(), players) >= 0))) {
-			clearPage()
-		} else {
-			popAlert("Players must already be registered")
-		}
+		clearPage();
 	}
 
 	//throws an alert taking in the text to be displayed as parameter
@@ -242,33 +148,31 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 
 	//clear the inputs on the page
 	function clearPage() {
-		$scope.scores = {}
-		score1 = [0, 0, 0, 0, 0]
-		score2 = [0, 0, 0, 0, 0]
+		// reset score object, rounds array and date/name inputs
+		scores = {};
+		rounds = [];
 		$("#dateInput").val("");
 		$(".nameInput").val("");
-		scores["1a"] = 0
-		$("#1a").html(scores["1a"])
-		scores["1b"] = 0
-		$("#1b").html(scores["1b"])
-		scores["2a"] = 0
-		$("#2a").html(scores["2a"])
-		scores["2b"] = 0
-		$("#2b").html(scores["2b"])
-		scores["3a"] = 0
-		$("#3a").html(scores["3a"])
-		scores["3b"] = 0
-		$("#3b").html(scores["3b"])
-		scores["4a"] = 0
-		$("#4a").html(scores["4a"])
-		scores["4b"] = 0
-		$("#4b").html(scores["4b"])
-		scores["5a"] = 0
-		$("#5a").html(scores["5a"])
-		scores["5b"] = 0
-		$("#5b").html(scores["5b"])
+		// loop through inputs and rest all their values
+		var inputs = ['1a','1b','2a','2b','3a','3b','4a','4b','5a','5b']
+		for (var x = 0; x < inputs.length; x++) {
+			var i = inputs[x];
+			var j = '#'+inputs[x];
+			scores[i] = 0;
+			$(j).html(scores[i]);
+		}
 		updateRounds();
 		setDateInput();
 		popAlert("Scores Submitted!");
 	}
 })
+
+
+
+
+
+
+
+
+
+

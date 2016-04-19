@@ -170,7 +170,7 @@ starter.controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicH
 
             $scope.load = function(index) {
                 $rootScope.matchindex = index;
-                        $rootScope.matchId = $.parseJSON(localStorage["userData"]).data.playerid;
+                $rootScope.matchId = $.parseJSON(localStorage["userData"]).data.playerid;
                 $state.go('squashLevels.matchData');
             }   
 

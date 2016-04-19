@@ -2,6 +2,7 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 
 	/* Load page when player link is tapped and make request to cache */
 	$scope.$on('$ionicView.enter', function() {
+		$("#msg").html();
 		var playerid = $rootScope.tapped
 		console.log(playerid)
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerid + "&show=last10&format=json", display, function() {
