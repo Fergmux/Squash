@@ -2,7 +2,7 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 
 	// get player id and make a request to the cache
 	$scope.$on('$ionicView.enter', function() {
-		var playerId = $rootScope.tapped
+		var playerId = $rootScope.tapped;
 		Cache.request("http://www.squashlevels.com/player_detail.php?player=" + playerId + "&show=last10&format=json", displayPlayerData, function() {
 			$("#msg").html("Error in AJAX request.");
 		})
@@ -29,7 +29,7 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 			data.addColumn('number', 'level');
 			// input players chart data as rows
 			for (var i = 0; i < chartData.length; i++) {
-				date = new Date(chartData[i][0] * 1000)
+				date = new Date(chartData[i][0] * 1000);
 				data.addRow([date, chartData[i][1]]);
 			}
 			// set chart options
@@ -85,18 +85,18 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 			if(stats.club_pos >= 0) {
 				$("#club_pos").html("Club Position: " + stats.club_pos);
 			} else {
-				$("#club_pos").html("Club Position: N/A")
+				$("#club_pos").html("Club Position: N/A");
 			}
 			// display county and country position
 			$("#county_pos").html("County Position: " + stats.county_pos);
 			$("#country_pos").html("Country Position: " + stats.country_pos);
 			// display games, matches, points which are won and lost
-			$("#m_won").html("Matches: <span class='green bold'>"+stats.matches_won+"<span>")
-			$("#g_won").html("Games: <span class='green bold'>"+stats.games_won+"<span>")
-			$("#p_won").html("Points: <span class='green bold'>"+stats.points_won+"<span>")
-			$("#m_lost").html("Matches: <span class='red bold'>"+stats.matches_lost+"<span>")
-			$("#g_lost").html("Games: <span class='red bold'>"+stats.games_lost+"<span>")
-			$("#p_lost").html("Points: <span class='red bold'>"+stats.points_lost+"<span>")
+			$("#m_won").html("Matches: <span class='green bold'>"+stats.matches_won+"<span>");
+			$("#g_won").html("Games: <span class='green bold'>"+stats.games_won+"<span>");
+			$("#p_won").html("Points: <span class='green bold'>"+stats.points_won+"<span>");
+			$("#m_lost").html("Matches: <span class='red bold'>"+stats.matches_lost+"<span>");
+			$("#g_lost").html("Games: <span class='red bold'>"+stats.games_lost+"<span>");
+			$("#p_lost").html("Points: <span class='red bold'>"+stats.points_lost+"<span>");
 			
 			// push data for matches and charts to respective functions
 			var matches = data.data.matches;
@@ -107,15 +107,15 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 			}
 
 			// list to store match results on player profiles	
-			$scope.matches = []
+			$scope.matches = [];
 			// populating the list of past matches
 			for (var i = 0; i < matches.length; i++) {
 				// find scores of the games to find match winner
-				var scores = matches[i].games_score.split("-")
+				var scores = matches[i].games_score.split("-");
 				// player win displays green name, red otherwise
-				var color = "red"
+				var color = "red";
 				if (scores[0] > scores[1]) {
-					color = "green"
+					color = "green";
 				}
 				// displays match opponent name and scare in list
 				$scope.matches[i] = {
@@ -127,15 +127,15 @@ starter.controller('playerProfilesCtrl', function($scope, $rootScope, $state) {
 			}
 
 			// hide loading button and display content
-			$scope.$apply()
-			$("#content3").show()
-			$("#loading3").hide()
+			$scope.$apply();
+			$("#content3").show();
+			$("#loading3").hide();
 
 			// on match button press load matchdata page
 			$scope.load = function(index) {
-				$rootScope.matchindex = index
-				$rootScope.matchId = $rootScope.tapped
-				$state.go('squashLevels.matchData')
+				$rootScope.matchindex = index;
+				$rootScope.matchId = $rootScope.tapped;
+				$state.go('squashLevels.matchData');
 			}	
 
 			// hide loading button show results tab and draw chart

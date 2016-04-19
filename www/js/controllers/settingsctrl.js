@@ -10,9 +10,9 @@ starter.controller('settingsCtrl', function($scope, $state, $ionicHistory, $root
 		// from start of time clear entire cache
 		Cache.clean(315360000000);
 		// return confirmation message
-		$("#message").html("Cache emptied")
+		$("#message").html("Cache emptied");
 		setTimeout(function() {
-			$("#message").empty()
+			$("#message").empty();
 		}, 3000);
 	}
 
@@ -21,6 +21,6 @@ starter.controller('settingsCtrl', function($scope, $state, $ionicHistory, $root
 		localStorage.removeItem("email");
 		localStorage.removeItem("password");
 		localStorage.removeItem("userData");
-		$state.go('squashLevels.login')
+		$state.go('squashLevels.login');
 	}
 })

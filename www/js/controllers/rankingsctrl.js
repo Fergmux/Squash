@@ -47,8 +47,8 @@ starter.controller('rankingsCtrl', function($scope, $rootScope, $state) {
 
 	// on list element tap go to player profile page
 	$scope.tapped = function(id) {
-		$rootScope.tapped = id
-		$state.go('squashLevels.playerProfiles')
+		$rootScope.tapped = id;
+		$state.go('squashLevels.playerProfiles');
 	}
 
 	// reset filters after being used
