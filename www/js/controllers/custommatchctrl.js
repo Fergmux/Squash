@@ -1,58 +1,164 @@
 starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 
-	//no. of rounds
-	// var rounds = 3;
-	//if the submission is for a doubles game
-	// var doubles = false
+	
 	setDateInput();
-	//set date input to current date/time
+	
+	// set date input to current date/time
 	function setDateInput() {
-		//get current date
+		// get current date
 		var currentTime = new Date();
-		//convert date to ISO
-		currentTime = currentTime.toISOString()
-		//convert date string to dattime input format
+		// convert date to ISO
+		currentTime = currentTime.toISOString();
+		// convert date string to dattime input format
 		currentTime = currentTime.substring(0, 16)
-		$("#dateInput").val(currentTime)
+		$("#dateInput").val(currentTime);
 	}
 
-	//autocomplet function
-	$(function() {
-		$(".nameInput").autocomplete({
-			// source: $parseJSON(localStorage["allplayers"]),
-			source: allplayers,
-			minLength: 3
-		});
+	// initialise search string, playerid lookup and player arrays as empty
+	var searchString = "";
+	var playerIdLookup = [];
+
+	// record keypresses and store in searchString
+	$("#name1, #name2").keydown(function(e) {
+		keypress = String.fromCharCode(e.keyCode);
+		// if backspace pressed remove last char
+		if(e.keyCode == 8) {
+			searchString = searchString.substring(0, searchString.length - 1);
+		} 
+		// if space pressed insert "+"
+		else if(e.keyCode == 32) {
+			searchString = searchString + "+";
+		} 
+		// else concat char pressed to search_string
+		else {
+			searchString = searchString + keypress;	
+		}
+		searchString = searchString.toLowerCase();
+		loadPlayerList(searchString, this.id);
 	});
 
-	var allplayers
 
-	function loadnames() {
-		// load player array for autocomplete
-		// work out key
-		var time = new Date().getTime()/1000
-		key = Math.round(Math.sqrt(time * 100) - 100)
-		console.log(key)
-		var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
-		k = "https://crossorigin.me/" + k + "&appid=SL2.0"
-		var data = $.ajax({
-            url: k
-        }).done(function(){
-            makePlayerArray(data.responseText)
-        }).fail(function(){
-
-        });
+	/* function to get url key */
+	function getKey() {
+		var time = new Date().getTime()/1000;
+		return Math.round(Math.sqrt(time * 100) - 100);
 	}
 
-	function makePlayerArray(data) {
-		var players = []
+	/* creates list of players for autocomplete and id lookup */
+	function createAutoList(data, id) {
+		var playersArray = []
 		data = $.parseJSON(data);
-		for (var x = 0; x < data.data.length; x++) {
-			players[x] = data.data[x].player;
+		for (var i = 0; i < data.data.length; i++) {
+			playersArray[i] = data.data[i].player;
 		}
-		// localStorage["allplayers"] = JSON.stringify(players)
-		allplayers = players
+		console.log(playersArray)
+		$('#'+id).autocomplete({
+			source: playersArray,
+			minLength: 2,
+			delay: 1300
+		})
+
 	}
+
+	/* make array of ids for player id lookup */
+	function createPlayerIdArray(data) {
+		var playerIds = []
+		data = $.parseJSON(data);
+		for(var i = 0; i < data.data.length; i++) {
+			playerIds[i] = data.data[i].playerid;
+		}
+		playerIdLookup = playerIds;
+	}
+
+	/* loads list of players from squashlevels from input string */
+	function loadPlayerList(search_string, id) {
+		var key = "&key=" + getKey();
+		var search = "&name=" + search_string;
+		var proxy = "https://cors-anywhere.herokuapp.com/";
+		var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
+		// make request to squashlevels find url
+		console.log(request_url)
+		var data = $.ajax({
+			url: request_url
+		}).done(function(){
+			createAutoList(data.responseText, id);
+			createPlayerIdArray(data.responseText);
+		}).fail(function(){
+			console.error("Ajax request failed!");
+		});
+	}
+
+	// array of players to be displayed in autocomplete
+	// var allplayers;
+
+	// // load player array for autocomplete
+	// function loadnames() {
+	// 	var key = getKey();
+	// 	var k = "http://www.squashlevels.com/players.php?&all=&key="+key+"&perpage=-1&format=json"
+	// 	k = "https://crossorigin.me/" + k + "&appid=SL2.0"
+	// 	var data = $.ajax({
+ //            url: k
+ //        }).done(function(){
+ //            makePlayerArray(data.responseText)
+ //        }).fail(function(){
+
+ //        });
+	// }
+
+	// function makePlayerArray(data) {
+	// 	var players = []
+	// 	data = $.parseJSON(data);
+	// 	for (var x = 0; x < data.data.length; x++) {
+	// 		players[x] = data.data[x].player;
+	// 	}
+	// 	// localStorage["allplayers"] = JSON.stringify(players)
+	// 	allplayers = players
+	// }
+
+	/* creates list of players for autocomplete and id lookup */
+	// function createAutoList(data) {
+	// 	var playersArray = []
+	// 	data = $.parseJSON(data);
+	// 	for (var i = 0; i < data.data.length; i++) {
+	// 		playersArray[i] = data.data[i].player;
+	// 	}
+
+	// 	$("#char_press").autocomplete({
+	// 		source: playersArray,
+	// 		minLength: 2,
+	// 		delay: 1300
+	// 	})
+
+	// }
+
+	// /* make array of ids for player id lookup */
+	// function createPlayerIdArray(data) {
+	// 	var playerIds = []
+	// 	data = $.parseJSON(data);
+	// 	for(var i = 0; i < data.data.length; i++) {
+	// 		playerIds[i] = data.data[i].playerid;
+	// 	}
+	// 	playerIdLookup = playerIds;
+	// 	console.log(playerIdLookup);
+	// 	$("#loading1").hide();
+	// }
+
+	//  loads list of players from squashlevels from input string 
+	// function loadPlayerList(search_string) {
+	// 	var key = "&key=" + getKey();
+	// 	var search = "&name=" + search_string;
+	// 	var proxy = "https://cors-anywhere.herokuapp.com/";
+	// 	var request_url = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
+	// 	// make request to squashlevels find url
+	// 	var data = $.ajax({
+	// 		url: request_url
+	// 	}).done(function(){
+	// 		createAutoList(data.responseText);
+	// 		createPlayerIdArray(data.responseText);
+	// 	}).fail(function(){
+	// 		console.error("Ajax request failed!");
+	// 	});
+	// }
 
 	var rounds = [-1, -1, -1, -1, -1]
 	var scores = {
