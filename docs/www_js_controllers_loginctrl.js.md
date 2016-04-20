@@ -10,12 +10,12 @@ Cache username and password and perform login request.
 
 **email**: String of login email.
 
-**pass**: String of login password.
+**pass**: MD5 string of login password.
 <hr>
 
 **`loadUserData(data)`**:
 
-Parse user profile JSON object,, cache it and go to `myProfile` screen.
+Parse user profile JSON object, cache it and go to `myProfile` screen.
 
 **data**: User profile JSON object.
 <hr>
