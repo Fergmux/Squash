@@ -14,7 +14,7 @@ Callback function to hide results, reload data and hide filters when search butt
 Callback function to toggle filters when filters button is pressed.
 <hr>
 
-**`displayRank(rank)`**:
+**`displayRankingList(rank)`**:
 
 Display ranking data as a list on the page.
 
