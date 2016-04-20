@@ -38,11 +38,11 @@ Given a SquashLevels JSON object containing a list of players, generate an array
 **data**: JSON string list of players such as that returned by request to `http://www.squashlevels.com/info.php?action=find&name=richard&format=json`.
 <hr>
 
-**`loadPlayerList(search_string, id)`**
+**`loadPlayerList(searchString, id)`**
 
-Load list of players from SquashLevels given the search string *search_string*. Calls `createAutoList()` to generate autocomplete data and `createPlayerIDArray()` to generate array of player IDs for lookup.
+Load list of players from SquashLevels given the search string *searchString*. Calls `createAutoList()` to generate autocomplete data and `createPlayerIDArray()` to generate array of player IDs for lookup.
 
-**search_string**: String containing search term.
+**searchString**: String containing search term.
 
 **id**: Player ID
 <hr>
