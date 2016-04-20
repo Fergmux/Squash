@@ -11,8 +11,6 @@ Request player data from SquashLevels if available, or from the Cache if availab
 **playerid**: Player ID.
 <hr>
 
-**date_int**: UNIX time in seconds.
-<hr>
 
 **`formatChart(match)`**
 
