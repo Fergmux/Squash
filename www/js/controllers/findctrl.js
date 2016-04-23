@@ -56,7 +56,8 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 	function loadPlayerList(searchString) {
 		var key = "&key=" + getKey();
 		var search = "&name=" + searchString;
-		var proxy = "http://localhost:8080/";
+		// var proxy = "http://localhost:8080/";
+		var proxy = "https://crossorigin.me/";
 		var requestUrl = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
 		var data = $.ajax({
