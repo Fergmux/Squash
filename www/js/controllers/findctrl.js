@@ -9,21 +9,11 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 	var playerIdLookup = [];
 
 	// record keypresses and store in searchString
-	$("#charpress").keydown(function(e) {
-		keypress = String.fromCharCode(e.keyCode);
-		// if backspace pressed remove last char
-		if(e.keyCode == 8) {
-			searchString = searchString.substring(0, searchString.length - 1);
-		} 
-		// if space pressed insert "+"
-		else if(e.keyCode == 32) {
-			searchString = searchString + "+";
-		} 
-		// else concat char pressed to searchString
-		else {
-			searchString = searchString + keypress;	
-		}
-		searchString = searchString.toLowerCase();
+	$("#charpress").keyup(function(e) {
+		var text = $("#charpress").val();
+		text =  text.replace(/ /g, '+');
+		var searchString = text.toLowerCase();
+		// console.log("searchstring -> " + searchString);
 		loadPlayerList(searchString);
 	});
 
@@ -36,7 +26,7 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 	var playerIds = [];
 	var playerNames = [];
 
-	// creates list of players for autocomplete and id lookup
+	// creates list of players for autcoomplete and id lookup
 	function createAutoList(data) {
 		data = $.parseJSON(data);
 		// fill playersArray with retrieved data (maximum 10)
@@ -44,11 +34,13 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 			playerIds[i] = data.data[i].playerid;
 			playerNames[i] = data.data[i].player;
 		}
+		console.log(playerNames);
+
 		// load autocomplete
 		$("#charpress").autocomplete({
-			source: playerNames,
-			minLength: 2,
-			delay: 1300
+			source: playerNames
+			// minLength: 2,
+			// delay: 1000
 		})
 	}
 
@@ -57,6 +49,7 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 		var key = "&key=" + getKey();
 		var search = "&name=" + searchString;
 		// var proxy = "http://localhost:8080/";
+		// var proxy = "";
 		var proxy = "https://crossorigin.me/";
 		var requestUrl = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
