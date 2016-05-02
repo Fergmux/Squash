@@ -34,12 +34,12 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 			playerIds[i] = data.data[i].playerid;
 			playerNames[i] = data.data[i].player;
 		}
-		console.log(playerNames);
+		// console.log(playerNames);
 
 		// load autocomplete
 		$("#charpress").autocomplete({
-			source: playerNames
-			// minLength: 2,
+			source: playerNames,
+			minLength: 2,
 			// delay: 1000
 		})
 	}
@@ -49,8 +49,8 @@ starter.controller('findCtrl', function($scope, $rootScope, $state) {
 		var key = "&key=" + getKey();
 		var search = "&name=" + searchString;
 		// var proxy = "http://localhost:8080/";
-		// var proxy = "";
-		var proxy = "https://crossorigin.me/";
+		var proxy = "";
+		// var proxy = "https://crossorigin.me/";
 		var requestUrl = proxy + "http://www.squashlevels.com/info.php?action=find" + search + "&format=json&appid=SL2.0" + key;  
 		// make request to squashlevels find url
 		var data = $.ajax({
