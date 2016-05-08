@@ -5,10 +5,11 @@ starter.controller('myProfileCtrl', function($scope, $rootScope, $state, $ionicH
 		var storedemail = $.parseJSON(localStorage.getItem("email"));
 		var storedpass = $.parseJSON(localStorage.getItem("password"));
 		// if no log in details found, go to log in page and disable back button, otherwise load user details
-		if (storedemail == undefined && storedpass == undefined) {
-			$ionicHistory.nextViewOptions({
-				disableBack: true
-			});
+		$ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+        if (storedemail == undefined && storedpass == undefined) {
+			
 			// go to login page 
 			$state.go('squashLevels.login');
 		} else {

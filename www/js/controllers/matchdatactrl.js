@@ -23,6 +23,7 @@ starter.controller('matchDataCtrl', function($scope, $rootScope) {
 		var index = $rootScope.matchindex;
 		var thisMatch = data.data.matches[index]; // get the data for this specific match
 		var playerName = data.data.summary.player;
+		console.log(playerName);
 
 		// calculate the date of the match
 		var matchDate = new Date(thisMatch.dateint * 1000);

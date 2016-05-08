@@ -18,7 +18,7 @@ starter.controller('customMatchCtrl', function($scope, $ionicPopup) {
 	var searchString = "";
 
 	// record keypresses and store in searchString
-	$("#name1, #name2").keydown(function(e) {
+	$("#name1, #name2").keyup(function(e) {
 		keypress = String.fromCharCode(e.keyCode);
 		// if backspace pressed remove last char
 		if(e.keyCode == 8) {
